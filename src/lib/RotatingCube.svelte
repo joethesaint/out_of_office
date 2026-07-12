@@ -3,8 +3,15 @@
   import * as THREE from 'three';
   import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
+  // 0..1 scroll progress: 0 = fully scrambled, 1 = solved. Leave unset
+  // (null) for the autonomous scramble/rest/solve/rest demo loop instead.
+  export let progress = null;
+
   let canvas;
   let container;
+
+  let liveProgress = progress;
+  $: liveProgress = progress;
 
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
@@ -177,6 +184,12 @@
     const disposableTextures = [plasticTexture];
     const disposableMaterials = [plasticMaterial];
 
+    const axisVectors = {
+      x: new THREE.Vector3(1, 0, 0),
+      y: new THREE.Vector3(0, 1, 0),
+      z: new THREE.Vector3(0, 0, 1),
+    };
+
     // approximate motion blur: each trail step re-evaluates the same twist
     // motion function at an earlier timestamp, no history buffer needed
     const TRAIL_STEPS = [
@@ -299,28 +312,65 @@
     ro.observe(container);
 
     // --- layer twists: real Rubik's-cube face turns ---
-    const axisVectors = {
-      x: new THREE.Vector3(1, 0, 0),
-      y: new THREE.Vector3(0, 1, 0),
-      z: new THREE.Vector3(0, 0, 1),
-    };
+    const scrollMode = liveProgress !== null;
+
     let twist = null;
-    let nextTwistAt = performance.now() + 500;
+    let nextTwistAt = scrollMode ? performance.now() : performance.now() + 500;
     const TWIST_MS = 420;
     const PAUSE_MS = 320;
-    const REST_MS = 1400; // pause once fully scrambled / fully solved
-
-    // scramble for SCRAMBLE_COUNT twists, then replay them inverted to solve
+    const REST_MS = 1400; // pause once fully scrambled / fully solved (autonomous mode only)
     const SCRAMBLE_COUNT = 14;
+
+    // autonomous-mode-only state: scramble for SCRAMBLE_COUNT twists, then
+    // replay them inverted to solve, on a timer, forever
     let phase = 'scramble';
     let history = [];
 
-    function beginTwist(now, axis, layer, dir) {
+    // scroll-mode-only state: a fixed scramble sequence generated once, then
+    // driven by how many of its moves are currently "applied" — 0 applied
+    // = solved, SCRAMBLE_COUNT applied = fully scrambled (progress 0)
+    const scrambleMoves = [];
+    let appliedCount = 0;
+    if (scrollMode) {
+      for (let i = 0; i < SCRAMBLE_COUNT; i++) {
+        scrambleMoves.push({
+          axis: AXES[(Math.random() * 3) | 0],
+          layer: ((Math.random() * 3) | 0) - 1,
+          dir: Math.random() < 0.5 ? 1 : -1,
+        });
+      }
+    }
+
+    function applyMoveInstant(axis, layer, dir) {
+      const axisVec = axisVectors[axis];
+      const q = new THREE.Quaternion().setFromAxisAngle(axisVec, dir * (Math.PI / 2));
+      for (const c of cubies) {
+        if (c[axis] !== layer) continue;
+        c.mesh.position.applyAxisAngle(axisVec, dir * (Math.PI / 2));
+        c.mesh.quaternion.premultiply(q);
+        const rotated = rotateGrid({ x: c.x, y: c.y, z: c.z }, axis, dir);
+        c.x = rotated.x;
+        c.y = rotated.y;
+        c.z = rotated.z;
+        c.mesh.position.set(c.x * UNIT, c.y * UNIT, c.z * UNIT);
+        c.mesh.quaternion.normalize();
+      }
+    }
+
+    if (scrollMode) {
+      // snap straight to the fully-scrambled starting state, no animation —
+      // the very first frame should already look chaotic at progress 0
+      for (const move of scrambleMoves) applyMoveInstant(move.axis, move.layer, move.dir);
+      appliedCount = SCRAMBLE_COUNT;
+    }
+
+    function beginTwist(now, axis, layer, dir, appliedDelta = 0) {
       const affected = cubies.filter((c) => c[axis] === layer);
       twist = {
         axis,
         dir,
         affected,
+        appliedDelta,
         startTime: now,
         initial: affected.map((c) => ({
           pos: c.mesh.position.clone(),
@@ -330,6 +380,20 @@
     }
 
     function queueNextTwist(now) {
+      if (scrollMode) {
+        const target = Math.max(0, Math.min(SCRAMBLE_COUNT, Math.round((1 - liveProgress) * SCRAMBLE_COUNT)));
+        if (target === appliedCount) return;
+        if (target < appliedCount) {
+          // scrolled further down: undo the most recently applied move
+          const move = scrambleMoves[appliedCount - 1];
+          beginTwist(now, move.axis, move.layer, -move.dir, -1);
+        } else {
+          // scrolled back up: re-apply the next move in the sequence
+          const move = scrambleMoves[appliedCount];
+          beginTwist(now, move.axis, move.layer, move.dir, 1);
+        }
+        return;
+      }
       if (phase === 'scramble') {
         if (history.length >= SCRAMBLE_COUNT) {
           phase = 'solve';
@@ -394,8 +458,14 @@
           c.mesh.quaternion.normalize();
           c.trail.forEach((ghost) => { ghost.mesh.visible = false; });
         }
-        twist = null;
-        nextTwistAt = now + PAUSE_MS;
+        if (scrollMode) {
+          appliedCount += twist.appliedDelta;
+          twist = null;
+          nextTwistAt = now; // no rest pause — chain straight into the next catch-up move
+        } else {
+          twist = null;
+          nextTwistAt = now + PAUSE_MS;
+        }
       }
     }
 
@@ -433,7 +503,7 @@
   });
 </script>
 
-<div class="cube-stage" bind:this={container}>
+<div class="cube-stage" class:allow-scroll={progress !== null} bind:this={container}>
   <canvas bind:this={canvas}></canvas>
 </div>
 
@@ -443,6 +513,11 @@
     height: 100%;
     touch-action: none;
     cursor: grab;
+  }
+  /* in scroll-driven mode, don't block vertical page scroll on touch —
+     drag-to-spin still works via pointer events, just not touch panning */
+  .cube-stage.allow-scroll {
+    touch-action: pan-y;
   }
   .cube-stage:active {
     cursor: grabbing;

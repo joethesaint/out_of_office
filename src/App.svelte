@@ -1,64 +1,117 @@
 <script>
+  import { onMount, onDestroy } from "svelte";
   import RotatingCube from "./lib/RotatingCube.svelte";
   import HeaderBar from "./lib/HeaderBar.svelte";
   import FooterBar from "./lib/FooterBar.svelte";
+
+  let scrollTrack;
+  let progress = 0;
+
+  function updateProgress() {
+    if (!scrollTrack) return;
+    const rect = scrollTrack.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    if (total <= 0) {
+      progress = 1;
+      return;
+    }
+    progress = Math.max(0, Math.min(1, -rect.top / total));
+  }
+
+  onMount(() => {
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+  });
+  onDestroy(() => {
+    window.removeEventListener("scroll", updateProgress);
+    window.removeEventListener("resize", updateProgress);
+  });
+
+  $: activated = progress >= 0.995;
 </script>
 
-<div class="stage-wrap">
-  <div class="grain"></div>
-  <main class="frame">
-    <HeaderBar />
+<div class="scroll-track" bind:this={scrollTrack}>
+  <div class="pinned">
+    <div class="stage-wrap">
+      <div class="grain"></div>
+      <main class="frame">
+        <HeaderBar />
 
-    <div class="hero">
-      <button class="icon-btn icon-heart" aria-label="Like">
-        <svg viewBox="0 0 24 24"
-          ><path
-            fill="#00bfff"
-            d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
-          /></svg
-        >
-      </button>
-      <button class="icon-btn icon-share" aria-label="Share">
-        <svg viewBox="0 0 24 24"
-          ><path
-            fill="none"
-            stroke="#181818"
-            stroke-width="2.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4 15c0-5 3-8 8-8m0 0V3l6 5-6 5V9"
-          /></svg
-        >
-      </button>
+        <div class="hero">
+          <button class="icon-btn icon-heart" aria-label="Like">
+            <svg viewBox="0 0 24 24"
+              ><path
+                fill="#00bfff"
+                d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
+              /></svg
+            >
+          </button>
+          <button class="icon-btn icon-share" aria-label="Share">
+            <svg viewBox="0 0 24 24"
+              ><path
+                fill="none"
+                stroke="#181818"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 15c0-5 3-8 8-8m0 0V3l6 5-6 5V9"
+              /></svg
+            >
+          </button>
 
-      <div class="headline">
-        <span class="eyebrow">Auto-reply for real life</span>
-        <div class="stack">
-          <span class="word">OUT OF</span>
-          <span class="word">OFFICE</span>
-          <div class="cube-slot">
-            <RotatingCube />
+          <div class="headline">
+            <span class="eyebrow">Auto-reply for real life</span>
+            <div class="stack">
+              <span class="word">OUT OF</span>
+              <span class="word">OFFICE</span>
+              <div class="cube-slot">
+                <RotatingCube {progress} />
+              </div>
+            </div>
+            <div class="subhead">
+              <span class="stamp">OOO 002</span>
+              <span class="venue">Tarkwa Bay · Apr 11</span>
+            </div>
+            <div class="tagline">
+              <span>Release. Unwind. Reconnect.</span>
+              <span class="sub">Auto replies enabled. Stress disabled.</span>
+            </div>
           </div>
         </div>
-        <div class="subhead">
-          <span class="stamp">OOO 002</span>
-          <span class="venue">Tarkwa Bay · Apr 11</span>
-        </div>
-        <div class="tagline">
-          <span>Release. Unwind. Reconnect.</span>
-          <span class="sub">Auto replies enabled. Stress disabled.</span>
-        </div>
-      </div>
-    </div>
 
-    <FooterBar />
-  </main>
+        <FooterBar />
+      </main>
+    </div>
+  </div>
 </div>
 
+<section class="activated" class:visible={activated}>
+  <p class="activated-eyebrow">Status update</p>
+  <h2 class="activated-title">Out of Office Activated</h2>
+  <p class="activated-sub">You've found a little order and peace.</p>
+</section>
+
 <style>
+  .scroll-track {
+    position: relative;
+    height: 220vh;
+  }
+
+  .pinned {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
   .stage-wrap {
     position: relative;
-    min-height: 100vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -211,5 +264,44 @@
     top: 52%;
     left: 78%;
     transform: translate(-50%, -50%);
+  }
+
+  .activated {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-align: center;
+    padding: 2rem;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .activated.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .activated-eyebrow {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .activated-title {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2rem, 7vw, 3.2rem);
+    color: var(--blue);
+  }
+  .activated-sub {
+    margin: 0;
+    font-family: var(--sans);
+    color: var(--ink);
   }
 </style>

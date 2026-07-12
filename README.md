@@ -112,24 +112,25 @@ are known/licensed, so use close free equivalents:
 Of the five cube concepts discussed, **Concept 1 — the cube solves itself
 as you scroll** is the chosen direction: the cube starts fully scrambled
 (representing Lagos-life chaos/complexity), and as the user scrolls down
-the page, notifications/traffic-sound UI fades away and the cube
-progressively un-scrambles. At full scroll, one face reads solved and
-"OUT OF OFFICE ACTIVATED" reveals — the moment of disconnecting.
+the page, the cube progressively un-scrambles. At full scroll, "Out of
+Office Activated" reveals — the moment of disconnecting.
 
-**Not implemented yet.** The current cube still runs its own autonomous,
-time-based scramble → rest → solve → rest loop (see
-[Implementation notes](#implementation-notes)) — this round of work only
-recolored it to the brand palette. Wiring it to scroll instead of time is
-future work; the mechanism would be:
-- Replace `nextTwistAt`/time-driven `queueNextTwist` with a **scroll
-  progress value** (0 = top of page/fully scrambled, 1 = bottom/solved).
-- Pre-generate the scramble move list once (as today), then instead of
-  playing moves on a timer, map scroll progress directly to "how many moves
-  into the solve sequence" — i.e. drive `t` in `updateTwist` from scroll
-  delta instead of `performance.now()`.
-- This requires an actual scrollable page (the current `App.svelte` is a
-  single fixed viewport) — out of scope until the multi-section site scope
-  is picked up.
+**Implemented.** `RotatingCube.svelte` accepts an optional `progress` prop
+(0 = fully scrambled, 1 = solved); when set, it replaces the autonomous
+timer loop entirely. `App.svelte` wraps the hero in a `position: sticky`
+container inside a tall (`220vh`) scroll track, computes `progress` from
+how far the user has scrolled through that track, and reveals an "Out of
+Office Activated" section once `progress >= 0.995`. See
+[Implementation notes](#implementation-notes) for the mechanism (fixed
+scramble sequence generated once, applied instantly at mount, then
+un-applied one move at a time to "catch up" to the scroll position) and a
+note on the one real bug this surfaced (a 3-line wordmark split that
+visually duplicated "OF").
+
+Not done: the notification/traffic-sound fade-out UI mentioned in the
+original concept, and a graceful re-scramble if the user scrolls back up
+past the top (currently it just re-applies scramble moves forward, which
+works but isn't dramatized).
 
 ## Legacy: Pinterest cube prototype
 
@@ -378,6 +379,34 @@ How the brand look is built:
   (where angular speed is highest under the ease curve) and fades out near
   the start/end of the move, and all ghosts are hidden (`visible = false`)
   the instant a twist completes, so there's zero render cost while idle.
+- **Scroll-driven solving**: passing a `progress` prop (0..1) switches the
+  cube from its autonomous timer loop to scroll-driven mode. A fixed
+  14-move scramble sequence (`scrambleMoves`) is generated once and applied
+  **instantly** at mount via `applyMoveInstant` (direct position/quaternion
+  math, no animation — important so the very first rendered frame already
+  looks scrambled at `progress = 0`, with no visible "un-scramble then
+  re-scramble" flash). From there, `queueNextTwist` compares a `target`
+  move-count (derived from `progress`) against `appliedCount` and animates
+  one move at a time toward it — undoing the most recent move if scrolling
+  down, re-applying the next one if scrolling back up — chaining
+  immediately (`nextTwistAt = now`, no `PAUSE_MS` gap) so it catches up to
+  fast scrolling as quickly as the twist animation allows. Verified via a
+  debug hook (temporarily exposing `window.__cubeDebug`, removed before
+  shipping) that `appliedCount` reaches exactly 0 and stays there — the
+  "solved" state is a coherent checkerboard-plus-decal per face, **not** a
+  solid color, since that's the cube's identity/at-rest texture assignment
+  either way (same as autonomous mode's solved state).
+- On the `App.svelte` side: `.scroll-track` (`height: 220vh`) provides the
+  scroll distance, `.pinned` (`position: sticky; top: 0`) holds the hero in
+  place while it's consumed, and `progress` is computed from
+  `scrollTrack.getBoundingClientRect()` on every `scroll`/`resize` event.
+  Because the pinned range is shorter than the full page, `progress` (and
+  therefore the "solved" moment) is reached well before the page finishes
+  scrolling — the `.activated` section's own reveal timing lines up with
+  when the sticky pin naturally releases, not with total page scroll.
+- `.cube-stage`'s `touch-action` switches from `none` to `pan-y` when
+  `progress` is set, so touch scrolling isn't blocked by the cube's drag
+  handler on mobile.
 
 Other implementation details for whoever extends this:
 - `UNIT` / `CUBIE` constants control cubie spacing/size (gap = UNIT - CUBIE);
@@ -423,9 +452,13 @@ sandboxed headless one, before concluding fonts are broken.)
 - [x] Responsive layout: centered phone-frame card on wide viewports, true
       full-bleed single viewport under 480px width (kept from the
       Pinterest-spec build).
-- [ ] Wire the cube's scramble/solve to scroll progress instead of an
-      autonomous timer — see [Cube narrative](#cube-narrative) for the plan.
-      Needs an actual scrollable page first.
+- [x] Wire the cube's scramble/solve to scroll progress instead of an
+      autonomous timer — see [Cube narrative](#cube-narrative) and
+      [Implementation notes](#implementation-notes) for how it works. The
+      hero is now pinned (`position: sticky`) over a tall scroll track;
+      scrolling through it drives the cube from fully scrambled (top) to
+      solved (bottom), revealing an "Out of Office Activated" section
+      once solved.
 - [ ] Boot/auto-reply loading sequence ("Sending auto-reply… ✓ Emails
       muted… ✓ Notifications paused… Redirecting to Out of Office…") before
       the hero, fading into ocean ambience.
