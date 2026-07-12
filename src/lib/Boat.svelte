@@ -1,3 +1,7 @@
+<script>
+  export let progress = 0;
+</script>
+
 <div class="boat-track" aria-hidden="true">
   <div class="boat-travel">
     <div class="boat-rig">

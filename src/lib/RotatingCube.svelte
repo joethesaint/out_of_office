@@ -322,6 +322,11 @@
         lastY = e.clientY;
       }
     }
+    // separate from lastX/lastY, which onPointerMove overwrites every frame
+    // while dragging — comparing against those in onPointerUp would always
+    // read as "no movement" regardless of the actual drag distance
+    let downX = 0;
+    let downY = 0;
     function onPointerDown(e) {
       wakeUp();
       dragging = true;
@@ -329,6 +334,8 @@
       dragStartY = e.clientY;
       lastX = e.clientX;
       lastY = e.clientY;
+      downX = e.clientX;
+      downY = e.clientY;
     }
     function onPointerUp(e) {
       dragging = false;

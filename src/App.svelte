@@ -11,6 +11,8 @@
   import Playlist from "./lib/Playlist.svelte";
   import Tickets from "./lib/Tickets.svelte";
   import DanfoBus from "./lib/DanfoBus.svelte";
+  import ZineDecorations from "./lib/ZineDecorations.svelte";
+  import ScrollReveal from "./lib/ScrollReveal.svelte";
   import Boat from "./lib/Boat.svelte";
   import ChaosLayer from "./lib/ChaosLayer.svelte";
 
@@ -58,13 +60,15 @@
   <div class="pinned">
     <div class="stage-wrap">
       <div class="grain"></div>
+      <!-- Chaos Layer chat bubbles outside of the main postcard card to frame the digital noise around our escape -->
+      <ChaosLayer {progress} />
       <main class="frame">
         <HeaderBar />
+        <ZineDecorations />
 
         <div class="hero">
           <DanfoBus />
           <Boat />
-          <ChaosLayer {progress} />
 
           <button class="icon-btn icon-heart" aria-label="Like">
             <svg viewBox="0 0 24 24"
@@ -73,6 +77,11 @@
                 d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
               /></svg
             >
+            {#if progress < 0.99}
+              <div class="notification-badge">
+                {Math.ceil(999 * Math.pow(1 - progress, 3)) || 1}{#if progress === 0}+{/if}
+              </div>
+            {/if}
           </button>
           <button class="icon-btn icon-share" aria-label="Share">
             <svg viewBox="0 0 24 24"
@@ -142,6 +151,7 @@
               <RotatingCube {progress} />
             </div>
           </div>
+          <Boat {progress} />
         </div>
 
         <FooterBar />
@@ -156,17 +166,17 @@
   <p class="activated-sub">You've found a little order and peace.</p>
 </section>
 
-<Postcard />
-<EscapeMetrics />
-<Community />
-<MemoryTimeline />
-<Playlist />
-<Tickets />
+<ScrollReveal><Postcard /></ScrollReveal>
+<ScrollReveal><EscapeMetrics /></ScrollReveal>
+<ScrollReveal><Community /></ScrollReveal>
+<ScrollReveal><MemoryTimeline /></ScrollReveal>
+<ScrollReveal><Playlist /></ScrollReveal>
+<ScrollReveal><Tickets /></ScrollReveal>
 
 <style>
   .scroll-track {
     position: relative;
-    height: 220vh;
+    height: 150vh;
   }
 
   .pinned {
@@ -201,28 +211,18 @@
 
   .frame {
     position: relative;
-    width: min(94vw, 900px);
-    aspect-ratio: 16 / 9;
-    max-height: 92vh;
+    width: 100%;
+    height: 100%;
     background: var(--bg);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.16);
   }
 
   @media (max-width: 700px) {
     .stage-wrap {
       padding: 0;
-    }
-    .frame {
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      border-radius: 0;
-      box-shadow: none;
     }
     .hero-row {
       flex-direction: column;
@@ -277,6 +277,22 @@
   }
   .icon-share {
     right: clamp(0.75rem, 4vw, 1.5rem);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #ff3b30;
+    color: white;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.6rem;
+    padding: 0.2em 0.5em;
+    border-radius: 99px;
+    border: 2px solid var(--bg);
+    line-height: 1;
+    pointer-events: none;
   }
 
   .headline {
@@ -429,7 +445,7 @@
   }
 
   .activated {
-    min-height: 100vh;
+    min-height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;

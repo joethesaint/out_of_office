@@ -68,12 +68,12 @@
 
 <style>
   .chaos-layer {
-    position: absolute;
+    position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 1;
+    z-index: 100;
     transition: opacity 0.1s linear, transform 0.1s linear, filter 0.1s linear;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .popup-card {
