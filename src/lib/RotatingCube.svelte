@@ -17,16 +17,11 @@
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
   // Out of Office brand palette, sampled from the real event flyers (see
-  // README "Brand identity: Out of Office (Lagos)"). Blue tiles blend
-  // sky-blue -> brand blue -> deep pink across each tile (a little Lagos
-  // sunset, not just flat blue); cream tiles warm into a dusty pink-cream
-  // in shadow, so the pink accent from the flyers' paint splats ties the
-  // whole cube together instead of living only in the wordmark.
-  const LIGHT_BLUE = '#6adcff';
+  // README "Brand identity: Out of Office (Lagos)"). Flat solid tiles, no
+  // gradient — the pink accent ties in through the decal color instead of
+  // being baked into the tile fill.
   const MID_BLUE = '#00bfff';
-  const DEEP_PINK = '#e0568f';
   const LIGHT_CREAM = '#f6f4f1';
-  const DEEP_CREAM_PINK = '#e9c7d6';
   const SEAM = '#f6f4f1'; // bright paper-cream seam, not dark plastic
 
   const AXES = ['x', 'y', 'z'];
@@ -112,18 +107,7 @@
     const isBlue = (i + j) % 2 === 0;
     const inset = TILE * 0.05;
     const r = TILE * 0.15;
-    const grad = ctx.createLinearGradient(0, 0, ATLAS, ATLAS);
-    if (isBlue) {
-      // sky blue -> brand blue -> deep pink: a little Lagos sunset in
-      // every tile, so pink isn't confined to the wordmark/decals
-      grad.addColorStop(0, LIGHT_BLUE);
-      grad.addColorStop(0.55, MID_BLUE);
-      grad.addColorStop(1, DEEP_PINK);
-    } else {
-      grad.addColorStop(0, LIGHT_CREAM);
-      grad.addColorStop(1, DEEP_CREAM_PINK);
-    }
-    ctx.fillStyle = grad;
+    ctx.fillStyle = isBlue ? MID_BLUE : LIGHT_CREAM;
     roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
     ctx.fill();
 
@@ -181,10 +165,12 @@
     const plasticTexture = makePlasticTexture();
     const plasticMaterial = new THREE.MeshPhysicalMaterial({
       map: plasticTexture,
+      transparent: true,
+      opacity: 0.9,
       roughness: 0.3,
       clearcoat: 0.4,
       clearcoatRoughness: 0.2,
-      metalness: 0.03,
+      metalness: 0,
     });
     const geometry = new RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 3, CUBIE * 0.12);
 
@@ -215,10 +201,12 @@
       disposableTextures.push(texture);
       const material = new THREE.MeshPhysicalMaterial({
         map: texture,
+        transparent: true,
+        opacity: 0.86,
         roughness: 0.22,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.15,
-        metalness: 0.03,
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.2,
+        metalness: 0,
       });
       disposableMaterials.push(material);
       return material;
