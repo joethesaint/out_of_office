@@ -1,12 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700;800&display=swap");
+/* Fonts are loaded via <link> in index.html (Fredoka, Space Grotesk) */
 
 :root {
-  --bg: #eae9e6;
-  --ink: #111111;
-  --pink: #e85d75;
-  --cream: #f5f0eb;
-  --display: "Archivo Black", "Inter", sans-serif;
-  --sans: "Inter", system-ui, sans-serif;
+  --bg: #f6f4f1;
+  --ink: #181818;
+  --blue: #00bfff;
+  --accent: #08cabd;
+  --cream: #f6f4f1;
+  --display: "Fredoka", system-ui, sans-serif;
+  --sans: "Space Grotesk", system-ui, sans-serif;
 }
 
 * {

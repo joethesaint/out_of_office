@@ -5,6 +5,7 @@
 </script>
 
 <div class="stage-wrap">
+  <div class="grain"></div>
   <main class="frame">
     <HeaderBar />
 
@@ -12,7 +13,7 @@
       <button class="icon-btn icon-heart" aria-label="Like">
         <svg viewBox="0 0 24 24"
           ><path
-            fill="#e85d75"
+            fill="#00bfff"
             d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
           /></svg
         >
@@ -21,7 +22,7 @@
         <svg viewBox="0 0 24 24"
           ><path
             fill="none"
-            stroke="#111"
+            stroke="#181818"
             stroke-width="2.2"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -31,22 +32,21 @@
       </button>
 
       <div class="headline">
-        <span class="eyebrow">CHINESE VALENTINE'S DAY</span>
+        <span class="eyebrow">Auto-reply for real life</span>
         <div class="stack">
-          <span class="word">CRUSH</span>
-          <span class="word">ON</span>
-          <span class="word">BOW</span>
+          <span class="word">OUT OF</span>
+          <span class="word">OFFICE</span>
           <div class="cube-slot">
             <RotatingCube />
           </div>
         </div>
         <div class="subhead">
-          <span class="year">2020</span>
-          <span class="soon">COMING SOON</span>
+          <span class="stamp">OOO 002</span>
+          <span class="venue">Tarkwa Bay · Apr 11</span>
         </div>
         <div class="tagline">
-          <span>LOVE IS SUPREME, PLAYERS GATHER</span>
-          <span class="cn">热爱至上 玩家集结</span>
+          <span>Release. Unwind. Reconnect.</span>
+          <span class="sub">Auto replies enabled. Stress disabled.</span>
         </div>
       </div>
     </div>
@@ -57,14 +57,26 @@
 
 <style>
   .stage-wrap {
+    position: relative;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
+    overflow: hidden;
+  }
+
+  .grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   .frame {
+    position: relative;
     width: min(100%, 480px);
     aspect-ratio: 9 / 16;
     max-height: 100vh;
@@ -72,10 +84,9 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: relative;
     overflow: hidden;
     border-radius: 20px;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.16);
   }
 
   @media (max-width: 480px) {
@@ -131,67 +142,74 @@
 
   .eyebrow {
     font-family: var(--sans);
-    font-weight: 800;
+    font-weight: 600;
     font-size: clamp(0.6rem, 1.8vw, 0.8rem);
-    letter-spacing: 0.06em;
-    color: var(--pink);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
   }
 
   .stack {
     position: relative;
     display: flex;
     flex-direction: column;
-    line-height: 0.92;
+    line-height: 0.95;
   }
   .stack .word {
     font-family: var(--display);
+    font-weight: 700;
     font-size: clamp(2.6rem, 12vw, 4.2rem);
-    color: var(--ink);
+    color: var(--blue);
     letter-spacing: -0.01em;
   }
 
   .subhead {
     display: flex;
     align-items: baseline;
-    gap: 0.5rem;
+    gap: 0.6rem;
   }
-  .subhead .year {
+  .subhead .stamp {
     font-family: var(--display);
-    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+    font-weight: 700;
+    font-size: clamp(1rem, 4vw, 1.4rem);
     color: var(--ink);
   }
-  .subhead .soon {
+  .subhead .venue {
     font-family: var(--sans);
-    font-weight: 600;
+    font-weight: 500;
     font-size: clamp(0.75rem, 3vw, 1rem);
-    color: #4a4a4a;
+    color: #5a5a5a;
   }
 
   .tagline {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    gap: 0.25rem;
     font-family: var(--sans);
-    font-weight: 700;
-    font-size: clamp(0.5rem, 1.6vw, 0.65rem);
-    color: #4a4a4a;
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    color: var(--ink);
   }
-  .tagline .cn {
-    letter-spacing: 0.15em;
+  .tagline .sub {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: clamp(0.5rem, 1.6vw, 0.65rem);
+    font-weight: 600;
+    color: #6b6b6b;
   }
 
   .cube-slot {
     position: absolute;
     z-index: 2;
     pointer-events: auto;
-    width: clamp(180px, 48vw, 260px);
-    height: clamp(180px, 48vw, 260px);
-    /* anchored on the ON / BOW boundary (2nd of 3 stacked lines) so it
-       overlaps ON above and BOW below, per the source design spec */
-    top: 63%;
-    left: 62%;
+    width: clamp(140px, 36vw, 190px);
+    height: clamp(140px, 36vw, 190px);
+    /* sits in the gap between "OUT OF" and "OFFICE", biased right so it
+       covers the tail of each line rather than obscuring either word's
+       first letters — same overlap idea as the original CRUSH/ON/BOW
+       build, tuned down since "OUT OF OFFICE" reads badly if truncated
+       at the start (looks like a typo, "OF"/"OF...") */
+    top: 52%;
+    left: 78%;
     transform: translate(-50%, -50%);
   }
 </style>

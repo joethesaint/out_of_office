@@ -5,28 +5,28 @@
   <div class="row">
     <div class="block block-left">
       <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M18 6 6 18M6 18h9M6 18V9" fill="none" stroke="#e85d75" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M18 6 6 18M6 18h9M6 18V9" fill="none" stroke="#00bfff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <div class="lines">
-        <span class="line">SURPRISE MAKER</span>
-        <span class="line">PARTY</span>
+        <span class="line">AUTO REPLY</span>
+        <span class="line">ENABLED</span>
       </div>
     </div>
 
     <div class="block block-right">
-      <div class="cn-lines">
-        <span class="cn">苏绝场</span>
-        <span class="en">SUZHOU</span>
+      <div class="meta-lines">
+        <span class="place">LAGOS</span>
+        <span class="en">NIGERIA</span>
       </div>
       <svg class="diamond" viewBox="0 0 20 20" aria-hidden="true">
-        <path d="M10 1 18 7l-8 12L2 7z" fill="none" stroke="#e85d75" stroke-width="1.3" />
-        <path d="M10 1 18 7H2z" fill="none" stroke="#e85d75" stroke-width="1" />
-        <path d="M6.5 7 10 19M13.5 7 10 19" fill="none" stroke="#e85d75" stroke-width="0.8" />
+        <path d="M10 1 18 7l-8 12L2 7z" fill="none" stroke="#08cabd" stroke-width="1.3" />
+        <path d="M10 1 18 7H2z" fill="none" stroke="#08cabd" stroke-width="1" />
+        <path d="M6.5 7 10 19M13.5 7 10 19" fill="none" stroke="#08cabd" stroke-width="0.8" />
       </svg>
     </div>
   </div>
 
-  <p class="fine-print">SHOWING THE MARKED DEPARTURE FROM PREVIOUS EXPERIENCE</p>
+  <p class="fine-print">LEAVING YELLOW LAGOS. ENTERING BLUE LAGOS.</p>
 </footer>
 
 <style>
@@ -59,6 +59,7 @@
     display: flex;
     flex-direction: column;
     font-family: var(--display);
+    font-weight: 600;
     line-height: 1.05;
   }
   .lines .line {
@@ -70,20 +71,21 @@
     align-items: center;
     gap: 0.5rem;
   }
-  .cn-lines {
+  .meta-lines {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     line-height: 1.1;
   }
-  .cn-lines .cn {
-    color: var(--pink);
-    font-weight: 700;
+  .meta-lines .place {
+    color: var(--accent);
+    font-family: var(--display);
+    font-weight: 600;
     font-size: clamp(0.6rem, 1.5vw, 0.8rem);
   }
-  .cn-lines .en {
+  .meta-lines .en {
     font-family: var(--sans);
-    font-weight: 700;
+    font-weight: 500;
     font-size: clamp(0.45rem, 1.1vw, 0.6rem);
     letter-spacing: 0.08em;
     color: #6b6b6b;
@@ -100,6 +102,7 @@
     font-family: var(--sans);
     font-size: clamp(0.35rem, 0.9vw, 0.5rem);
     letter-spacing: 0.15em;
+    text-transform: uppercase;
     color: #8a8a8a;
   }
 </style>

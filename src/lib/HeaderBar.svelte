@@ -3,25 +3,25 @@
 
 <header class="bar">
   <div class="block block-brand">
-    <span class="line">CRUSH ON</span>
-    <span class="line">BOW</span>
+    <span class="line">STATUS:</span>
+    <span class="line">AWAY</span>
   </div>
 
   <div class="block block-trend">
-    <span class="tag">NEW TREND</span>
-    <span class="butterfly">BUTTERFLY</span>
-    <span class="sub">ORIGINAL WILD</span>
+    <span class="tag">NOW ACTIVE</span>
+    <span class="word">ESCAPE</span>
+    <span class="sub">LAGOS TO TARKWA</span>
   </div>
 
   <div class="block block-logo">
-    <svg class="bow-mark" viewBox="0 0 32 20" aria-hidden="true">
-      <path d="M14 10 3 3v14z" fill="#e85d75" />
-      <path d="M18 10 29 3v14z" fill="#e85d75" />
-      <circle cx="16" cy="10" r="3.2" fill="#fff" stroke="#e85d75" stroke-width="1.4" />
+    <svg class="ooo-mark" viewBox="0 0 32 20" aria-hidden="true">
+      <circle cx="8" cy="10" r="6.5" fill="none" stroke="#00bfff" stroke-width="1.6" />
+      <circle cx="16" cy="10" r="6.5" fill="none" stroke="#08cabd" stroke-width="1.6" />
+      <circle cx="24" cy="10" r="6.5" fill="none" stroke="#181818" stroke-width="1.6" />
     </svg>
     <div class="wordmark-col">
-      <span class="wordmark">bow</span>
-      <span class="cn">蝴蝶结原创</span>
+      <span class="wordmark">ooo</span>
+      <span class="meta">Lagos</span>
     </div>
   </div>
 </header>
@@ -65,17 +65,17 @@
   }
   .block-trend .tag {
     font-family: var(--sans);
-    font-weight: 800;
+    font-weight: 700;
     font-size: clamp(0.45rem, 1.1vw, 0.6rem);
-    color: var(--pink);
+    color: var(--blue);
     letter-spacing: 0.08em;
   }
-  .block-trend .butterfly {
+  .block-trend .word {
     font-size: clamp(0.85rem, 2.4vw, 1.3rem);
   }
   .block-trend .sub {
     font-family: var(--sans);
-    font-weight: 700;
+    font-weight: 600;
     font-size: clamp(0.4rem, 1vw, 0.55rem);
     letter-spacing: 0.12em;
     color: #cfcfcf;
@@ -88,7 +88,7 @@
     align-items: center;
     gap: 0.4rem;
   }
-  .bow-mark {
+  .ooo-mark {
     width: clamp(20px, 4vw, 28px);
     height: auto;
     flex: none;
@@ -104,7 +104,7 @@
     font-size: clamp(0.9rem, 2.2vw, 1.2rem);
     text-transform: lowercase;
   }
-  .cn {
+  .meta {
     font-family: var(--sans);
     font-size: clamp(0.4rem, 0.9vw, 0.5rem);
     color: #6b6b6b;
