@@ -12,7 +12,7 @@
   :global(html, body) {
     margin: 0;
     height: 100%;
-    background: #111114;
+    background: #e4e4e4;
   }
   main {
     height: 100vh;

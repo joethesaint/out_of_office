@@ -6,34 +6,119 @@
   let container;
 
   const UNIT = 0.72; // spacing between cubie centers
-  const CUBIE = 0.66; // cubie edge length (< UNIT leaves a visible gap)
-  const PLASTIC = '#141416';
+  const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
-  // classic six-color scheme, one per world-facing direction
-  const STICKER = {
-    px: '#e85d75', // right — pink
-    nx: '#f5f0eb', // left — off-white
-    py: '#f2c14e', // up — gold
-    ny: '#2b2b2b', // down — charcoal
-    pz: '#3fb8af', // front — teal
-    nz: '#8f6fd8', // back — violet
-  };
+  // colors sampled from the source video's frames (see README "Matching the
+  // source cube's look") — one pink hue running light -> deep, plus white
+  const LIGHT_PINK = '#f7a6d0';
+  const DEEP_PINK = '#c4467b';
+  const LIGHT_WHITE = '#ffffff';
+  const DEEP_WHITE = '#e9dee3';
+  const SEAM = '#f4eef1'; // bright/light seam, not dark plastic
 
   const AXES = ['x', 'y', 'z'];
 
-  function makeStickerTexture(color) {
-    const size = 256;
-    const el = document.createElement('canvas');
-    el.width = el.height = size;
-    const ctx = el.getContext('2d');
-    ctx.fillStyle = PLASTIC;
-    ctx.fillRect(0, 0, size, size);
-    const inset = size * 0.09;
-    const r = size * 0.14;
-    const w = size - inset * 2;
+  // which two grid axes tile a given face, and which brand glyph rides on it
+  const FACE_AXES = {
+    px: { u: 'z', v: 'y', decal: 'heart' },
+    nx: { u: 'z', v: 'y', decal: 'heart' },
+    py: { u: 'x', v: 'z', decal: 'ring' },
+    ny: { u: 'x', v: 'z', decal: 'ring' },
+    pz: { u: 'x', v: 'y', decal: 'bowtie' },
+    nz: { u: 'x', v: 'y', decal: 'bowtie' },
+  };
+
+  const ATLAS = 660; // conceptual size of a whole 3x3 face, in texture pixels
+  const TILE = ATLAS / 3; // one sticker's texture size
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // big brand-glyph decals, drawn in whole-face ("atlas") coordinates so
+  // they read as one continuous shape spanning multiple stickers
+  function drawHeart(ctx, atlas, color) {
+    const cx = atlas / 2, cy = atlas / 2, s = atlas * 0.16;
     ctx.fillStyle = color;
-    roundRect(ctx, inset, inset, w, w, r);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + s * 2.3);
+    ctx.bezierCurveTo(cx - s * 3.2, cy + s * 0.4, cx - s * 1.8, cy - s * 2, cx, cy - s * 0.6);
+    ctx.bezierCurveTo(cx + s * 1.8, cy - s * 2, cx + s * 3.2, cy + s * 0.4, cx, cy + s * 2.3);
+    ctx.closePath();
     ctx.fill();
+  }
+
+  function drawRing(ctx, atlas, color) {
+    const cx = atlas / 2, cy = atlas / 2, r = atlas * 0.3;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = atlas * 0.075;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawBowtie(ctx, atlas, color) {
+    const cx = atlas / 2, cy = atlas / 2, w = atlas * 0.34, h = atlas * 0.26;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx - w, cy - h);
+    ctx.lineTo(cx - w, cy + h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + w, cy - h);
+    ctx.lineTo(cx + w, cy + h);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  const DECALS = { heart: drawHeart, ring: drawRing, bowtie: drawBowtie };
+
+  // one sticker texture for tile (i, j) of a 3x3 face. Drawing happens in
+  // atlas-space (0..ATLAS) with the canvas translated so it's naturally
+  // clipped to this tile's TILE x TILE window — that's what makes the
+  // gradient and the big decal shape continue seamlessly from tile to tile.
+  function makeTileTexture(i, j, decalKey) {
+    const el = document.createElement('canvas');
+    el.width = el.height = TILE;
+    const ctx = el.getContext('2d');
+    ctx.translate(-i * TILE, -j * TILE);
+
+    const x = i * TILE, y = j * TILE;
+    ctx.fillStyle = SEAM;
+    ctx.fillRect(x, y, TILE, TILE);
+
+    const isPink = (i + j) % 2 === 0;
+    const inset = TILE * 0.05;
+    const r = TILE * 0.15;
+    const grad = ctx.createLinearGradient(0, 0, ATLAS, ATLAS);
+    if (isPink) {
+      grad.addColorStop(0, LIGHT_PINK);
+      grad.addColorStop(1, DEEP_PINK);
+    } else {
+      grad.addColorStop(0, LIGHT_WHITE);
+      grad.addColorStop(1, DEEP_WHITE);
+    }
+    ctx.fillStyle = grad;
+    roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = TILE * 0.02;
+    roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
+    ctx.stroke();
+
+    const decalColor = isPink ? 'rgba(255,255,255,0.5)' : 'rgba(199,74,132,0.45)';
+    DECALS[decalKey](ctx, ATLAS, decalColor);
+
     const texture = new THREE.CanvasTexture(el);
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
@@ -44,21 +129,11 @@
     const el = document.createElement('canvas');
     el.width = el.height = size;
     const ctx = el.getContext('2d');
-    ctx.fillStyle = PLASTIC;
+    ctx.fillStyle = SEAM;
     ctx.fillRect(0, 0, size, size);
     const texture = new THREE.CanvasTexture(el);
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
-  }
-
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
   }
 
   function easeInOutQuad(t) {
@@ -81,36 +156,56 @@
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
 
     const cubeGroup = new THREE.Group();
     scene.add(cubeGroup);
 
-    const stickerTextures = new Map();
-    for (const [key, color] of Object.entries(STICKER)) {
-      stickerTextures.set(key, makeStickerTexture(color));
-    }
     const plasticTexture = makePlasticTexture();
+    const plasticMaterial = new THREE.MeshPhysicalMaterial({
+      map: plasticTexture,
+      roughness: 0.3,
+      clearcoat: 0.4,
+      clearcoatRoughness: 0.2,
+      metalness: 0.03,
+    });
     const geometry = new THREE.BoxGeometry(CUBIE, CUBIE, CUBIE);
 
-    function faceMaterial(exteriorKey) {
-      const map = exteriorKey ? stickerTextures.get(exteriorKey) : plasticTexture;
-      return new THREE.MeshStandardMaterial({ map, roughness: 0.5, metalness: 0.05 });
+    const disposableTextures = [plasticTexture];
+    const disposableMaterials = [plasticMaterial];
+
+    // exterior sticker material for cubie (gx,gy,gz)'s face pointing `dir`
+    function stickerMaterial(dir, gx, gy, gz) {
+      const axes = FACE_AXES[dir];
+      const coord = { x: gx, y: gy, z: gz };
+      const i = coord[axes.u] + 1;
+      const j = coord[axes.v] + 1;
+      const texture = makeTileTexture(i, j, axes.decal);
+      disposableTextures.push(texture);
+      const material = new THREE.MeshPhysicalMaterial({
+        map: texture,
+        roughness: 0.22,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.15,
+        metalness: 0.03,
+      });
+      disposableMaterials.push(material);
+      return material;
     }
 
-    const disposableMaterials = [];
     const cubies = [];
     for (let gx = -1; gx <= 1; gx++) {
       for (let gy = -1; gy <= 1; gy++) {
         for (let gz = -1; gz <= 1; gz++) {
           const materials = [
-            faceMaterial(gx === 1 ? 'px' : null),
-            faceMaterial(gx === -1 ? 'nx' : null),
-            faceMaterial(gy === 1 ? 'py' : null),
-            faceMaterial(gy === -1 ? 'ny' : null),
-            faceMaterial(gz === 1 ? 'pz' : null),
-            faceMaterial(gz === -1 ? 'nz' : null),
+            gx === 1 ? stickerMaterial('px', gx, gy, gz) : plasticMaterial,
+            gx === -1 ? stickerMaterial('nx', gx, gy, gz) : plasticMaterial,
+            gy === 1 ? stickerMaterial('py', gx, gy, gz) : plasticMaterial,
+            gy === -1 ? stickerMaterial('ny', gx, gy, gz) : plasticMaterial,
+            gz === 1 ? stickerMaterial('pz', gx, gy, gz) : plasticMaterial,
+            gz === -1 ? stickerMaterial('nz', gx, gy, gz) : plasticMaterial,
           ];
-          disposableMaterials.push(...materials);
           const mesh = new THREE.Mesh(geometry, materials);
           mesh.position.set(gx * UNIT, gy * UNIT, gz * UNIT);
           cubeGroup.add(mesh);
@@ -119,13 +214,16 @@
       }
     }
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const key = new THREE.DirectionalLight(0xffffff, 1.1);
-    key.position.set(3, 4, 5);
+    // soft key + dim fill, matching the source's gradient-lit glossy look
+    // (the light->dark shading is mostly baked into the sticker textures
+    // above; these lights mainly add the specular "candy plastic" pop)
+    scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+    const key = new THREE.PointLight(0xffffff, 60, 0, 2);
+    key.position.set(2.6, 3, 4.4);
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0xff8fa3, 0.5);
-    rim.position.set(-4, -2, -3);
-    scene.add(rim);
+    const fill = new THREE.DirectionalLight(0xffffff, 1.2);
+    fill.position.set(-3, -2, -2);
+    scene.add(fill);
 
     // --- whole-cube tumble: auto-spin, drag-to-spin, pointer parallax ---
     let pointerX = 0;
@@ -282,8 +380,7 @@
       window.removeEventListener('pointerup', onPointerUp);
       geometry.dispose();
       disposableMaterials.forEach((m) => m.dispose());
-      stickerTextures.forEach((t) => t.dispose());
-      plasticTexture.dispose();
+      disposableTextures.forEach((t) => t.dispose());
       renderer.dispose();
     });
   });

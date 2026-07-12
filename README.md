@@ -11,8 +11,10 @@ implemented.
 
 **Built**: the 3D hero object (`src/lib/RotatingCube.svelte`) — a real
 27-cubie Rubik's cube that auto-tumbles, drag-rotates, and runs a
-scramble/solve loop. See [Implementation notes](#implementation-notes) for
-how it intentionally diverges from the source video.
+scramble/solve loop, styled with the source video's sampled pink/white
+palette, checkerboard stickers, face-spanning glyph decals, and glossy
+lighting. See [Implementation notes](#implementation-notes) for how it's
+built and what's still approximated rather than exact.
 
 **Not built**: everything else on the page — header bar, floating icons,
 headline typography, tagline, footer bar. See [TODO](#todo--replication-checklist).
@@ -196,19 +198,49 @@ this because there's no per-facet gradient and no strong specular response.
 
 ## Implementation notes
 
-`src/lib/RotatingCube.svelte` deliberately diverges from the source spec in
-one way: it's a **real 27-cubie Rubik's cube** with a classic **six-color**
-scheme (pink / off-white / gold / charcoal / teal / violet, one per face
-direction) and genuine layer twists, rather than the source's two-tone
-single-textured cube with brand glyphs. It runs a scramble → rest → solve
+`src/lib/RotatingCube.svelte` is a **real 27-cubie Rubik's cube** with
+genuine layer twists, using the pink/white palette and material approach
+from [Matching the source cube's look](#matching-the-source-cubes-look)
+rather than a generic six-color scheme. It runs a scramble → rest → solve
 → rest loop (14 moves, recorded and replayed inverted so it returns to
 solved with no drift), plus auto-tumble, drag-to-spin, and pointer parallax
 on the whole assembly.
 
-Key implementation details for whoever extends this:
-- `UNIT` / `CUBIE` constants control cubie spacing/size (gap = UNIT - CUBIE).
-- Stickers are canvas-generated textures (`makeStickerTexture`), cached per
-  color; non-exterior faces reuse a single shared plastic texture.
+How the source look is approximated:
+- **Checkerboard + gradient stickers**: `makeTileTexture(i, j, decalKey)`
+  generates one canvas texture per sticker (54 total — one per exterior
+  cubie face). Each tile alternates pink/white by `(i + j) % 2`, and its
+  fill is a `LIGHT_PINK → DEEP_PINK` (or white equivalent) linear gradient
+  defined in whole-face ("atlas") coordinates, then the canvas is
+  `translate()`-shifted so only that tile's window gets drawn — this is
+  what makes the gradient and the big glyph decal (see below) continue
+  seamlessly from tile to tile without needing a real texture atlas.
+- **Face-spanning decals**: `drawHeart` / `drawRing` / `drawBowtie` draw
+  one big shape per face (mapped via `FACE_AXES[dir].decal`) at whole-face
+  scale, semi-transparent, so it reads as a decal sitting over the
+  checkerboard rather than a per-tile icon.
+- **Bright seams**: the base/seam color (`SEAM`) and interior (non-exterior)
+  faces are light (`#f4eef1`), not dark plastic, and each sticker gets a
+  translucent white stroke around its rounded-rect inset to fake the bright
+  bevel highlight seen in the source.
+- **Glossy material + lighting**: stickers use `MeshPhysicalMaterial` with
+  low roughness and clearcoat for a candy-plastic specular response, lit by
+  a close `PointLight` (its falloff is what produces the specular hotspot
+  blob and reinforces the baked gradient) plus a dim fill `DirectionalLight`
+  and ambient. Three.js's physically-based light units meant the first pass
+  at these intensities rendered almost flat gray — the working values here
+  are tuned relatively high (e.g. key `PointLight` intensity `60`) alongside
+  `ACESFilmicToneMapping`; if you change light setup, re-check against a
+  screenshot rather than assuming "reasonable-looking" intensity values.
+- **Not attempted**: true rounded-corner geometry (would require
+  `RoundedBoxGeometry`, which doesn't preserve per-face material groups the
+  way `BoxGeometry` does, so it can't easily take 6 different sticker
+  materials per cubie without extra plumbing) and real motion blur — both
+  called out as lower-priority in the matching-the-look section above.
+
+Other implementation details for whoever extends this:
+- `UNIT` / `CUBIE` constants control cubie spacing/size (gap = UNIT - CUBIE);
+  the gap is intentionally small/near-seamless to match the source.
 - Layer twists use exact integer grid rotation (`rotateGrid`) so repeated
   twists never accumulate floating-point drift — logical cubie position is
   tracked separately from the rendered `mesh.position`/`quaternion`.
@@ -229,9 +261,12 @@ To bring the page in line with the full source spec:
 - [ ] Pick/license real display typeface for the headline (source uses a
       tight-tracked black grotesk — something like Archivo Black or a
       similar condensed sans)
-- [ ] Rework the cube's material/color/lighting to match the source — see
+- [x] Rework the cube's material/color/lighting to match the source — see
       [Matching the source cube's look](#matching-the-source-cubes-look)
-      for the full sampled-color and lighting spec
+      and [Implementation notes](#implementation-notes) for what changed
+      (checkerboard gradient stickers, face-spanning decals, bright seams,
+      glossy `MeshPhysicalMaterial`). Still open: true rounded-corner
+      geometry and motion blur, both noted as lower priority above.
 - [ ] Responsive layout beyond the current centered square stage in
       `App.svelte`
 
