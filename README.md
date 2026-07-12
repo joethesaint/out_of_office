@@ -31,21 +31,23 @@ can land a commit in the minutes it takes you to build and verify yours.
 
 ## Status
 
-scramble/solve loop, recolored to the Out of Office brand palette (see
-[Brand identity](#brand-identity-out-of-office-lagos)) instead of the
-original Pinterest-derived pink/white. Also built (structure from a
-concurrent branch, content re-skinned to the real brand in this merge):
-header bar, footer bar, floating heart/share icons, and a headline
-typography block with the cube overlapping the wordmark, in `App.svelte` +
-`src/lib/HeaderBar.svelte` + `src/lib/FooterBar.svelte`. See
-[Implementation notes](#implementation-notes) for how it's built.
+**Built**: the full single-page site. A pinned hero (`src/lib/RotatingCube.svelte`
+— a real 27-cubie Rubik's cube, drag/scroll-driven) that solves itself as
+the user scrolls (see [Cube narrative](#cube-narrative)), recolored to the
+Out of Office blue/pink/cream palette; a header bar, footer bar, and
+headline typography block (`HeaderBar.svelte` / `FooterBar.svelte` /
+`App.svelte`); a boot/auto-reply loading sequence (`BootSequence.svelte`);
+and five content sections after the "Activated" reveal — escape metrics,
+community/polaroids, memory timeline, playlist, and tickets
+(`EscapeMetrics.svelte` / `Community.svelte` / `MemoryTimeline.svelte` /
+`Playlist.svelte` / `Tickets.svelte`). Fonts are self-hosted (no Google
+Fonts dependency at runtime). See
+[Implementation notes](#implementation-notes) for how each piece works.
 
-**Not built**: the full multi-section site described in
-[Brand identity](#brand-identity-out-of-office-lagos) and
-[Cube narrative](#cube-narrative) — boot/auto-reply sequence, scroll-linked
-cube solving, escape metrics, community/polaroids, memory timeline,
-playlist, tickets. Also not done: font self-hosting if this ships publicly
-(currently loaded from Google Fonts). See
+**Not built**: the ticket/zine layout devices beyond the header/footer
+(vertical spine text, barcode, QR code, care-label icon row, smiley-flower
+stickers, paint-splat scatter graphics), and scroll-reveal animation on the
+new sections (they currently render in normal document flow). See
 [TODO](#todo--replication-checklist).
 
 ## Brand identity: Out of Office (Lagos)
@@ -70,12 +72,18 @@ plays out as: **Mainland** (leave: traffic, deadlines, stress) →
 
 ### Real events (for the memory-timeline / "OOO 00X" numbering)
 
-- **OOO 001 — Open Canvas**, Jaekel House Garden, outdoor painting, ₦5,000
+- **OOO 001 — Open Canvas**, Jaekel House Garden, May 30, ₦5,000
   (`docs/brand-reference/flyer-open-canvas-jaekel-house.png`)
 - **OOO 002 — The Post-NYSC Hangout**, Tarkwa Bay Beach, 11 April 2026,
   12pm till daybreak (`docs/brand-reference/flyer-post-nysc-hangout-tarkwa-bay.png`)
-- A "Save the Date" teaser for a follow-up outdoor painting event
-  (`docs/brand-reference/flyer-save-the-date-painting.png`)
+- **OOO 003 — ???** — unannounced/coming soon (per the brand brief's own
+  "OOO 003 ???" pattern; don't fabricate a third event)
+
+Correction from an earlier pass of this doc:
+`flyer-save-the-date-painting.png` is **not** a third, separate event — its
+circled "Saturday 30 · D-day!!" matches Open Canvas's "MAY 30TH" exactly.
+It's the teaser for OOO 001, not a fourth data point. Three flyer files
+exist in `docs/brand-reference/`, but they document **two** real events.
 
 These three flyers are the actual, currently-in-use brand assets — treat
 them as ground truth over anything invented earlier in this doc.
@@ -95,6 +103,16 @@ them as ground truth over anything invented earlier in this doc.
 This **replaces** the pink/white palette in
 [Legacy: Pinterest cube prototype](#legacy-pinterest-cube-prototype) — the
 cube should be recolored to blue/teal/cream, not pink/white.
+
+**Update**: don't let the palette read as "just blue." The pink accent
+(`#fc9ce0`, deepened to `#e0568f` for text/UI contrast) is now blended
+directly into the cube's own gradient — see
+[Implementation notes](#implementation-notes) — rather than living only in
+decorative splats, so blue and pink read as one connected palette (a small
+Lagos-sunset blend) instead of blue-as-primary with pink as an afterthought.
+Site-wide, blue/pink/teal are used together: blue for the primary wordmark
+and headings, pink for secondary emphasis (eyebrows, CTA gradient, stat
+tiles), teal for tertiary UI accents (footer, tags).
 
 ### Typography direction
 
@@ -356,17 +374,21 @@ drag-to-spin, and pointer parallax on the whole assembly.
 How the brand look is built:
 - **Checkerboard + gradient stickers**: `makeTileTexture(i, j, decalKey)`
   generates one canvas texture per sticker (54 total — one per exterior
-  cubie face). Each tile alternates blue/cream by `(i + j) % 2`, and its
-  fill is a `LIGHT_BLUE → DEEP_BLUE` (or cream equivalent) linear gradient
-  defined in whole-face ("atlas") coordinates, then the canvas is
-  `translate()`-shifted so only that tile's window gets drawn — this is
-  what makes the gradient and the big glyph decal (see below) continue
-  seamlessly from tile to tile without needing a real texture atlas.
+  cubie face). Each tile alternates blue/cream by `(i + j) % 2`. Blue tiles
+  are a 3-stop gradient `LIGHT_BLUE → MID_BLUE (#00bfff) → DEEP_PINK
+  (#e0568f)` — sky blue blending into the brand's pink accent, not just a
+  flat/two-tone blue — and cream tiles blend `LIGHT_CREAM → DEEP_CREAM_PINK`
+  (a dusty pink-tinted cream), so the pink accent reaches the cube's base
+  colors, not only its decals. Gradients are defined in whole-face
+  ("atlas") coordinates, then the canvas is `translate()`-shifted so only
+  that tile's window gets drawn — this is what makes the gradient and the
+  big glyph decal (see below) continue seamlessly from tile to tile without
+  needing a real texture atlas.
 - **Face-spanning decals**: `drawHeart` / `drawRing` / `drawBowtie` draw
   one big shape per face (mapped via `FACE_AXES[dir].decal`) at whole-face
-  scale, semi-transparent — white on blue tiles, brand teal
-  (`rgba(8,202,189,…)`) on cream tiles — so it reads as a decal sitting over
-  the checkerboard rather than a per-tile icon.
+  scale, semi-transparent — white on blue tiles, brand pink
+  (`rgba(224,86,143,…)`) on cream tiles — so it reads as a decal sitting
+  over the checkerboard rather than a per-tile icon.
 - **Bright seams**: the base/seam color (`SEAM`, paper cream `#f6f4f1`) and
   interior (non-exterior) faces are light, not dark plastic, and each
   sticker gets a translucent white stroke around its rounded-rect inset to
@@ -440,12 +462,61 @@ Other implementation details for whoever extends this:
 `src/App.svelte` and `index.html` carry the rest of the rebrand: cream
 (`#f6f4f1`) background with a low-opacity SVG `feTurbulence` grain layer
 (no image asset — generated inline as a data URI), the "Out of Office"
-wordmark set in **Fredoka** (bold, brand blue `#00bfff`) with **Space
-Grotesk** for the eyebrow/tagline, both loaded via a Google Fonts `<link>`
-in `index.html`. (If a headless/sandboxed environment can't reach
-`fonts.googleapis.com`, the fonts fail closed to the `system-ui` fallback
-declared in each `font-family` — verify against a real browser, not just a
-sandboxed headless one, before concluding fonts are broken.)
+wordmark set in **Fredoka**.
+
+### Self-hosted fonts
+
+Fonts are **no longer loaded from Google Fonts at runtime**. Five families
+are downloaded once and served from `public/fonts/*.woff2`, declared via
+`@font-face` in `src/app.css`:
+- **Fredoka** (600–700) — wordmark/headline display, `var(--display)`
+- **Space Grotesk** (400–500) — body/meta copy, `var(--sans)`
+- **Bungee** (400) — blocky tag/date-badge display, `var(--tag)` (memory
+  timeline stamps, playlist track numbers)
+- **Permanent Marker** — handwritten accents, `var(--marker)` (polaroid
+  captions)
+- **Fraunces** (700–900) — elegant serif for event names, `var(--serif)`
+  (memory timeline titles), matching the "Open Canvas" flyer's headline
+
+Fredoka, Space Grotesk, and Fraunces are variable fonts — Google served the
+*same* `.woff2` URL for multiple requested weights (e.g. Fredoka 600 and
+700), so each local `@font-face` declares a **weight range** (e.g.
+`font-weight: 600 700`) against one file rather than downloading separate
+files per weight. This was a real fix, not just a nice-to-have: the
+sandboxed test browser used during earlier work couldn't reach
+`fonts.googleapis.com` at all (`ERR_CONNECTION_RESET`) and silently fell
+back to `system-ui`, which was masking the actual result — self-hosting
+removed that runtime dependency entirely and was verified via screenshot
+(Fredoka's rounded terminals, Bungee's blocky caps, and Permanent Marker's
+script are all visibly rendering, not falling back).
+
+### Boot sequence
+
+`src/lib/BootSequence.svelte` is a fixed-position overlay (dark `#181818`
+background, `z-index: 50`) that mounts once per page load: five lines
+("Sending auto-reply…", three "✓ …" checklist lines, "Redirecting to Out
+of Office…") appear staggered (380ms apart) via a `setTimeout` array, then
+after a hold the whole overlay fades out (`opacity` transition) while an
+SVG wave shape rises up from the bottom (`transform: translateY`) — the
+"ocean waves appear" moment from the brief. It unmounts itself (`{#if
+!removed}`) after the exit transition finishes rather than staying in the
+DOM invisible.
+
+### Multi-section site
+
+Below the existing pinned hero + "Activated" reveal, `App.svelte` now
+renders, in order: `EscapeMetrics` (the auto-reply blurb + a 4-tile stat
+grid), `Community` (the three real flyers from `docs/brand-reference/`
+presented as rotated, drop-shadowed polaroid cards — imported directly via
+relative path, e.g. `import img from '../../docs/brand-reference/…png'`,
+which Vite bundles into the build regardless of source folder, so the
+flyers aren't duplicated between `docs/` and `public/`), `MemoryTimeline`
+(the `OOO 001` / `OOO 002` / `OOO 003` stamps — see the "Real events"
+correction above), `Playlist` (five **fictional** mood-appropriate
+track/artist names — deliberately not real songs or artists, to avoid any
+impression of licensing/endorsement), and `Tickets` (a CTA linking to the
+real ticket page, `https://tix.africa/discover/outofofficeng`, taken
+directly off the Tarkwa Bay flyer).
 
 ## TODO / replication checklist
 
@@ -478,19 +549,29 @@ sandboxed headless one, before concluding fonts are broken.)
       scrolling through it drives the cube from fully scrambled (top) to
       solved (bottom), revealing an "Out of Office Activated" section
       once solved.
-- [ ] Boot/auto-reply loading sequence ("Sending auto-reply… ✓ Emails
+- [x] Boot/auto-reply loading sequence ("Sending auto-reply… ✓ Emails
       muted… ✓ Notifications paused… Redirecting to Out of Office…") before
-      the hero, fading into ocean ambience.
-- [ ] Full multi-section site: escape metrics, community/polaroids, memory
-      timeline (`OOO 001`, `OOO 002`, …), playlist, tickets — see
-      [Brand identity](#brand-identity-out-of-office-lagos) for the section
-      list and copy direction.
+      the hero, fading into ocean ambience — `BootSequence.svelte`, see
+      [Implementation notes](#implementation-notes).
+- [x] Full multi-section site: escape metrics, community/polaroids, memory
+      timeline (`OOO 001`, `OOO 002`, `OOO 003`), playlist, tickets — see
+      [Implementation notes](#implementation-notes) for what each section
+      is (`EscapeMetrics`, `Community`, `MemoryTimeline`, `Playlist`,
+      `Tickets`). Not done: a real per-section reveal-on-scroll animation
+      (sections currently just render in normal document flow, no
+      IntersectionObserver fade-in) — a reasonable next polish pass.
+- [x] Self-host fonts if this ships publicly — done, all five families
+      (Fredoka, Space Grotesk, Bungee, Permanent Marker, Fraunces) are now
+      served from `public/fonts/`, no Google Fonts dependency at runtime.
+- [x] Don't let the palette read as "just blue" — blended the pink accent
+      directly into the cube's gradient and used blue/pink/teal together
+      across the new sections, see the
+      [Brand identity](#brand-identity-out-of-office-lagos) palette update
+      and [Implementation notes](#implementation-notes).
 - [ ] Ticket/zine layout devices beyond what's in the header/footer: full
       vertical spine text, barcode, QR code, care-label icon row,
       smiley-flower stickers, paint-splat scatter graphics (see flyers in
       `docs/brand-reference/`).
-- [ ] Self-host the Fredoka/Space Grotesk fonts if this ships publicly
-      (currently loaded from Google Fonts via `index.html`).
 
 ### Legacy Pinterest-spec items (superseded, kept for context)
 
@@ -522,15 +603,25 @@ npm run preview   # preview the production build
 ```
 docs/
   brand-reference/        # real Out of Office event flyers (ground truth
-                           # for brand identity — see that section)
+                           # for brand identity — see that section). Also
+                           # imported directly as images by Community.svelte
+public/
+  fonts/                  # self-hosted woff2 files (see Implementation notes)
 src/
-  App.svelte              # page shell: phone-frame, header/footer, headline
-                           # stack, cube stage, grain texture
-  app.css                 # fonts (Fredoka/Space Grotesk), brand color variables
+  App.svelte              # page shell: boot sequence, pinned hero (header/
+                           # footer/headline/cube), activated reveal, and
+                           # all content sections in order
+  app.css                 # @font-face declarations, brand color variables
   lib/
+    BootSequence.svelte   # "sending auto-reply…" loading overlay
     HeaderBar.svelte      # 3-block header strip
     FooterBar.svelte      # footer callout + fine print
     RotatingCube.svelte   # Three.js hero object (see Implementation notes)
+    EscapeMetrics.svelte  # auto-reply blurb + stat grid
+    Community.svelte      # polaroid gallery (real flyer images)
+    MemoryTimeline.svelte # OOO 001 / 002 / 003 event stamps
+    Playlist.svelte       # mixtape-style track list (fictional tracks)
+    Tickets.svelte        # CTA linking to the real ticket page
   main.js                 # Svelte app entry point
-index.html                 # Google Fonts (Fredoka, Space Grotesk) loaded here
+index.html
 ```

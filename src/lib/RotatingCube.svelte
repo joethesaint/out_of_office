@@ -17,12 +17,16 @@
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
   // Out of Office brand palette, sampled from the real event flyers (see
-  // README "Brand identity: Out of Office (Lagos)") — wordmark blue running
-  // light -> deep, plus paper cream
+  // README "Brand identity: Out of Office (Lagos)"). Blue tiles blend
+  // sky-blue -> brand blue -> deep pink across each tile (a little Lagos
+  // sunset, not just flat blue); cream tiles warm into a dusty pink-cream
+  // in shadow, so the pink accent from the flyers' paint splats ties the
+  // whole cube together instead of living only in the wordmark.
   const LIGHT_BLUE = '#6adcff';
-  const DEEP_BLUE = '#0077a8';
+  const MID_BLUE = '#00bfff';
+  const DEEP_PINK = '#e0568f';
   const LIGHT_CREAM = '#f6f4f1';
-  const DEEP_CREAM = '#dcd4c4';
+  const DEEP_CREAM_PINK = '#e9c7d6';
   const SEAM = '#f6f4f1'; // bright paper-cream seam, not dark plastic
 
   const AXES = ['x', 'y', 'z'];
@@ -110,11 +114,14 @@
     const r = TILE * 0.15;
     const grad = ctx.createLinearGradient(0, 0, ATLAS, ATLAS);
     if (isBlue) {
+      // sky blue -> brand blue -> deep pink: a little Lagos sunset in
+      // every tile, so pink isn't confined to the wordmark/decals
       grad.addColorStop(0, LIGHT_BLUE);
-      grad.addColorStop(1, DEEP_BLUE);
+      grad.addColorStop(0.55, MID_BLUE);
+      grad.addColorStop(1, DEEP_PINK);
     } else {
       grad.addColorStop(0, LIGHT_CREAM);
-      grad.addColorStop(1, DEEP_CREAM);
+      grad.addColorStop(1, DEEP_CREAM_PINK);
     }
     ctx.fillStyle = grad;
     roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
@@ -125,7 +132,7 @@
     roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
     ctx.stroke();
 
-    const decalColor = isBlue ? 'rgba(255,255,255,0.5)' : 'rgba(8,202,189,0.45)';
+    const decalColor = isBlue ? 'rgba(255,255,255,0.5)' : 'rgba(224,86,143,0.42)';
     DECALS[decalKey](ctx, ATLAS, decalColor);
 
     const texture = new THREE.CanvasTexture(el);

@@ -3,6 +3,12 @@
   import RotatingCube from "./lib/RotatingCube.svelte";
   import HeaderBar from "./lib/HeaderBar.svelte";
   import FooterBar from "./lib/FooterBar.svelte";
+  import BootSequence from "./lib/BootSequence.svelte";
+  import EscapeMetrics from "./lib/EscapeMetrics.svelte";
+  import Community from "./lib/Community.svelte";
+  import MemoryTimeline from "./lib/MemoryTimeline.svelte";
+  import Playlist from "./lib/Playlist.svelte";
+  import Tickets from "./lib/Tickets.svelte";
 
   let scrollTrack;
   let progress = 0;
@@ -30,6 +36,8 @@
 
   $: activated = progress >= 0.995;
 </script>
+
+<BootSequence />
 
 <div class="scroll-track" bind:this={scrollTrack}>
   <div class="pinned">
@@ -91,6 +99,12 @@
   <h2 class="activated-title">Out of Office Activated</h2>
   <p class="activated-sub">You've found a little order and peace.</p>
 </section>
+
+<EscapeMetrics />
+<Community />
+<MemoryTimeline />
+<Playlist />
+<Tickets />
 
 <style>
   .scroll-track {
