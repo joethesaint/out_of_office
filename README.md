@@ -48,7 +48,100 @@ Fonts dependency at runtime). See
 (vertical spine text, barcode, QR code, care-label icon row, smiley-flower
 stickers, paint-splat scatter graphics), and scroll-reveal animation on the
 new sections (they currently render in normal document flow). See
-[TODO](#todo--replication-checklist).
+[TODO](#todo--replication-checklist) for the implementation-level list, or
+[Brief-vs-build audit](#brief-vs-build-audit-2026-07-12) for a full
+gap-by-gap evaluation against the original brand brief (boat animation,
+notification counter, boarding-pass/passport-stamp visuals, cube easter
+eggs, and more are open — see that section before assuming the site is
+brief-complete).
+
+## Brief-vs-build audit (2026-07-12)
+
+The complete original brand brief — including the positioning statement,
+Lagos interpretation, landing-experience script, visual-metaphor list,
+motion-design rules, moodboard, and all five Rubik's-cube narrative
+concepts — is preserved verbatim in `concept.txt` at the repo root. Treat
+that file as the source brief everything below is measured against.
+
+This section was written on explicit request ("eval what you did according
+to the concepts I gave to you... do not code or do anything") as a self-
+audit of how much of that brief actually made it into the build versus what
+was skipped, substituted, or only partially realized. The audit text below
+is reproduced **verbatim** — the exact words from the chat response it was
+written as, not a re-summary — followed by a concrete, prioritized action
+list derived from it.
+
+### The audit (verbatim)
+
+Here's an honest read against everything in your brief — including where I diverged, substituted, or just didn't get to something.
+
+#### What landed faithfully
+
+- **Core positioning language**: "Auto-reply for real life," "Release. Unwind. Reconnect.," "Auto replies enabled. Stress disabled." — these are near-verbatim from your Final Concept, not paraphrases.
+- **Boot sequence** — this is the strongest match in the whole build. Your loading-screen idea ("Sending auto-reply… ✓ Emails muted ✓ Notifications paused ✓ Lagos stress suspended / Redirecting to Out of Office… then ocean waves appear") got built almost line-for-line, wave-rise and all.
+- **Escape Metrics + Memory Timeline** sections match your spec closely (87 emails, 62% stress, ∞ friendships, 100% battery; OOO 001/002/003 numbering).
+- **"Leaving yellow Lagos, entering blue Lagos"** made it in as literal footer copy, and the header's "STATUS: AWAY" accidentally lands the "old MSN status" moodboard note better than I'd planned — a nice unintended alignment.
+- **Cube idle behavior** — "never static, slight rotation, subtle floating, responds to cursor" is genuinely there (auto-tumble + pointer parallax).
+
+#### What's a substitution, not the real thing
+
+- **Community section** uses your three real event *flyers* as polaroids, not disposable-camera candid crowd photos — I don't have real attendee photos, so this is a stand-in, not the "nostalgia" texture you described.
+- **Color direction** — I abandoned your original chaos-yellow/traffic-red vs. teal/sunset-orange/sand palette once real flyers arrived, in favor of sampling the *actual* flyer colors (blue/pink/teal/cream). Reasonable call, but it means "sunset orange," "warm sand," "muted greens" never appear. Pink — which wasn't in your color brief at all — became a primary color because that's what the real assets showed.
+- **"Boarding pass"** is a label over a generic CTA button, not an actual boarding-pass-shaped ticket (no stub, no gate/seat-style fields). Same gap for **passport stamps** — OOO 001/002/003 are text badges, not a stamp graphic.
+
+#### What's just missing
+
+- **The boat.** You called it out specifically — "boat = escape," moving horizontally as you scroll. Never built. The danfo bus (added in a separate session) covers the *leaving* side of the metaphor, but nothing represents *arriving*.
+- **Notification counter** (999+ → 0 as you scroll). Not built.
+- **The Scene 1 chaos-desktop** (Slack/WhatsApp/calendar/battery-low/email popups) that the boot sequence was supposed to visually dissolve. My boot sequence is a text checklist on a dark screen — evocative, but not the cluttered-UI scene you described.
+- **Typography going corporate → handwritten as you scroll.** I used five fonts, but assigned to fixed roles (Fredoka for headers, Permanent Marker for captions) — not a progressive transformation tied to scroll depth like you specified.
+- **Glassmorphism** — never appeared anywhere.
+- **Cube click easter egg** (10 clicks → Auto Reply Generator / Lagos Survival Stats) and **cube sleep mode on inactivity** — neither exists. The cube only responds to drag.
+- **Cube-as-logo/favicon** — still the default Vite scaffold favicon. Never swapped for an OOO mark despite your own suggestion.
+- The exact line **"Life is messy. Like a scrambled cube. Out of Office is where we stop trying to solve everything for a moment."** — never used as displayed copy anywhere, despite you flagging it as something that "could become part of your branding."
+
+#### The cube, specifically
+
+I built **Concept 1** — your stated favorite — and the reveal payoff ("Out of Office Activated / You've found a little order and peace") is a close match. But two things are worth being precise about:
+
+1. **"One side becomes complete"** in your concept implies a classic Rubik's-cube tell: solved = one uniform color, instantly legible. Because I built a checkerboard-pattern cube (to match the flyer aesthetic) instead of flat colors, "solved" is the *original checkerboard*, not a clean single color. A first-time viewer scrolling through may not clearly register "oh, it's solved now" the way a real Rubik's cube telegraphs it — the brand-matching aesthetic came at some cost to the concept's visual clarity.
+2. **The scroll choreography is cube-only.** Your concept paired the unscrambling with notifications disappearing and traffic sounds fading *simultaneously*. I only built the cube half — there's no competing digital-clutter layer in the hero to dissolve alongside it, so the "de-cluttering" feeling is thinner than described.
+
+The other four concepts weren't partially built — they were fully set aside, including **Concept 4**, which you flagged as "most Elliot-coded" (most you) even though Concept 1 was the stated favorite. Nothing in the current architecture leaves room for it later: the cube lives only in the pinned hero and disappears the moment you scroll past. It doesn't persist, track section visits, or reappear as a running progress thread the way Concept 4 imagined. If that one still appeals to you, it'd need to be designed in now rather than bolted on.
+
+There's also a structural tension worth naming: you explicitly reframed the cube as "the person before they go Out of Office," not the whole brand. But the amount of engineering polish it got (motion blur, glossy PBR material, rounded geometry, decal system) makes it the single most sophisticated thing on the page, with nothing of equal visual weight on the "escape" side to balance it once you scroll past the hero. The postcard and polaroids gesture at the arrival/calm side, but they're static images, not part of a continuous motion narrative — so the site currently reads more "chaos symbol, well-executed" than "chaos resolving into an equally realized calm."
+
+*(Note written alongside this audit but outside the verbatim block: as of the same session, a concurrent commit — `51a3c32 Flatten cube stickers to solid colors, lean material toward glass` — already started addressing audit point #1 above by moving the cube away from checkerboard tiles toward flat/solid colors. Re-check the live cube against that gap before assuming it's still open.)*
+
+### Action list (prioritized, derived from the audit)
+
+**P0 — explicit, concrete brief items that were simply never built:**
+1. Add the "Activate Auto Reply →" CTA button to the hero — the brief specifies this exact button and it does not currently exist anywhere in the hero.
+2. Build the boat animation: moves horizontally across the screen, tied to scroll, representing "boat = escape" / arrival at Tarkwa Bay. Nothing currently represents the *arrival* half of the mainland→island metaphor (the danfo bus only covers *leaving*).
+3. Build the notification counter (999+ → 23 → 7 → 1 → 0) tied to scroll progress, ideally in or near the hero alongside the cube.
+4. Decide whether to insert a literal "Scene 1" chaos-desktop treatment (Slack/WhatsApp/calendar/battery-low/email popups) before/within the boot sequence, or formally scope it out — right now the boot sequence is a lighter abstraction of this, not the scene itself.
+
+**P1 — cube-narrative decisions that need a call made, not just code:**
+5. Resolve the solved-state legibility gap: either keep the checkerboard (brand-accurate, less legible as "solved") or move fully to flat/solid colors per face (more legible, less flyer-accurate). Note a concurrent commit already nudged toward flat colors — check current state before treating this as unresolved.
+6. Decide if Concept 4 (cube as a persistent, cross-section progress tracker — one face solves per section visited: Escape/Community/Activities/Memories/Playlist/Tickets) should be designed in as a v2, given it was flagged as "most you." This needs an architectural decision (cube reappearing/persisting across scroll, not just living in the pinned hero) before more content sections get built on top of the current one-shot-hero pattern.
+7. Add the cube click-count easter egg (10 clicks → Auto Reply Generator or Lagos Survival Stats generator).
+8. Add cube idle/sleep-mode behavior after a period of user inactivity.
+9. Design a simplified "OOO cube" mark (one face = sun, one = ocean, one = paint palette per the brief) for use as the site favicon/logo — replacing the still-default Vite scaffold favicon.
+10. Pair the cube's scroll-driven unscrambling with an actual dissolving digital-clutter layer in the hero, so the "de-cluttering" feeling described in Concept 1 has something besides the cube itself to resolve.
+
+**P2 — visual-metaphor fidelity (currently superficial nods, not the real device):**
+11. Redesign the Tickets section as an actual boarding-pass-shaped UI (stub/perforation, gate-and-seat-style fields, "Destination: Out of Office"), not a label over a generic button.
+12. Redesign the OOO 001/002/003 memory-timeline badges as passport-stamp graphics (circular/ink-stamp visual treatment) rather than plain rounded-rect text badges.
+
+**P3 — content and texture gaps:**
+13. Source or commission real disposable-camera-style community/attendee photos to replace the event-flyers-as-polaroids substitution in the Community section, when available.
+14. Consider working a glassmorphism treatment into at least one section, per the moodboard.
+15. Find a natural place for the line "Life is messy. Like a scrambled cube. Out of Office is where we stop trying to solve everything for a moment." as displayed copy — it was explicitly flagged as reusable brand language and hasn't been used anywhere yet.
+
+**P4 — motion and typography systems (bigger lifts, revisit once P0–P2 are settled):**
+16. Build actual scroll-reveal animation into the sections below the hero (EscapeMetrics, Community, MemoryTimeline, Playlist, Tickets currently render instantly in normal document flow with no fade/motion) — ties directly to the brief's "slow, breathing, flowing, no sharp transitions" motion philosophy, which is currently only honored inside the hero/cube.
+17. Build a genuine scroll-tied typography transformation (corporate/grotesk → handwritten/marker) rather than the current fixed-per-element font assignment (Fredoka always headers, Permanent Marker always captions, etc.) — this is a distinct, unrealized mechanic from the brief, not just "did we use nice fonts."
+18. Revisit the color-direction question directly with the user: is the flyer-sampled blue/pink/teal/cream palette final, or should sunset-orange/warm-sand/muted-green accents from the original brief be reintroduced somewhere (e.g. in later/calmer sections, to visually complete the "chaos → calm" color arc the brief implies)?
 
 ## Brand identity: Out of Office (Lagos)
 
