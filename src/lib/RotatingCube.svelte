@@ -259,6 +259,7 @@
     window.addEventListener('pointerup', onPointerUp);
 
     function resize() {
+      if (!container) return;
       const { clientWidth: w, clientHeight: h } = container;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;

@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700;800&display=swap");
+
+:root {
+  --bg: #eae9e6;
+  --ink: #111111;
+  --pink: #e85d75;
+  --cream: #f5f0eb;
+  --display: "Archivo Black", "Inter", sans-serif;
+  --sans: "Inter", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+#app {
+  height: 100%;
+}

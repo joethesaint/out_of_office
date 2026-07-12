@@ -14,10 +14,14 @@ implemented.
 scramble/solve loop, styled with the source video's sampled pink/white
 palette, checkerboard stickers, face-spanning glyph decals, and glossy
 lighting. See [Implementation notes](#implementation-notes) for how it's
-built and what's still approximated rather than exact.
+built and what's still approximated rather than exact. Also built: header
+bar, footer bar, floating heart/share icons, and the headline typography
+block with the cube overlapping ON/BOW, in `App.svelte` +
+`src/lib/HeaderBar.svelte` + `src/lib/FooterBar.svelte`.
 
-**Not built**: everything else on the page — header bar, floating icons,
-headline typography, tagline, footer bar. See [TODO](#todo--replication-checklist).
+**Not built**: true rounded-corner cubie geometry, motion blur on fast
+tumbles (explicitly lowest-priority/optional), and font self-hosting if
+this ships publicly. See [TODO](#todo--replication-checklist).
 
 ## Source design spec
 
@@ -252,23 +256,30 @@ Other implementation details for whoever extends this:
 
 To bring the page in line with the full source spec:
 
-- [ ] Header bar component (3-block strip: brand lockup, trend tag, logo)
-- [ ] Footer bar component (party callout + Suzhou label + mini cube mark)
-- [ ] Floating heart / share-arrow icons
-- [ ] Headline typography block (eyebrow, CRUSH/ON/BOW stack, subhead,
-      bilingual tagline), laid out so the cube overlaps it (`z-index`,
-      negative margins or `position: absolute` for the `<RotatingCube>`)
-- [ ] Pick/license real display typeface for the headline (source uses a
-      tight-tracked black grotesk — something like Archivo Black or a
-      similar condensed sans)
+- [x] Header bar component (3-block strip: brand lockup, trend tag, logo)
+- [x] Footer bar component (party callout + Suzhou label + mini cube mark)
+- [x] Floating heart / share-arrow icons
+- [x] Headline typography block (eyebrow, CRUSH/ON/BOW stack, subhead,
+      bilingual tagline), laid out so the cube overlaps it — the cube is
+      anchored to the ON/BOW boundary inside `.stack`, not the whole hero,
+      so it stays put regardless of tagline/subhead height
+- [x] Pick/license real display typeface for the headline — using
+      Archivo Black (Google Fonts) for the headline/wordmarks, Inter for
+      body/label text
 - [x] Rework the cube's material/color/lighting to match the source — see
       [Matching the source cube's look](#matching-the-source-cubes-look)
       and [Implementation notes](#implementation-notes) for what changed
       (checkerboard gradient stickers, face-spanning decals, bright seams,
-      glossy `MeshPhysicalMaterial`). Still open: true rounded-corner
-      geometry and motion blur, both noted as lower priority above.
-- [ ] Responsive layout beyond the current centered square stage in
-      `App.svelte`
+      glossy `MeshPhysicalMaterial`)
+- [x] Responsive layout: centered phone-frame card on wide viewports,
+      true full-bleed single viewport under 480px width
+- [ ] True rounded-corner cubie geometry (currently plain `BoxGeometry` —
+      noted as still open in the cube rework above)
+- [ ] Motion blur on fast tumbles (optional/lowest-priority, see
+      [Motion](#motion))
+- [ ] License/attribute the Archivo Black + Inter Google Fonts usage if
+      this ships publicly (currently loaded via CSS `@import`, fine for a
+      prototype but consider self-hosting for production)
 
 ## Development
 
@@ -283,9 +294,11 @@ npm run preview   # preview the production build
 
 ```
 src/
-  App.svelte              # page shell, mounts the cube stage
-  app.css                 # global styles (currently empty)
+  App.svelte              # page shell: phone-frame, hero layout, headline stack
+  app.css                 # fonts (Archivo Black/Inter), brand color variables
   lib/
+    HeaderBar.svelte      # 3-block header strip
+    FooterBar.svelte      # footer callout + Suzhou label + fine print
     RotatingCube.svelte   # Three.js hero object (see Implementation notes)
   main.js                 # Svelte app entry point
 ```
