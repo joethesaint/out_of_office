@@ -180,11 +180,14 @@
     let nextTwistAt = performance.now() + 500;
     const TWIST_MS = 420;
     const PAUSE_MS = 320;
+    const REST_MS = 1400; // pause once fully scrambled / fully solved
 
-    function startTwist(now) {
-      const axis = AXES[(Math.random() * 3) | 0];
-      const layer = ((Math.random() * 3) | 0) - 1;
-      const dir = Math.random() < 0.5 ? 1 : -1;
+    // scramble for SCRAMBLE_COUNT twists, then replay them inverted to solve
+    const SCRAMBLE_COUNT = 14;
+    let phase = 'scramble';
+    let history = [];
+
+    function beginTwist(now, axis, layer, dir) {
       const affected = cubies.filter((c) => c[axis] === layer);
       twist = {
         axis,
@@ -198,9 +201,32 @@
       };
     }
 
+    function queueNextTwist(now) {
+      if (phase === 'scramble') {
+        if (history.length >= SCRAMBLE_COUNT) {
+          phase = 'solve';
+          nextTwistAt = now + REST_MS;
+          return;
+        }
+        const axis = AXES[(Math.random() * 3) | 0];
+        const layer = ((Math.random() * 3) | 0) - 1;
+        const dir = Math.random() < 0.5 ? 1 : -1;
+        history.push({ axis, layer, dir });
+        beginTwist(now, axis, layer, dir);
+      } else {
+        if (history.length === 0) {
+          phase = 'scramble';
+          nextTwistAt = now + REST_MS;
+          return;
+        }
+        const move = history.pop();
+        beginTwist(now, move.axis, move.layer, -move.dir);
+      }
+    }
+
     function updateTwist(now) {
       if (!twist) {
-        if (now >= nextTwistAt) startTwist(now);
+        if (now >= nextTwistAt) queueNextTwist(now);
         return;
       }
       const t = Math.min(1, (now - twist.startTime) / TWIST_MS);
