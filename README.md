@@ -147,10 +147,12 @@ this because there's no per-facet gradient and no strong specular response.
 
 ### Geometry
 - Cubie corners and edges are **visibly rounded**, not sharp — soft
-  highlight curvature is visible along every edge. Swap the current
-  `THREE.BoxGeometry` for a rounded-box geometry (three.js doesn't ship one
-  in core; either use `RoundedBoxGeometry` from `three/examples/jsm/geometries/`
-  or fake it with a beveled-edge shader/normal trick).
+  highlight curvature is visible along every edge. Uses `RoundedBoxGeometry`
+  from `three/examples/jsm/geometries/`. It extends `BoxGeometry` and never
+  reassigns `this.groups`, so the original 6 per-face material groups (set
+  up index-based by the `super()` `BoxGeometry` call) survive the
+  indexed→non-indexed conversion unchanged — multi-material cubies work with
+  it with no extra plumbing needed.
 - Cubie gap should stay small — the source cube reads as almost seamless,
   with the "gap" mostly expressed as a highlight bevel rather than a visible
   dark gutter.
@@ -232,11 +234,12 @@ How the source look is approximated:
   are tuned relatively high (e.g. key `PointLight` intensity `60`) alongside
   `ACESFilmicToneMapping`; if you change light setup, re-check against a
   screenshot rather than assuming "reasonable-looking" intensity values.
-- **Not attempted**: true rounded-corner geometry (would require
-  `RoundedBoxGeometry`, which doesn't preserve per-face material groups the
-  way `BoxGeometry` does, so it can't easily take 6 different sticker
-  materials per cubie without extra plumbing) and real motion blur — both
-  called out as lower-priority in the matching-the-look section above.
+- **Rounded cubie edges**: `RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 3, CUBIE * 0.12)`
+  replaces the flat `BoxGeometry`, giving each cubie soft, highlight-catching
+  corners. Verified via screenshots that all 6 sticker materials still land
+  on the correct faces after the switch.
+- **Not attempted**: real motion blur on fast twists — noted as
+  lower-priority in the matching-the-look section above.
 
 Other implementation details for whoever extends this:
 - `UNIT` / `CUBIE` constants control cubie spacing/size (gap = UNIT - CUBIE);
@@ -265,8 +268,8 @@ To bring the page in line with the full source spec:
       [Matching the source cube's look](#matching-the-source-cubes-look)
       and [Implementation notes](#implementation-notes) for what changed
       (checkerboard gradient stickers, face-spanning decals, bright seams,
-      glossy `MeshPhysicalMaterial`). Still open: true rounded-corner
-      geometry and motion blur, both noted as lower priority above.
+      glossy `MeshPhysicalMaterial`, rounded cubie edges). Still open:
+      real motion blur on fast twists, noted as lower priority above.
 - [ ] Responsive layout beyond the current centered square stage in
       `App.svelte`
 
