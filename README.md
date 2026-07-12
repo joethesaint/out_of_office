@@ -7,6 +7,25 @@ extracted from that video, written so an agent (or a human) can pick up the
 project and build out the remaining page around the cube that's already
 implemented.
 
+## Working on this repo
+
+**Multiple agents may be working on this branch at the same time.** Before
+pushing any commit here — and ideally before starting work each session —
+run `git fetch` and check the branch against `origin` first:
+
+```bash
+git fetch origin
+git status   # "behind"/"diverged"? pull/merge before you start editing
+```
+
+If you're already mid-edit when you discover new remote commits, don't
+discard either side: `git stash -u`, pull/merge, `git stash pop`, resolve
+conflicts by hand (favor whichever side is objectively newer/more complete
+for that file — check commit messages and dates, don't just pick "ours"),
+then re-verify the app still runs before committing. Re-fetch immediately
+before every push, not just once at the start of a session — another agent
+can land a commit in the minutes it takes you to build and verify yours.
+
 ## Status
 
 **Built**: the 3D hero object (`src/lib/RotatingCube.svelte`) — a real
