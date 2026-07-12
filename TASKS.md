@@ -1,0 +1,79 @@
+# Out of Office — Agent Task Board
+
+> **Protocol for agents:**
+> 1. `git fetch` + `git pull` before reading this file — another agent may have updated it
+> 2. Pick an unclaimed item (`[ ]`), change it to `[~] In progress — <brief description> — <date>`
+> 3. Commit + push the TASKS.md change **before** starting the code work (so other agents see it claimed)
+> 4. When done, change to `[x]` and commit with the implementation
+
+Legend: `[ ]` not started · `[~]` in progress · `[x]` done
+
+---
+
+## P0 — Explicit brief items that were simply never built
+
+- [~] **"Activate Auto Reply →" CTA button** in the hero — brief specifies this exact button, currently missing from the hero entirely. Should scroll-trigger the 220vh journey. — _In progress (2026-07-12)_
+- [~] **Notification counter** (999+ → 23 → 7 → 1 → 0) tied to scroll `progress` in the hero. — _In progress (2026-07-12)_
+- [ ] **Boat animation** — horizontal scroll-tied boat crossing the screen, representing arrival at Tarkwa Bay (danfo bus = leaving, boat = arriving). The two can coexist.
+- [ ] **Scene 1 chaos-desktop layer** — Slack/WhatsApp/calendar/battery-low/email popups overlaid in the hero that dissolve as the cube solves. Currently the boot sequence is a lighter abstraction; this is the full UI-noise version. Design call needed on whether to add it to the boot screen or layer it into the hero scroll.
+
+---
+
+## P1 — Cube narrative decisions / interaction gaps
+
+- [~] **Click-cube easter egg** — click counter in `RotatingCube.svelte`; at 10 clicks show an Auto Reply Generator / Lagos Survival Stats overlay. Already has pointer events (drag-to-spin). — _In progress (2026-07-12)_
+- [~] **Cube idle / sleep mode** — after ~5s of no pointer movement, cube dims and enters a slow "breathing" rotation. Reset on any `pointermove`. — _In progress (2026-07-12)_
+- [ ] **OOO favicon / logo** — replace the default Vite scaffold favicon with a simplified "OOO cube" mark (one face = sun, one = ocean, one = paint palette). SVG favicon.
+- [ ] **Concept 4 architectural decision** — cube as persistent cross-section progress tracker (one face solves per section visited: Escape/Community/Activities/Memories/Playlist/Tickets). Needs design decision before more sections are added. If yes, cube must persist/reappear across scroll; current one-shot-hero pattern does not support this.
+- [ ] **Dissolving UI layer alongside cube solve** — notifications/traffic-sounds UI decays *simultaneously* with the cube unscrambling. Currently the cube solves alone with no competing digital-clutter layer to dissolve.
+
+---
+
+## P2 — Visual-metaphor fidelity (currently shallow nods)
+
+- [ ] **Boarding pass UI** — redesign Tickets section as an actual boarding-pass-shaped component (stub/perforation, gate-and-seat-style fields, "Destination: Out of Office"), not just a label over a pill button.
+- [ ] **Passport stamp graphics** — redesign OOO 001/002/003 timeline badges as ink-stamp / circular stamp visuals rather than plain rounded-rect text badges.
+- [ ] **Glassmorphism** — the moodboard lists it; never appeared anywhere on the site. Consider for at least one section.
+- [ ] **"Life is messy. Like a scrambled cube."** — this line was explicitly flagged as reusable brand copy in the brief; never used as displayed copy anywhere yet.
+
+---
+
+## P3 — Content gaps
+
+- [ ] **Real community / attendee photos** — Community section currently uses event flyers as polaroid stand-ins. Replace with real disposable-camera-style candid photos when available.
+- [ ] **Playlist tracks** — currently 5 fictional tracks. Replace with a real curated list or link to a real Spotify/Apple Music playlist.
+- [ ] **OG image** — `og-image.jpg` is referenced in `index.html` meta tags but the file doesn't exist yet. Create a branded 1200×630 image.
+
+---
+
+## P4 — Motion and typography systems (bigger lifts)
+
+- [ ] **Scroll-reveal animations on sections** — EscapeMetrics, Community, MemoryTimeline, Playlist, Tickets currently render instantly. Add `IntersectionObserver` fade/rise animations to match the brief's "slow, breathing, flowing" motion philosophy.
+- [ ] **Typography transformation** — conscious corporate→handwritten shift tied to scroll depth (not just fixed font-per-element assignments).
+- [ ] **Ticket/zine layout devices** — vertical spine text, barcode, QR code, care-label icon row, smiley-flower stickers, paint-splat scatter graphics (see `docs/brand-reference/` flyers).
+- [ ] **Sunset-orange / warm-sand colour arc** — original brief's second palette (escape colours) never appeared. Consider introducing them in calmer/later sections to complete the chaos→calm colour journey.
+
+---
+
+## ✅ Done (do not re-implement)
+
+- [x] Scroll-driven cube solve (Concept 1) — `progress` prop, 220vh sticky track
+- [x] Boot sequence — lines, wave rise, dark overlay (verbatim from brief)
+- [x] Escape Metrics section (87 emails, 62% stress, ∞ friendships, 100% battery)
+- [x] Memory Timeline — OOO 001 / 002 / 003 with Bungee stamps
+- [x] Community polaroids (real flyers as stand-ins)
+- [x] Playlist section (fictional tracks, real structure)
+- [x] Tickets CTA — real `tix.africa` URL
+- [x] Postcard section — "Greetings from Out of Office" reference image
+- [x] Danfo bus animation (leaving-Lagos metaphor)
+- [x] Cube idle/tumble + pointer parallax (always-moving, responds to cursor)
+- [x] Self-hosted fonts — all 5 families in `public/fonts/`
+- [x] 16:9 landscape hero card — replaced portrait phone-card
+- [x] Blue/pink/teal palette blended into cube gradient
+- [x] SEO meta tags — title, description, og:*, twitter:*
+- [x] `prefers-reduced-motion` — all animations suppressed
+- [x] `aria-live` on boot sequence, `sessionStorage` skip on return visits
+- [x] `:focus-visible` on icon buttons and CTA
+- [x] Body baseline — `line-height`, antialiased, `text-rendering`
+- [x] Polaroid `aspect-ratio: 9/16` matching real flyer proportions
+- [x] Project SKILL.md for agents (`.gemini/skills/out-of-office-project/`)
