@@ -57,19 +57,25 @@ buttons:
 The headline is the only content block; everything else is chrome around it.
 
 ### The hero object (cube)
-This is the piece that's implemented so far:
-- Cube with visible 3×3 grid lines per face — reads as a Rubik's-style
-  puzzle. **In the source video it only uses two colors** (hot pink +
-  white/cream), not six — it stays on-brand rather than reading as a toy.
-- Each face carries **one large brand glyph** rather than a plain color:
-  a heart outline, a butterfly silhouette (the logomark), a ring/smile
-  motif — different marks rotate into view as it tumbles.
+This is the piece that's implemented so far — see
+[Matching the source cube's look](#matching-the-source-cubes-look) for the
+full lighting/color/material breakdown, sampled directly from video frames.
+- Cube reads as a Rubik's-style puzzle, but **only uses two hues** (magenta
+  pink + white), not six — it stays on-brand rather than reading as a toy.
+- Each sticker tile is **checkered pink/white**, and on top of that
+  checkerboard sits **one large, soft-edged, semi-transparent brand glyph**
+  per face (heart outline, butterfly silhouette, ring/smile motif) that
+  spans multiple cubies like a projected decal, not a per-tile icon.
 - **Positioned absolutely over the headline text**, larger than its column
   — it visually breaks the grid (overlaps "ON" above, "BOW" below), which
   is what sells the "floating 3D object" effect rather than an inline image.
 - **Motion**: continuous multi-axis tumble (not single-axis spin), heavier
-  and more physical than a simple Y rotate, visible motion blur on fast
-  edges, soft ambient shadow underneath.
+  and more physical than a simple Y rotate, with visible motion blur on
+  fast-moving edges.
+- **Finish**: glossy plastic/candy-coat, not matte — strong gradient shading
+  across each facet and blown-out specular hotspots, rather than flat color
+  fills. No strong cast shadow is visible under the cube in the source
+  frames — the background stays a flat, uniform gray.
 
 ### Footer bar (mirrors the header)
 - **Left**: pink down-left arrow icon + bold two-line text
@@ -91,6 +97,102 @@ Part of the source clip has the Xiaohongshu/RedNote app's own UI bar
 cutting into the app's loading splash screen (blurred avatar, account ID,
 search bar, app logo + tagline). Those are from whoever screen-recorded the
 post inside the app — not part of the ad's own design.
+
+## Matching the source cube's look
+
+The current `RotatingCube.svelte` cube does **not** match the source video —
+it's flatter, more evenly lit, and uses six arbitrary hues instead of the
+source's cohesive pink/white scheme. This section documents exactly what
+needs to change, based on pixel sampling of the actual video frames (not
+guesswork), so it's actionable without re-watching the clip.
+
+### Color — sampled swatches
+Colors below were averaged from small patches on decompressed video frames
+(`ffmpeg -vf fps=2`, then sampled with Pillow). The source is a compressed,
+motion-blurred phone video, so treat these as a target *range*, not exact
+brand hex values:
+
+| Region | Sampled hex | Notes |
+|---|---|---|
+| Background | `#e4e4e4` | flat, uniform, no visible gradient or vignette |
+| Pink cubie, lit | `#f5c3e1` – `#f7a6d0` | light, slightly desaturated pink where the key light hits |
+| Pink cubie, shadowed | `#c4467b` – `#c44f80` | same hue, deeper and more saturated in shadow — **it's one pink hue shading light→dark, not two different pinks** |
+| White cubie | `#f2ecee` – `#ffffff` | reads as white but pulls very slightly warm/pink from bounce light |
+| Specular hotspot | `#ffffff` (blown out) | small, sharp, on the top-lit facet edges |
+| Glyph decal overlay | `#e086b0` | mid pink, sits at ~50–60% opacity over the checkerboard beneath it |
+
+Key takeaway: **each facet is a gradient, not a flat fill** — the same pink
+hue runs from a light, slightly washed-out pink at the top-left (toward the
+key light) down to a deep saturated magenta in shadow, plus a hard white
+specular bloom. The current implementation's flat `MeshStandardMaterial`
+per sticker with ambient + one directional light reads much flatter than
+this because there's no per-facet gradient and no strong specular response.
+
+### Sticker pattern & decals
+- Every face is a **checkerboard of pink and white tiles** (alternating per
+  cubie), not one solid color per face like a real Rubik's cube and not the
+  single-icon-per-face approach currently implemented.
+- On top of the checkerboard, each face carries **one oversized brand glyph**
+  (heart / butterfly / ring-smile) rendered soft-edged and semi-transparent,
+  large enough to span most of the 3×3 grid rather than sit inside one tile.
+  It reads like a decal projected over the sticker grid, letting the
+  checkerboard show through faintly.
+- Seams between cubies are **bright/light, not dark** — thin highlighted
+  bevel lines catching specular light, which is a big part of why it reads
+  as glossy candy-like plastic rather than a physical toy with black gaps.
+  The current implementation's dark plastic base color between stickers
+  works against this — it should be light/white, not `#141416`.
+
+### Geometry
+- Cubie corners and edges are **visibly rounded**, not sharp — soft
+  highlight curvature is visible along every edge. Swap the current
+  `THREE.BoxGeometry` for a rounded-box geometry (three.js doesn't ship one
+  in core; either use `RoundedBoxGeometry` from `three/examples/jsm/geometries/`
+  or fake it with a beveled-edge shader/normal trick).
+- Cubie gap should stay small — the source cube reads as almost seamless,
+  with the "gap" mostly expressed as a highlight bevel rather than a visible
+  dark gutter.
+
+### Lighting & shading
+- One large, soft **key light from the upper-left/front**, strong enough to
+  blow out small specular highlights on lit edges.
+- A gentle **fill light** keeps shadow-side facets from going near-black —
+  they bottom out around the deep magenta swatch above, not black.
+- No strong rim/back light needed; the "glow" on far edges in the video is
+  more likely fill light + the glossy material's specular response than a
+  dedicated rim light.
+- To get this in three.js: use `MeshPhysicalMaterial` (not
+  `MeshStandardMaterial`) with low `roughness` (~0.2–0.35) and a touch of
+  `clearcoat` (~0.3–0.5) for the glossy plastic response, one large soft key
+  `DirectionalLight` or `RectAreaLight`, one dim fill light, and bake the
+  light→dark gradient directly into each sticker's canvas texture (radial
+  or diagonal gradient from light pink to deep magenta) rather than relying
+  on flat-color materials plus real-time lighting alone — the source's look
+  is closer to a pre-lit/baked gradient than a physically simulated one.
+- No visible ground-contact shadow needs to be added — keep the background
+  flat, matching the source.
+
+### Motion
+- The tumbling motion itself (multi-axis, weighted) is already a reasonable
+  match. What's missing is the **motion blur** on fast-moving edges in the
+  source clip — a real render/camera artifact. This is the lowest-priority
+  item: three.js has no built-in motion blur, and faking it well needs a
+  velocity buffer + post-process pass (or a cheaper trick like a trailing
+  ghost mesh with fading opacity). Treat as a nice-to-have, not a blocker.
+
+### Summary of concrete changes needed
+1. Swap the six-color-per-direction scheme for the sampled pink/white
+   palette above.
+2. Checkerboard the stickers per face instead of one flat color per cubie.
+3. Replace per-tile icons with one large soft-edged translucent glyph per
+   face, spanning multiple cubies.
+4. Bake a light-to-dark gradient into each sticker texture rather than
+   flat-filling it.
+5. Change the inter-cubie seam/base color from dark plastic to light/white.
+6. Round the cubie edges (rounded-box geometry).
+7. Switch to `MeshPhysicalMaterial` with low roughness + clearcoat, and
+   restructure lighting to one soft key + one dim fill (no rim light).
+8. (Optional/last) approximate motion blur on fast tumbles.
 
 ## Implementation notes
 
@@ -127,8 +229,9 @@ To bring the page in line with the full source spec:
 - [ ] Pick/license real display typeface for the headline (source uses a
       tight-tracked black grotesk — something like Archivo Black or a
       similar condensed sans)
-- [ ] Decide whether to keep the six-color "real Rubik's cube" or switch
-      the cube back to the source's two-tone + brand-glyph look
+- [ ] Rework the cube's material/color/lighting to match the source — see
+      [Matching the source cube's look](#matching-the-source-cubes-look)
+      for the full sampled-color and lighting spec
 - [ ] Responsive layout beyond the current centered square stage in
       `App.svelte`
 
