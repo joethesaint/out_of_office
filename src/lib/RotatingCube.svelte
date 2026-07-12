@@ -176,6 +176,14 @@
     const disposableTextures = [plasticTexture];
     const disposableMaterials = [plasticMaterial];
 
+    // approximate motion blur: each trail step re-evaluates the same twist
+    // motion function at an earlier timestamp, no history buffer needed
+    const TRAIL_STEPS = [
+      { lagMs: 50, opacity: 0.32 },
+      { lagMs: 100, opacity: 0.16 },
+      { lagMs: 160, opacity: 0.07 },
+    ];
+
     // exterior sticker material for cubie (gx,gy,gz)'s face pointing `dir`
     function stickerMaterial(dir, gx, gy, gz) {
       const axes = FACE_AXES[dir];
@@ -210,7 +218,26 @@
           const mesh = new THREE.Mesh(geometry, materials);
           mesh.position.set(gx * UNIT, gy * UNIT, gz * UNIT);
           cubeGroup.add(mesh);
-          cubies.push({ mesh, x: gx, y: gy, z: gz });
+
+          // trailing "ghost" copies for motion blur during fast twists —
+          // each is a transparent clone of this cubie's own materials
+          // (shares the same textures), positioned a few ms in the past
+          const trail = TRAIL_STEPS.map(() => {
+            const ghostMats = materials.map((m) => {
+              const gm = m.clone();
+              gm.transparent = true;
+              gm.depthWrite = false;
+              gm.opacity = 0;
+              disposableMaterials.push(gm);
+              return gm;
+            });
+            const ghostMesh = new THREE.Mesh(geometry, ghostMats);
+            ghostMesh.visible = false;
+            cubeGroup.add(ghostMesh);
+            return { mesh: ghostMesh, materials: ghostMats };
+          });
+
+          cubies.push({ mesh, x: gx, y: gy, z: gz, trail });
         }
       }
     }
@@ -333,11 +360,27 @@
       const theta = twist.dir * (Math.PI / 2) * eased;
       const axisVec = axisVectors[twist.axis];
       const q = new THREE.Quaternion().setFromAxisAngle(axisVec, theta);
+      // fastest mid-twist (eased' peaks at t=0.5) is where the blur should
+      // be most visible; fade trails out near the start/end of the move
+      const speed = Math.sin(Math.min(t, 1) * Math.PI);
       for (let i = 0; i < twist.affected.length; i++) {
         const c = twist.affected[i];
         const init = twist.initial[i];
         c.mesh.position.copy(init.pos).applyAxisAngle(axisVec, theta);
         c.mesh.quaternion.copy(q).multiply(init.quat);
+
+        for (let k = 0; k < TRAIL_STEPS.length; k++) {
+          const step = TRAIL_STEPS[k];
+          const tLag = Math.max(0, Math.min(1, (now - step.lagMs - twist.startTime) / TWIST_MS));
+          const thetaLag = twist.dir * (Math.PI / 2) * easeInOutQuad(tLag);
+          const qLag = new THREE.Quaternion().setFromAxisAngle(axisVec, thetaLag);
+          const ghost = c.trail[k];
+          ghost.mesh.visible = true;
+          ghost.mesh.position.copy(init.pos).applyAxisAngle(axisVec, thetaLag);
+          ghost.mesh.quaternion.copy(qLag).multiply(init.quat);
+          const opacity = step.opacity * speed;
+          ghost.materials.forEach((m) => { m.opacity = opacity; });
+        }
       }
       if (t >= 1) {
         for (const c of twist.affected) {
@@ -347,6 +390,7 @@
           c.z = rotated.z;
           c.mesh.position.set(c.x * UNIT, c.y * UNIT, c.z * UNIT);
           c.mesh.quaternion.normalize();
+          c.trail.forEach((ghost) => { ghost.mesh.visible = false; });
         }
         twist = null;
         nextTwistAt = now + PAUSE_MS;

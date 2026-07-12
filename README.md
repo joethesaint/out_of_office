@@ -178,11 +178,10 @@ this because there's no per-facet gradient and no strong specular response.
 
 ### Motion
 - The tumbling motion itself (multi-axis, weighted) is already a reasonable
-  match. What's missing is the **motion blur** on fast-moving edges in the
-  source clip — a real render/camera artifact. This is the lowest-priority
-  item: three.js has no built-in motion blur, and faking it well needs a
-  velocity buffer + post-process pass (or a cheaper trick like a trailing
-  ghost mesh with fading opacity). Treat as a nice-to-have, not a blocker.
+  match. The **motion blur** on fast-moving edges in the source clip is
+  implemented as trailing ghost meshes (see [Implementation notes](#implementation-notes))
+  rather than a true velocity-buffer post-process pass, which three.js
+  doesn't provide out of the box.
 
 ### Summary of concrete changes needed
 1. Swap the six-color-per-direction scheme for the sampled pink/white
@@ -238,8 +237,20 @@ How the source look is approximated:
   replaces the flat `BoxGeometry`, giving each cubie soft, highlight-catching
   corners. Verified via screenshots that all 6 sticker materials still land
   on the correct faces after the switch.
-- **Not attempted**: real motion blur on fast twists — noted as
-  lower-priority in the matching-the-look section above.
+- **Motion blur on twists**: each cubie gets 3 extra "ghost" meshes
+  (`TRAIL_STEPS`, defined by `lagMs`/`opacity` pairs), created once at
+  startup with cloned transparent materials sharing the same textures
+  (`gm.transparent = true`, `depthWrite = false`, `opacity` driven per
+  frame) and `visible = false` until needed. During a twist, each ghost's
+  transform is computed by **re-evaluating the twist's motion function at
+  an earlier timestamp** (`now - lagMs`) rather than recording a runtime
+  history buffer — since a cubie's position during a twist is a pure
+  function of elapsed time (`theta = dir * (PI/2) * easeInOutQuad(t)`), the
+  "position N ms ago" is just that same function called with an earlier
+  `t`. Opacity is further scaled by `sin(t * PI)` so the blur peaks mid-twist
+  (where angular speed is highest under the ease curve) and fades out near
+  the start/end of the move, and all ghosts are hidden (`visible = false`)
+  the instant a twist completes, so there's zero render cost while idle.
 
 Other implementation details for whoever extends this:
 - `UNIT` / `CUBIE` constants control cubie spacing/size (gap = UNIT - CUBIE);
@@ -268,8 +279,9 @@ To bring the page in line with the full source spec:
       [Matching the source cube's look](#matching-the-source-cubes-look)
       and [Implementation notes](#implementation-notes) for what changed
       (checkerboard gradient stickers, face-spanning decals, bright seams,
-      glossy `MeshPhysicalMaterial`, rounded cubie edges). Still open:
-      real motion blur on fast twists, noted as lower priority above.
+      glossy `MeshPhysicalMaterial`, rounded cubie edges, twist motion blur
+      via trailing ghost meshes). The cube now matches the source spec in
+      full — remaining TODOs below are about the rest of the page.
 - [ ] Responsive layout beyond the current centered square stage in
       `App.svelte`
 
