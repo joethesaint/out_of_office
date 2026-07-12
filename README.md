@@ -88,6 +88,15 @@ exist in `docs/brand-reference/`, but they document **two** real events.
 These three flyers are the actual, currently-in-use brand assets — treat
 them as ground truth over anything invented earlier in this doc.
 
+A fourth reference image, `docs/brand-reference/postcard-greetings-from-out-of-office.jpg`,
+is a "Greetings from Out of Office" retro postcard (mountain/forest photo,
+pink slab-serif wordmark, script "Greetings from") supplied directly by the
+brand owner as a style/content reference — **not** a Lagos photo (it's a
+mountain landscape), used deliberately as a general "wherever you are when
+you're out of office" postcard rather than a literal Tarkwa Bay image. It's
+rendered as-is in `Postcard.svelte` (see [Implementation notes](#implementation-notes)),
+not recreated/redrawn.
+
 ### Color palette — sampled from the flyers
 
 | Role | Sampled hex | Source |
@@ -518,6 +527,35 @@ impression of licensing/endorsement), and `Tickets` (a CTA linking to the
 real ticket page, `https://tix.africa/discover/outofofficeng`, taken
 directly off the Tarkwa Bay flyer).
 
+### Landscape hero + postcard
+
+The hero `.frame` changed from a portrait phone-card (`aspect-ratio: 9/16`)
+to landscape (`aspect-ratio: 16/9`, `width: min(94vw, 900px)`). This forced
+a rework of how the cube sits next to the headline: the original technique
+absolutely-positioned `.cube-slot` at a hand-tuned `top`/`left` percentage
+of the text stack's own bounding box (see the git history around "OUT/OF/OF…"
+for why that was fragile — it broke once already when word-wrapping
+changed). That's gone. `.hero` now contains a `.hero-row` flex container
+with `.headline` and `.cube-slot` as siblings — the cube is a normal flex
+item to the right of the text, sized independently
+(`clamp(150px, 20vw, 260px)`), with only a small negative `margin-left`
+(`clamp(-1.5rem, -3vw, -0.5rem)`) so it nudges into the gap next to
+"OFFICE" without any risk of covering a letter, regardless of how long the
+wordmark or viewport width changes. Below `700px` width, `.hero-row`
+switches to `flex-direction: column` (cube below text) and the frame goes
+full-bleed, same fallback behavior as before just at a wider breakpoint
+(was `480px`, now `700px`, since landscape needs more room before it
+should give up and stack).
+
+`Postcard.svelte` renders the actual uploaded "Greetings from Out of
+Office" reference image (imported from `docs/brand-reference/`, same
+technique as `Community.svelte`) as a slightly rotated, drop-shadowed card
+with a decorative "OOO · LAGOS" postmark stamp (inline SVG, dashed circle)
+in the corner — no text/typography was redrawn, the photo already has its
+own baked-in treatment. Placed right after the "Activated" reveal, as a
+"you've arrived, here's your postcard" beat before the stat/community
+sections.
+
 ## TODO / replication checklist
 
 - [x] Recolor the cube from the legacy pink/white palette to the Out of
@@ -530,18 +568,24 @@ directly off the Tarkwa Bay flyer).
       reused from the earlier Pinterest-spec build (`HeaderBar.svelte`,
       `FooterBar.svelte`), content and colors replaced with real Out of
       Office copy (see [Implementation notes](#implementation-notes)).
-- [x] Headline typography block: "OUT / OF / OFFICE" wordmark stack, cube
-      anchored at the OF/OFFICE boundary (same anchoring technique as the
-      original CRUSH/ON/BOW build — cube stays put regardless of
-      tagline/subhead height), subhead referencing the next real event,
+- [x] Headline typography block: "OUT OF / OFFICE" wordmark stack, cube
+      sitting to its right in a flex row (**not** absolute-positioned
+      percentage overlap anymore — see [Implementation notes](#implementation-notes)
+      for why that was replaced), subhead referencing the next real event,
       tagline "Release. Unwind. Reconnect."
 - [x] Typography: Fredoka (rounded display, wordmark/headline) + Space
       Grotesk (body/labels/tags), per the
       [Brand identity](#brand-identity-out-of-office-lagos) direction —
       replaces the Archivo Black + Inter used in the Pinterest-spec build.
-- [x] Responsive layout: centered phone-frame card on wide viewports, true
-      full-bleed single viewport under 480px width (kept from the
-      Pinterest-spec build).
+- [x] Responsive layout: centered landscape card on wide viewports, true
+      full-bleed single viewport under 700px width — updated from a
+      portrait 9/16 phone-frame to a 16/9 landscape frame, see
+      [Implementation notes](#implementation-notes) for the layout rework
+      this required (cube moved from absolute-overlap positioning to a
+      flex-row sibling of the headline).
+- [x] Add the "Greetings from Out of Office" postcard reference image
+      somewhere on the site — `Postcard.svelte`, see
+      [Implementation notes](#implementation-notes).
 - [x] Wire the cube's scramble/solve to scroll progress instead of an
       autonomous timer — see [Cube narrative](#cube-narrative) and
       [Implementation notes](#implementation-notes) for how it works. The
@@ -617,6 +661,7 @@ src/
     HeaderBar.svelte      # 3-block header strip
     FooterBar.svelte      # footer callout + fine print
     RotatingCube.svelte   # Three.js hero object (see Implementation notes)
+    Postcard.svelte       # "Greetings from Out of Office" reference image
     EscapeMetrics.svelte  # auto-reply blurb + stat grid
     Community.svelte      # polaroid gallery (real flyer images)
     MemoryTimeline.svelte # OOO 001 / 002 / 003 event stamps

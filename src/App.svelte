@@ -4,6 +4,7 @@
   import HeaderBar from "./lib/HeaderBar.svelte";
   import FooterBar from "./lib/FooterBar.svelte";
   import BootSequence from "./lib/BootSequence.svelte";
+  import Postcard from "./lib/Postcard.svelte";
   import EscapeMetrics from "./lib/EscapeMetrics.svelte";
   import Community from "./lib/Community.svelte";
   import MemoryTimeline from "./lib/MemoryTimeline.svelte";
@@ -68,22 +69,24 @@
             >
           </button>
 
-          <div class="headline">
-            <span class="eyebrow">Auto-reply for real life</span>
-            <div class="stack">
-              <span class="word">OUT OF</span>
-              <span class="word">OFFICE</span>
-              <div class="cube-slot">
-                <RotatingCube {progress} />
+          <div class="hero-row">
+            <div class="headline">
+              <span class="eyebrow">Auto-reply for real life</span>
+              <div class="stack">
+                <span class="word">OUT OF</span>
+                <span class="word">OFFICE</span>
+              </div>
+              <div class="subhead">
+                <span class="stamp">OOO 002</span>
+                <span class="venue">Tarkwa Bay · Apr 11</span>
+              </div>
+              <div class="tagline">
+                <span>Release. Unwind. Reconnect.</span>
+                <span class="sub">Auto replies enabled. Stress disabled.</span>
               </div>
             </div>
-            <div class="subhead">
-              <span class="stamp">OOO 002</span>
-              <span class="venue">Tarkwa Bay · Apr 11</span>
-            </div>
-            <div class="tagline">
-              <span>Release. Unwind. Reconnect.</span>
-              <span class="sub">Auto replies enabled. Stress disabled.</span>
+            <div class="cube-slot">
+              <RotatingCube {progress} />
             </div>
           </div>
         </div>
@@ -100,6 +103,7 @@
   <p class="activated-sub">You've found a little order and peace.</p>
 </section>
 
+<Postcard />
 <EscapeMetrics />
 <Community />
 <MemoryTimeline />
@@ -144,9 +148,9 @@
 
   .frame {
     position: relative;
-    width: min(100%, 480px);
-    aspect-ratio: 9 / 16;
-    max-height: 100vh;
+    width: min(94vw, 900px);
+    aspect-ratio: 16 / 9;
+    max-height: 92vh;
     background: var(--bg);
     display: flex;
     flex-direction: column;
@@ -156,7 +160,7 @@
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.16);
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 700px) {
     .stage-wrap {
       padding: 0;
     }
@@ -167,6 +171,14 @@
       border-radius: 0;
       box-shadow: none;
     }
+    .hero-row {
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .cube-slot {
+      margin-left: 0;
+    }
   }
 
   .hero {
@@ -174,8 +186,18 @@
     flex: 1 1 auto;
     display: flex;
     align-items: center;
-    padding: 0 clamp(1rem, 6vw, 2rem);
+    padding: 0 clamp(1.25rem, 5vw, 3rem);
     overflow: hidden;
+  }
+
+  .hero-row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 2vw, 1.5rem);
+    width: 100%;
   }
 
   .icon-btn {
@@ -200,8 +222,6 @@
   }
 
   .headline {
-    position: relative;
-    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: clamp(0.5rem, 1.5vh, 0.9rem);
@@ -265,19 +285,17 @@
   }
 
   .cube-slot {
-    position: absolute;
+    position: relative;
     z-index: 2;
+    flex: none;
     pointer-events: auto;
-    width: clamp(140px, 36vw, 190px);
-    height: clamp(140px, 36vw, 190px);
-    /* sits in the gap between "OUT OF" and "OFFICE", biased right so it
-       covers the tail of each line rather than obscuring either word's
-       first letters — same overlap idea as the original CRUSH/ON/BOW
-       build, tuned down since "OUT OF OFFICE" reads badly if truncated
-       at the start (looks like a typo, "OF"/"OF...") */
-    top: 52%;
-    left: 78%;
-    transform: translate(-50%, -50%);
+    width: clamp(150px, 20vw, 260px);
+    height: clamp(150px, 20vw, 260px);
+    /* sits to the right of "OUT OF / OFFICE" in its own flex column, with
+       a small negative margin so it only nudges into the empty space past
+       the text rather than ever covering a letter — the landscape frame
+       gives it room to sit clear of the words instead of overlapping them */
+    margin-left: clamp(-1.5rem, -3vw, -0.5rem);
   }
 
   .activated {
