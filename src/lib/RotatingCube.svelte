@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
+  import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
   let canvas;
   let container;
@@ -170,7 +171,7 @@
       clearcoatRoughness: 0.2,
       metalness: 0.03,
     });
-    const geometry = new THREE.BoxGeometry(CUBIE, CUBIE, CUBIE);
+    const geometry = new RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 3, CUBIE * 0.12);
 
     const disposableTextures = [plasticTexture];
     const disposableMaterials = [plasticMaterial];
