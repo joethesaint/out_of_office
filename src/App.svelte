@@ -37,6 +37,17 @@
   });
 
   $: activated = progress >= 0.995;
+
+  $: notificationCount =
+    progress < 0.05
+      ? "999+"
+      : progress < 0.25
+        ? Math.floor(840 * (1 - progress))
+        : progress < 0.65
+          ? Math.floor(420 * (1 - progress))
+          : progress < 0.95
+            ? Math.max(1, Math.floor(60 * (1 - progress)))
+            : 0;
 </script>
 
 <BootSequence />
@@ -74,6 +85,11 @@
 
           <div class="hero-row">
             <div class="headline">
+              <div class="notification-pill" class:zero={notificationCount === 0}>
+                <span class="bell-icon">🔔</span>
+                <span class="notif-label">Pending Notifications:</span>
+                <span class="notif-count">{notificationCount === 0 ? "0 (Muted ✓)" : notificationCount}</span>
+              </div>
               <span class="eyebrow">
                 <svg class="paint-splat" viewBox="0 0 60 50" aria-hidden="true">
                   <path
@@ -100,6 +116,22 @@
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>
                 <span class="sub">Auto replies enabled. Stress disabled.</span>
+              </div>
+              <div class="hero-cta-wrap">
+                <button
+                  class="activate-cta"
+                  on:click={() => {
+                    if (scrollTrack) {
+                      const rect = scrollTrack.getBoundingClientRect();
+                      window.scrollTo({
+                        top: window.scrollY + rect.top + window.innerHeight * 1.5,
+                        behavior: "smooth"
+                      });
+                    }
+                  }}
+                >
+                  Activate Auto Reply →
+                </button>
               </div>
             </div>
             <div class="cube-slot">
@@ -315,6 +347,67 @@
     font-size: clamp(0.5rem, 1.6vw, 0.65rem);
     font-weight: 600;
     color: #6b6b6b;
+  }
+
+  .notification-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255, 60, 60, 0.12);
+    border: 1px solid rgba(255, 60, 60, 0.28);
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-family: var(--sans);
+    font-size: clamp(0.65rem, 1.8vw, 0.75rem);
+    width: fit-content;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+  .notification-pill.zero {
+    background: rgba(0, 191, 255, 0.12);
+    border-color: rgba(0, 191, 255, 0.35);
+  }
+  .notif-label {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .notif-count {
+    font-family: var(--display);
+    font-weight: 700;
+    color: #e63946;
+    transition: color 0.3s ease;
+  }
+  .notification-pill.zero .notif-count {
+    color: var(--blue, #00bfff);
+  }
+
+  .hero-cta-wrap {
+    margin-top: clamp(0.4rem, 1.2vh, 0.8rem);
+  }
+  .activate-cta {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(0.85rem, 2.4vw, 1.05rem);
+    background: var(--blue, #00bfff);
+    color: #fff;
+    border: none;
+    padding: clamp(0.65rem, 2vh, 0.85rem) clamp(1.2rem, 4vw, 1.8rem);
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 191, 255, 0.32);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .activate-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 191, 255, 0.45);
+    background: #00aceb;
+  }
+  .activate-cta:active {
+    transform: translateY(0);
+  }
+  .activate-cta:focus-visible {
+    outline: 3px solid var(--pink-deep, #fc9ce0);
+    outline-offset: 3px;
   }
 
   .cube-slot {

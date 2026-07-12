@@ -10,8 +10,45 @@
   let canvas;
   let container;
 
+  let clickCount = 0;
+  let showEasterEgg = false;
+  let isSleeping = false;
+  let lastActivityTime = performance.now();
+
+  const AUTO_REPLIES = [
+    "I'm currently unavailable. I'm at the beach pretending my problems don't exist.",
+    "Gone to touch grass at Tarkwa Bay. Back soon.",
+    "I will return when my soul battery is charged. Currently: 2%.",
+    "Auto-reply for real life: Emails muted. Lagos stress suspended.",
+    "If this is urgent, please re-evaluate your relationship with time."
+  ];
+  let currentReply = AUTO_REPLIES[0];
+
+  function handleCubeClick() {
+    clickCount = (clickCount + 1) % 11;
+    if (clickCount === 10) {
+      showEasterEgg = true;
+      currentReply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
+    }
+  }
+
+  function regenerateReply() {
+    currentReply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
+  }
+
+  function wakeUp() {
+    lastActivityTime = performance.now();
+    isSleeping = false;
+  }
+
   let liveProgress = progress;
-  $: liveProgress = progress;
+  $: {
+    liveProgress = progress;
+    if (liveProgress !== null) {
+      lastActivityTime = performance.now();
+      isSleeping = false;
+    }
+  }
 
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
@@ -266,12 +303,15 @@
     let pointerX = 0;
     let pointerY = 0;
     let dragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
     let lastX = 0;
     let lastY = 0;
     let velX = 0.004;
     let velY = 0.007;
 
     function onPointerMove(e) {
+      wakeUp();
       const rect = container.getBoundingClientRect();
       pointerX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       pointerY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
@@ -283,12 +323,18 @@
       }
     }
     function onPointerDown(e) {
+      wakeUp();
       dragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
       lastX = e.clientX;
       lastY = e.clientY;
     }
-    function onPointerUp() {
+    function onPointerUp(e) {
       dragging = false;
+      if (e && Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) < 6) {
+        handleCubeClick();
+      }
     }
 
     container.addEventListener('pointermove', onPointerMove);
@@ -470,9 +516,23 @@
       const now = performance.now();
       updateTwist(now);
 
+      if (!dragging && now - lastActivityTime > 5000) {
+        isSleeping = true;
+      }
+
       if (!dragging) {
-        velX += (0.004 - velX) * 0.02;
-        velY += (0.007 - velY) * 0.02;
+        if (isSleeping) {
+          velX += (0.001 - velX) * 0.02;
+          velY += (0.0018 - velY) * 0.02;
+          const breath = 1 + Math.sin(now * 0.002) * 0.04;
+          cubeGroup.scale.set(breath, breath, breath);
+        } else {
+          velX += (0.004 - velX) * 0.02;
+          velY += (0.007 - velY) * 0.02;
+          cubeGroup.scale.set(1, 1, 1);
+        }
+      } else {
+        cubeGroup.scale.set(1, 1, 1);
       }
       cubeGroup.rotation.x += velX;
       cubeGroup.rotation.y += velY;
@@ -500,10 +560,37 @@
 
 <div class="cube-stage" class:allow-scroll={progress !== null} bind:this={container}>
   <canvas bind:this={canvas}></canvas>
+
+  {#if isSleeping && !showEasterEgg}
+    <div class="sleep-badge" aria-hidden="true">
+      <span class="zzz">zZz</span>
+      <span class="sleep-text">Cube sleeping · Click or drag to wake</span>
+    </div>
+  {/if}
+
+  {#if showEasterEgg}
+    <div class="easter-egg-modal" role="dialog" aria-label="Auto-Reply Generator">
+      <div class="modal-content">
+        <button class="close-btn" on:click={() => showEasterEgg = false} aria-label="Close">×</button>
+        <p class="modal-eyebrow">Easter Egg · 10 Clicks</p>
+        <h3 class="modal-title">Out of Office Auto-Reply</h3>
+        <div class="reply-box">
+          <p class="reply-text">"{currentReply}"</p>
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn primary" on:click={regenerateReply}>Shuffle Reply</button>
+          <button class="action-btn secondary" on:click={() => {
+            navigator.clipboard?.writeText(currentReply);
+          }}>Copy</button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
   .cube-stage {
+    position: relative;
     width: 100%;
     height: 100%;
     touch-action: none;
@@ -521,5 +608,136 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  .sleep-badge {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(24, 24, 24, 0.82);
+    backdrop-filter: blur(8px);
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    pointer-events: none;
+    animation: fadeIn 0.4s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .zzz {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--pink-deep, #fc9ce0);
+  }
+  .sleep-text {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    color: #f6f4f1;
+    letter-spacing: 0.04em;
+  }
+
+  .easter-egg-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(24, 24, 24, 0.45);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: min(90%, 340px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .close-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+  }
+  .close-btn:hover {
+    color: #181818;
+  }
+  .modal-eyebrow {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--pink-deep, #e0568f);
+  }
+  .modal-title {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--blue, #00bfff);
+  }
+  .reply-box {
+    background: #f6f4f1;
+    border-radius: 10px;
+    padding: 0.9rem;
+    margin: 0.3rem 0;
+  }
+  .reply-text {
+    margin: 0;
+    font-family: var(--sans);
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #333;
+    line-height: 1.4;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.25rem;
+  }
+  .action-btn {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .action-btn:hover {
+    transform: translateY(-1px);
+  }
+  .action-btn.primary {
+    background: var(--blue, #00bfff);
+    color: #fff;
+  }
+  .action-btn.secondary {
+    background: #eae8e4;
+    color: #333;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
   }
 </style>
