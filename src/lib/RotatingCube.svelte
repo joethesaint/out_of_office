@@ -13,6 +13,9 @@
   let liveProgress = progress;
   $: liveProgress = progress;
 
+  let showEasterEgg = false;
+  let easterEggTimer;
+
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
@@ -271,6 +274,21 @@
     let velX = 0.004;
     let velY = 0.007;
 
+    // --- Sleep mode for inactivity ---
+    let isSleeping = false;
+    let sleepTimer;
+    function resetSleep() {
+      isSleeping = false;
+      clearTimeout(sleepTimer);
+      sleepTimer = setTimeout(() => {
+        isSleeping = true;
+      }, 5000);
+    }
+    window.addEventListener('pointermove', resetSleep);
+    window.addEventListener('scroll', resetSleep);
+    window.addEventListener('keydown', resetSleep);
+    resetSleep();
+
     function onPointerMove(e) {
       const rect = container.getBoundingClientRect();
       pointerX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -498,8 +516,13 @@
       updateTwist(now);
 
       if (!dragging) {
-        velX += (0.004 - velX) * 0.02;
-        velY += (0.007 - velY) * 0.02;
+        if (isSleeping) {
+          velX += (0.0005 - velX) * 0.02;
+          velY += (0.001 - velY) * 0.02;
+        } else {
+          velX += (0.004 - velX) * 0.02;
+          velY += (0.007 - velY) * 0.02;
+        }
       }
       cubeGroup.rotation.x += velX;
       cubeGroup.rotation.y += velY;
@@ -507,16 +530,28 @@
       camera.position.x += (pointerX * 0.6 - camera.position.x) * 0.04;
       camera.position.y += (-pointerY * 0.6 - camera.position.y) * 0.04;
       camera.lookAt(0, 0, 0);
+
+      // Dim lights when sleeping
+      const targetFill = isSleeping ? 0.3 : 1.2;
+      const targetKey = isSleeping ? 15 : 60;
+      fill.intensity += (targetFill - fill.intensity) * 0.05;
+      key.intensity += (targetKey - key.intensity) * 0.05;
+
       renderer.render(scene, camera);
     }
     animate();
 
     onDestroy(() => {
       cancelAnimationFrame(frameId);
+      clearTimeout(easterEggTimer);
+      clearTimeout(sleepTimer);
       ro.disconnect();
       container.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointermove', resetSleep);
+      window.removeEventListener('scroll', resetSleep);
+      window.removeEventListener('keydown', resetSleep);
       geometry.dispose();
       disposableMaterials.forEach((m) => m.dispose());
       disposableTextures.forEach((t) => t.dispose());
@@ -527,10 +562,16 @@
 
 <div class="cube-stage" class:allow-scroll={progress !== null} bind:this={container}>
   <canvas bind:this={canvas}></canvas>
+
+  <div class="easter-egg" class:visible={showEasterEgg} role="status">
+    <p class="egg-title">Auto Reply Generator</p>
+    <p class="egg-body">I'm currently unavailable.<br />I'm at the beach pretending my problems don't exist.</p>
+  </div>
 </div>
 
 <style>
   .cube-stage {
+    position: relative;
     width: 100%;
     height: 100%;
     touch-action: none;
@@ -548,5 +589,43 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  /* easter-egg reveal: a soft in-brand toast, not a blocking native alert —
+     matches the site's own "slow, breathing, flowing" motion philosophy */
+  .easter-egg {
+    position: absolute;
+    left: 50%;
+    bottom: 8%;
+    transform: translate(-50%, 12px);
+    width: max-content;
+    max-width: 85%;
+    padding: 0.75rem 1.1rem;
+    border-radius: 14px;
+    background: rgba(246, 244, 241, 0.9);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .easter-egg.visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .egg-title {
+    margin: 0 0 0.2rem;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--blue);
+  }
+  .egg-body {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--ink);
   }
 </style>

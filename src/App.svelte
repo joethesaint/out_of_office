@@ -112,7 +112,9 @@
               </div>
             </div>
             <div class="cube-slot">
-              <RotatingCube {progress} />
+              <div class="cube-floating-container" class:is-floating={activated}>
+                <RotatingCube {progress} />
+              </div>
             </div>
           </div>
           <Boat {progress} />
@@ -340,11 +342,32 @@
     pointer-events: auto;
     width: clamp(150px, 20vw, 260px);
     height: clamp(150px, 20vw, 260px);
-    /* sits to the right of "OUT OF / OFFICE" in its own flex column, with
-       a small negative margin so it only nudges into the empty space past
-       the text rather than ever covering a letter — the landscape frame
-       gives it room to sit clear of the words instead of overlapping them */
     margin-left: clamp(-1.5rem, -3vw, -0.5rem);
+  }
+
+  .cube-floating-container {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cube-floating-container.is-floating {
+    position: fixed;
+    bottom: clamp(1.5rem, 5vh, 3rem);
+    right: clamp(1.5rem, 5vw, 3rem);
+    width: clamp(70px, 10vw, 100px);
+    height: clamp(70px, 10vw, 100px);
+    z-index: 100;
+    pointer-events: auto;
+    animation: floatAssistant 4s ease-in-out infinite;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+  }
+
+  @keyframes floatAssistant {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
   }
 
   .activated {
