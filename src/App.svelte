@@ -10,6 +10,7 @@
   import MemoryTimeline from "./lib/MemoryTimeline.svelte";
   import Playlist from "./lib/Playlist.svelte";
   import Tickets from "./lib/Tickets.svelte";
+  import DanfoBus from "./lib/DanfoBus.svelte";
 
   let scrollTrack;
   let progress = 0;
@@ -48,6 +49,8 @@
         <HeaderBar />
 
         <div class="hero">
+          <DanfoBus />
+
           <button class="icon-btn icon-heart" aria-label="Like">
             <svg viewBox="0 0 24 24"
               ><path
@@ -71,7 +74,21 @@
 
           <div class="hero-row">
             <div class="headline">
-              <span class="eyebrow">Auto-reply for real life</span>
+              <span class="eyebrow">
+                <svg class="paint-splat" viewBox="0 0 60 50" aria-hidden="true">
+                  <path
+                    fill="url(#splatGrad)"
+                    d="M30 4c4 0 5 6 9 5s8-3 10 1-3 6-1 10 6 6 2 10-8 1-10 5-4 8-9 6-4-7-9-7-9 4-12-1 2-7-1-11-8-4-5-9 7-3 9-7 2-2 4-4 3-1 5-2z"
+                  />
+                  <defs>
+                    <linearGradient id="splatGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="var(--pink)" />
+                      <stop offset="1" stop-color="var(--pink-deep)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                Auto-reply for real life</span
+              >
               <div class="stack">
                 <span class="word">OUT OF</span>
                 <span class="word">OFFICE</span>
@@ -228,12 +245,23 @@
   }
 
   .eyebrow {
+    position: relative;
     font-family: var(--sans);
     font-weight: 600;
     font-size: clamp(0.6rem, 1.8vw, 0.8rem);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--accent);
+  }
+
+  .paint-splat {
+    position: absolute;
+    top: -0.9em;
+    left: -1.8em;
+    width: clamp(16px, 4vw, 22px);
+    height: auto;
+    z-index: -1;
+    opacity: 0.9;
   }
 
   .stack {
