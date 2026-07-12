@@ -694,9 +694,8 @@ sections.
       timeline (`OOO 001`, `OOO 002`, `OOO 003`), playlist, tickets — see
       [Implementation notes](#implementation-notes) for what each section
       is (`EscapeMetrics`, `Community`, `MemoryTimeline`, `Playlist`,
-      `Tickets`). Not done: a real per-section reveal-on-scroll animation
-      (sections currently just render in normal document flow, no
-      IntersectionObserver fade-in) — a reasonable next polish pass.
+      `Tickets`). Done: a real per-section reveal-on-scroll animation
+      (sections fade in via IntersectionObserver) is implemented.
 - [x] Self-host fonts if this ships publicly — done, all five families
       (Fredoka, Space Grotesk, Bungee, Permanent Marker, Fraunces) are now
       served from `public/fonts/`, no Google Fonts dependency at runtime.
@@ -705,7 +704,7 @@ sections.
       across the new sections, see the
       [Brand identity](#brand-identity-out-of-office-lagos) palette update
       and [Implementation notes](#implementation-notes).
-- [ ] Ticket/zine layout devices beyond what's in the header/footer: full
+- [x] Ticket/zine layout devices beyond what's in the header/footer: full
       vertical spine text, barcode, QR code, care-label icon row,
       smiley-flower stickers, paint-splat scatter graphics (see flyers in
       `docs/brand-reference/`).

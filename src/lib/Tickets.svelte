@@ -51,15 +51,23 @@
     font-weight: 700;
     font-size: 1.15rem;
     color: #fff;
-    background: linear-gradient(135deg, var(--blue), var(--pink-deep));
+    background: linear-gradient(135deg, var(--blue), var(--pink-deep), var(--accent), var(--blue));
+    background-size: 300% 300%;
+    animation: gradientShift 6s ease infinite;
     padding: 1rem 2.25rem;
     border-radius: 999px;
     text-decoration: none;
     box-shadow: 0 16px 34px rgba(224, 86, 143, 0.28);
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
   .cta:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(224, 86, 143, 0.4);
   }
   .cta:focus-visible {
     outline: 3px solid var(--blue);

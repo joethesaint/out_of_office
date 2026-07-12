@@ -11,6 +11,8 @@
   import Playlist from "./lib/Playlist.svelte";
   import Tickets from "./lib/Tickets.svelte";
   import DanfoBus from "./lib/DanfoBus.svelte";
+  import ZineDecorations from "./lib/ZineDecorations.svelte";
+  import ScrollReveal from "./lib/ScrollReveal.svelte";
 
   let scrollTrack;
   let progress = 0;
@@ -47,6 +49,7 @@
       <div class="grain"></div>
       <main class="frame">
         <HeaderBar />
+        <ZineDecorations />
 
         <div class="hero">
           <DanfoBus />
@@ -120,17 +123,17 @@
   <p class="activated-sub">You've found a little order and peace.</p>
 </section>
 
-<Postcard />
-<EscapeMetrics />
-<Community />
-<MemoryTimeline />
-<Playlist />
-<Tickets />
+<ScrollReveal><Postcard /></ScrollReveal>
+<ScrollReveal><EscapeMetrics /></ScrollReveal>
+<ScrollReveal><Community /></ScrollReveal>
+<ScrollReveal><MemoryTimeline /></ScrollReveal>
+<ScrollReveal><Playlist /></ScrollReveal>
+<ScrollReveal><Tickets /></ScrollReveal>
 
 <style>
   .scroll-track {
     position: relative;
-    height: 220vh;
+    height: 150vh;
   }
 
   .pinned {
@@ -165,28 +168,18 @@
 
   .frame {
     position: relative;
-    width: min(94vw, 900px);
-    aspect-ratio: 16 / 9;
-    max-height: 92vh;
+    width: 100%;
+    height: 100%;
     background: var(--bg);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.16);
   }
 
   @media (max-width: 700px) {
     .stage-wrap {
       padding: 0;
-    }
-    .frame {
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      border-radius: 0;
-      box-shadow: none;
     }
     .hero-row {
       flex-direction: column;
@@ -332,7 +325,7 @@
   }
 
   .activated {
-    min-height: 100vh;
+    min-height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;

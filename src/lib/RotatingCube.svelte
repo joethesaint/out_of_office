@@ -282,12 +282,39 @@
         lastY = e.clientY;
       }
     }
+    // separate from lastX/lastY, which onPointerMove overwrites every frame
+    // while dragging — comparing against those in onPointerUp would always
+    // read as "no movement" regardless of the actual drag distance
+    let downX = 0;
+    let downY = 0;
     function onPointerDown(e) {
       dragging = true;
       lastX = e.clientX;
       lastY = e.clientY;
+      downX = e.clientX;
+      downY = e.clientY;
     }
-    function onPointerUp() {
+
+    // easter egg: 10 taps (not drags) in quick succession
+    const TAP_WINDOW_MS = 1500;
+    let tapCount = 0;
+    let lastTapTime = 0;
+    function onPointerUp(e) {
+      if (dragging && e) {
+        const dx = e.clientX - downX;
+        const dy = e.clientY - downY;
+        if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
+          const now = performance.now();
+          tapCount = now - lastTapTime > TAP_WINDOW_MS ? 1 : tapCount + 1;
+          lastTapTime = now;
+          if (tapCount >= 10) {
+            tapCount = 0;
+            showEasterEgg = true;
+            clearTimeout(easterEggTimer);
+            easterEggTimer = setTimeout(() => (showEasterEgg = false), 4000);
+          }
+        }
+      }
       dragging = false;
     }
 
