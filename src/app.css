@@ -1,0 +1,28 @@
+/* Fonts are loaded via <link> in index.html (Fredoka, Space Grotesk) */
+
+:root {
+  --bg: #f6f4f1;
+  --ink: #181818;
+  --blue: #00bfff;
+  --accent: #08cabd;
+  --cream: #f6f4f1;
+  --display: "Fredoka", system-ui, sans-serif;
+  --sans: "Space Grotesk", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+#app {
+  height: 100%;
+}

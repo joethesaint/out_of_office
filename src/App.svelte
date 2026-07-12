@@ -1,33 +1,71 @@
 <script>
-  import RotatingCube from './lib/RotatingCube.svelte';
+  import RotatingCube from "./lib/RotatingCube.svelte";
+  import HeaderBar from "./lib/HeaderBar.svelte";
+  import FooterBar from "./lib/FooterBar.svelte";
 </script>
 
-<main>
+<div class="stage-wrap">
   <div class="grain"></div>
-  <div class="hero">
-    <p class="eyebrow">Auto-reply for real life</p>
-    <h1 class="wordmark">Out of Office</h1>
-    <div class="stage">
-      <RotatingCube />
+  <main class="frame">
+    <HeaderBar />
+
+    <div class="hero">
+      <button class="icon-btn icon-heart" aria-label="Like">
+        <svg viewBox="0 0 24 24"
+          ><path
+            fill="#00bfff"
+            d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
+          /></svg
+        >
+      </button>
+      <button class="icon-btn icon-share" aria-label="Share">
+        <svg viewBox="0 0 24 24"
+          ><path
+            fill="none"
+            stroke="#181818"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 15c0-5 3-8 8-8m0 0V3l6 5-6 5V9"
+          /></svg
+        >
+      </button>
+
+      <div class="headline">
+        <span class="eyebrow">Auto-reply for real life</span>
+        <div class="stack">
+          <span class="word">OUT OF</span>
+          <span class="word">OFFICE</span>
+          <div class="cube-slot">
+            <RotatingCube />
+          </div>
+        </div>
+        <div class="subhead">
+          <span class="stamp">OOO 002</span>
+          <span class="venue">Tarkwa Bay · Apr 11</span>
+        </div>
+        <div class="tagline">
+          <span>Release. Unwind. Reconnect.</span>
+          <span class="sub">Auto replies enabled. Stress disabled.</span>
+        </div>
+      </div>
     </div>
-    <p class="tagline">Release. Unwind. Reconnect.</p>
-  </div>
-</main>
+
+    <FooterBar />
+  </main>
+</div>
 
 <style>
-  :global(html, body) {
-    margin: 0;
-    height: 100%;
-    background: #f6f4f1;
-  }
-  main {
+  .stage-wrap {
     position: relative;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 2rem 1rem;
     overflow: hidden;
   }
+
   .grain {
     position: absolute;
     inset: 0;
@@ -36,42 +74,142 @@
     mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+
+  .frame {
+    position: relative;
+    width: min(100%, 480px);
+    aspect-ratio: 9 / 16;
+    max-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.16);
+  }
+
+  @media (max-width: 480px) {
+    .stage-wrap {
+      padding: 0;
+    }
+    .frame {
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+
   .hero {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(1rem, 6vw, 2rem);
+    overflow: hidden;
+  }
+
+  .icon-btn {
+    position: absolute;
+    top: clamp(0.75rem, 2.5vh, 1.5rem);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: clamp(26px, 6vw, 34px);
+    height: clamp(26px, 6vw, 34px);
+  }
+  .icon-btn svg {
+    width: 100%;
+    height: 100%;
+  }
+  .icon-heart {
+    left: clamp(0.75rem, 4vw, 1.5rem);
+  }
+  .icon-share {
+    right: clamp(0.75rem, 4vw, 1.5rem);
+  }
+
+  .headline {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1.5vh, 0.9rem);
+  }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .stack {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 3rem 1.5rem;
-  }
-  .eyebrow {
-    margin: 0;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #08cabd;
-    font-weight: 500;
-  }
-  .wordmark {
-    margin: 0;
-    font-family: 'Fredoka', system-ui, sans-serif;
-    font-weight: 700;
-    font-size: clamp(2.75rem, 9vw, 5.5rem);
-    color: #00bfff;
     line-height: 0.95;
-    text-align: center;
   }
-  .stage {
-    width: min(60vh, 80vw);
-    height: min(60vh, 80vw);
-    margin: -1rem 0;
+  .stack .word {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 12vw, 4.2rem);
+    color: var(--blue);
+    letter-spacing: -0.01em;
   }
+
+  .subhead {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .subhead .stamp {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1rem, 4vw, 1.4rem);
+    color: var(--ink);
+  }
+  .subhead .venue {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: clamp(0.75rem, 3vw, 1rem);
+    color: #5a5a5a;
+  }
+
   .tagline {
-    margin: 0;
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.04em;
-    color: #181818;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-family: var(--sans);
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    color: var(--ink);
+  }
+  .tagline .sub {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: clamp(0.5rem, 1.6vw, 0.65rem);
+    font-weight: 600;
+    color: #6b6b6b;
+  }
+
+  .cube-slot {
+    position: absolute;
+    z-index: 2;
+    pointer-events: auto;
+    width: clamp(140px, 36vw, 190px);
+    height: clamp(140px, 36vw, 190px);
+    /* sits in the gap between "OUT OF" and "OFFICE", biased right so it
+       covers the tail of each line rather than obscuring either word's
+       first letters — same overlap idea as the original CRUSH/ON/BOW
+       build, tuned down since "OUT OF OFFICE" reads badly if truncated
+       at the start (looks like a typo, "OF"/"OF...") */
+    top: 52%;
+    left: 78%;
+    transform: translate(-50%, -50%);
   }
 </style>

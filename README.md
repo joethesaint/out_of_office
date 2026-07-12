@@ -12,19 +12,22 @@ concept** are being replaced with the real brand described below.
 
 ## Status
 
-**Built**: the 3D hero object (`src/lib/RotatingCube.svelte`) — a real
-27-cubie Rubik's cube that auto-tumbles, drag-rotates, and runs a
-scramble/solve loop, now recolored to the Out of Office brand palette (see
+scramble/solve loop, recolored to the Out of Office brand palette (see
 [Brand identity](#brand-identity-out-of-office-lagos)) instead of the
-original Pinterest-derived pink/white. See
+original Pinterest-derived pink/white. Also built (structure from a
+concurrent branch, content re-skinned to the real brand in this merge):
+header bar, footer bar, floating heart/share icons, and a headline
+typography block with the cube overlapping the wordmark, in `App.svelte` +
+`src/lib/HeaderBar.svelte` + `src/lib/FooterBar.svelte`. See
 [Implementation notes](#implementation-notes) for how it's built.
 
 **Not built**: the full multi-section site described in
 [Brand identity](#brand-identity-out-of-office-lagos) and
 [Cube narrative](#cube-narrative) — boot/auto-reply sequence, scroll-linked
 cube solving, escape metrics, community/polaroids, memory timeline,
-playlist, tickets. This round of work is scoped to the hero + cube rebrand
-only. See [TODO](#todo--replication-checklist).
+playlist, tickets. Also not done: font self-hosting if this ships publicly
+(currently loaded from Google Fonts). See
+[TODO](#todo--replication-checklist).
 
 ## Brand identity: Out of Office (Lagos)
 
@@ -398,16 +401,28 @@ sandboxed headless one, before concluding fonts are broken.)
 
 ## TODO / replication checklist
 
-### Out of Office rebrand (current priority)
-
 - [x] Recolor the cube from the legacy pink/white palette to the Out of
       Office blue/teal/cream palette (see
       [Brand identity](#brand-identity-out-of-office-lagos)) — same
       checkerboard/gradient/decal/glossy technique, new hex values.
 - [x] Swap the page background from the legacy dark theme to brand cream,
       with a subtle SVG-noise grain texture.
-- [x] Add the "Out of Office" wordmark to the hero using the brand
-      typography direction (rounded bold display font).
+- [x] Header bar, footer bar, and floating heart/share icons — structure
+      reused from the earlier Pinterest-spec build (`HeaderBar.svelte`,
+      `FooterBar.svelte`), content and colors replaced with real Out of
+      Office copy (see [Implementation notes](#implementation-notes)).
+- [x] Headline typography block: "OUT / OF / OFFICE" wordmark stack, cube
+      anchored at the OF/OFFICE boundary (same anchoring technique as the
+      original CRUSH/ON/BOW build — cube stays put regardless of
+      tagline/subhead height), subhead referencing the next real event,
+      tagline "Release. Unwind. Reconnect."
+- [x] Typography: Fredoka (rounded display, wordmark/headline) + Space
+      Grotesk (body/labels/tags), per the
+      [Brand identity](#brand-identity-out-of-office-lagos) direction —
+      replaces the Archivo Black + Inter used in the Pinterest-spec build.
+- [x] Responsive layout: centered phone-frame card on wide viewports, true
+      full-bleed single viewport under 480px width (kept from the
+      Pinterest-spec build).
 - [ ] Wire the cube's scramble/solve to scroll progress instead of an
       autonomous timer — see [Cube narrative](#cube-narrative) for the plan.
       Needs an actual scrollable page first.
@@ -418,27 +433,28 @@ sandboxed headless one, before concluding fonts are broken.)
       timeline (`OOO 001`, `OOO 002`, …), playlist, tickets — see
       [Brand identity](#brand-identity-out-of-office-lagos) for the section
       list and copy direction.
-- [ ] Ticket/zine layout devices: vertical spine text, barcode, QR code,
-      care-label icon row, smiley-flower stickers, paint-splat scatter
-      graphics (see flyers in `docs/brand-reference/`).
+- [ ] Ticket/zine layout devices beyond what's in the header/footer: full
+      vertical spine text, barcode, QR code, care-label icon row,
+      smiley-flower stickers, paint-splat scatter graphics (see flyers in
+      `docs/brand-reference/`).
+- [ ] Self-host the Fredoka/Space Grotesk fonts if this ships publicly
+      (currently loaded from Google Fonts via `index.html`).
 
 ### Legacy Pinterest-spec items (superseded, kept for context)
 
-- [ ] ~~Header bar component (3-block strip: brand lockup, trend tag,
-      logo)~~ — replaced by the Out of Office brand's own layout devices.
-- [ ] ~~Footer bar component (party callout + Suzhou label + mini cube
-      mark)~~ — not part of the real brand.
-- [ ] ~~Floating heart / share-arrow icons~~ — not part of the real brand.
-- [ ] ~~Headline typography block (eyebrow, CRUSH/ON/BOW stack, subhead,
-      bilingual tagline)~~ — replaced by the Out of Office wordmark/copy
-      above.
+- [x] ~~Header bar component (3-block strip: brand lockup, trend tag,
+      logo)~~ — structure kept, content replaced (see rebrand items above).
+- [x] ~~Footer bar component (party callout + Suzhou label + mini cube
+      mark)~~ — structure kept, content replaced.
+- [x] ~~Floating heart / share-arrow icons~~ — kept, recolored to brand.
+- [x] ~~Headline typography block (eyebrow, CRUSH/ON/BOW stack, subhead,
+      bilingual tagline)~~ — structure kept, replaced with the Out of
+      Office wordmark/copy above.
 - [x] Rework the cube's material/color/lighting to match the *Pinterest*
       source — done; palette has since been superseded by the rebrand item
       above, but the technique (checkerboard gradient stickers,
       face-spanning decals, bright seams, glossy `MeshPhysicalMaterial`,
       rounded cubie edges, twist motion blur) carries forward unchanged.
-- [ ] Responsive layout beyond the current centered square stage in
-      `App.svelte`
 
 ## Development
 
@@ -456,10 +472,12 @@ docs/
   brand-reference/        # real Out of Office event flyers (ground truth
                            # for brand identity — see that section)
 src/
-  App.svelte              # page shell: hero copy, wordmark, cube stage,
-                           # background/grain texture
-  app.css                 # global styles (currently empty)
+  App.svelte              # page shell: phone-frame, header/footer, headline
+                           # stack, cube stage, grain texture
+  app.css                 # fonts (Fredoka/Space Grotesk), brand color variables
   lib/
+    HeaderBar.svelte      # 3-block header strip
+    FooterBar.svelte      # footer callout + fine print
     RotatingCube.svelte   # Three.js hero object (see Implementation notes)
   main.js                 # Svelte app entry point
 index.html                 # Google Fonts (Fredoka, Space Grotesk) loaded here
