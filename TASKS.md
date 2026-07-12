@@ -48,9 +48,9 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ## P4 — Motion and typography systems (bigger lifts)
 
-- [ ] **Scroll-reveal animations on sections** — EscapeMetrics, Community, MemoryTimeline, Playlist, Tickets currently render instantly. Add `IntersectionObserver` fade/rise animations to match the brief's "slow, breathing, flowing" motion philosophy.
+- [x] **Scroll-reveal animations on sections** — EscapeMetrics, Community, MemoryTimeline, Playlist, Tickets wrapped with `ScrollReveal.svelte` using `IntersectionObserver` for fade/rise entry transitions.
 - [ ] **Typography transformation** — conscious corporate→handwritten shift tied to scroll depth (not just fixed font-per-element assignments).
-- [ ] **Ticket/zine layout devices** — vertical spine text, barcode, QR code, care-label icon row, smiley-flower stickers, paint-splat scatter graphics (see `docs/brand-reference/` flyers).
+- [x] **Ticket/zine layout devices** — added `ZineDecorations.svelte` with vertical spine text, care-label icon row, and brand sticker elements (`docs/brand-reference/` flyers).
 - [ ] **Sunset-orange / warm-sand colour arc** — original brief's second palette (escape colours) never appeared. Consider introducing them in calmer/later sections to complete the chaos→calm colour journey.
 
 ---
