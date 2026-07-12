@@ -16,6 +16,13 @@
   let removed = false;
 
   onMount(() => {
+    // Skip boot animation on return visits within the same session
+    if (sessionStorage.getItem('ooo-booted')) {
+      removed = true;
+      return;
+    }
+    sessionStorage.setItem('ooo-booted', '1');
+
     const timers = LINES.map((_, i) =>
       setTimeout(() => { shownCount = i + 1; }, i * LINE_DELAY)
     );
@@ -28,7 +35,7 @@
 
 {#if !removed}
   <div class="boot" class:leaving>
-    <div class="lines">
+    <div class="lines" aria-live="polite" aria-atomic="false">
       {#each LINES.slice(0, shownCount) as line}
         <p class="line">{line}</p>
       {/each}

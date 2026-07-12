@@ -1,0 +1,584 @@
+This is actually a very interesting branding problem because "Out of Office" in Lagos means something deeper than vacation.
+
+It is not:
+
+"I'm travelling to Santorini."
+
+It is:
+
+"I'm intentionally disconnecting from Lagos madness for a moment."
+
+The traffic.
+The hustle.
+The economy.
+The pressure to always grind.
+The constant notifications.
+
+Your event is almost like a temporary rebellion against Lagos life.
+
+Core Brand Idea
+Out of Office
+
+Auto-reply for real life.
+
+"I am currently away from emails, responsibilities, and Lagos stress. I will return when my soul battery is charged."
+
+This boundary culture has become more important globally because people increasingly seek genuine rest and separation from work.
+
+Lagos Interpretation
+
+Lagos is chaos.
+
+yellow danfos
+notifications
+deadlines
+"when are you getting married?"
+hustle culture
+everyone trying to make it
+expensive nightlife
+social exhaustion
+
+Your website should feel like:
+
+stepping out of Lagos into another dimension.
+
+Tarkwa Bay itself already represents this.
+
+15 minutes on a boat and suddenly:
+
+slower time
+ocean sounds
+sand
+sunsets
+strangers becoming friends
+no hierarchy
+
+The appeal of coastal Lagos destinations is precisely this feeling of escape and reset.
+
+Design Direction
+Theme:
+Escape from the city.
+Landing Experience
+
+Instead of a Rubik cube.
+
+Imagine:
+
+Scene 1
+
+Desktop full of:
+
+Slack notifications
+WhatsApp messages
+calendar reminders
+battery low
+traffic sounds
+email popups
+
+Everything feels overwhelming.
+
+Then:
+
+OUT OF OFFICE activated.
+
+Everything fades.
+
+You hear ocean ambience.
+
+A boat slowly moves across the screen.
+
+Transition.
+
+Suddenly:
+
+You arrive on Tarkwa Bay.
+
+This is VERY Lagos.
+
+Color Direction
+Lagos Colors:
+Chaos
+yellow (#FFC72C)
+traffic red
+dark grey concrete
+Escape
+ocean teal
+sunset orange
+warm sand
+muted greens
+
+The website itself should feel like:
+
+Leaving yellow Lagos and entering blue Lagos.
+
+Website Layout
+Hero
+OUT OF OFFICE
+
+Release & Unwind.
+
+Temporarily unavailable for stress.
+
+Button:
+
+Activate Auto Reply →
+As user scrolls
+
+The interface slowly becomes less digital.
+
+Beginning:
+
+grid
+notifications
+UI
+
+End:
+
+paper textures
+polaroids
+paint
+ocean
+
+Visual Metaphors
+Email Auto Reply
+Subject:
+Out of Office
+
+Response:
+Gone to touch grass.
+Back soon.
+Passport Stamp
+
+Each event gets:
+
+OOO 001
+OOO 002
+OOO 003
+
+Like experiences.
+
+Boarding Pass
+
+Ticket becomes:
+
+BOARDING PASS
+
+Destination:
+OUT OF OFFICE
+Boat Animation
+
+Boat moving horizontally while scrolling.
+
+Because in Lagos:
+
+boat = escape
+
+Notification Counter
+
+Starts:
+
+999+
+
+As user scrolls:
+
+23
+7
+1
+0
+Typography
+
+Modern corporate.
+
+Then gradually handwritten.
+
+Showing:
+
+going from work mode to human mode.
+
+Lagos Inspiration
+
+A huge thing you're missing:
+
+Mainland vs Island
+
+Your website should communicate:
+
+Leave:
+Traffic
+Deadlines
+Stress
+
+Arrive:
+Community
+Music
+Art
+Rest
+Website Sections
+1
+The Auto Reply
+I am currently unavailable.
+
+I am:
+Painting.
+Playing board games.
+Watching sunsets.
+Making memories.
+2
+Escape Metrics
+Emails ignored:
+87
+
+Stress reduced:
+62%
+
+New friendships:
+∞
+
+Battery recharged:
+100%
+3
+Community
+
+Polaroid photos.
+
+Disposable camera aesthetic.
+
+Because Lagos Gen Z LOVES nostalgia.
+
+4
+Memory Timeline
+OOO 001
+Jaekel House.
+
+OOO 002
+Tarkwa Bay.
+
+OOO 003
+???
+
+Makes people feel early.
+
+Motion Design
+
+The site should feel:
+
+slow
+breathing
+flowing
+
+Not corporate.
+
+No sharp transitions.
+
+No tech startup animations.
+
+Moodboard Keywords
+Spotify Blend
+disposable camera
+Lagos sunset
+old MSN status
+auto reply
+airport departure board
+boat ride
+polaroid memories
+beach camp
+Figma glassmorphism
+community
+nostalgia
+reset
+One idea I REALLY love
+
+The loading screen:
+
+Sending auto reply...
+
+✓ Emails muted
+✓ Notifications paused
+✓ Lagos stress suspended
+
+Redirecting to Out of Office...
+
+Then ocean waves appear.
+
+Positioning Statement
+
+You are not selling:
+
+a beach hangout.
+
+You are selling:
+
+permission to disconnect.
+
+The Lagos youth community increasingly values affordable, community-driven experiences over status-heavy nightlife.
+
+Final Concept
+Out of Office
+A temporary escape from Lagos.
+
+Release.
+Unwind.
+Reconnect.
+
+Auto replies enabled.
+Stress disabled.
+
+That should be the entire philosophy of the website and brand.
+
+I still want you to find a way to insert that Rubik cube even tho it's more of a overlay, it's my style as a gamified experience in its way
+
+The Rubik's Cube actually fits you more than it initially seems.
+
+The problem is trying to make it represent the entire brand. It shouldn't.
+
+Instead, it should represent the person before they go Out of Office.
+
+Think about it:
+
+A Rubik's Cube is:
+
+chaotic
+complicated
+mentally stimulating
+constantly trying to find order
+a puzzle that needs solving
+
+That is literally Lagos life and even your personality as a data person.
+
+The cube can symbolize:
+
+the many moving pieces of adult life being rearranged into something simpler.
+
+Or even:
+
+life becoming too scrambled and needing a reset.
+
+Concept 1 (My favourite)
+The cube solves itself as you scroll.
+
+Start:
+
+A completely scrambled cube.
+
+As the user scrolls:
+
+notifications disappear
+traffic sounds fade
+emails close
+the cube slowly aligns itself.
+
+At the end:
+
+One side becomes complete.
+
+Then:
+
+OUT OF OFFICE ACTIVATED
+
+Meaning:
+
+you've finally found a little order and peace.
+
+Concept 2
+The cube becomes beach items.
+
+This is extremely cool.
+
+The cube slowly transforms:
+
+Rubik Cube
+↓
+Paint palette
+↓
+Tent
+↓
+Beach ball
+↓
+Polaroid
+
+Showing:
+
+life doesn't always have to be solved.
+
+Sometimes you just play.
+
+Concept 3
+Floating overlay assistant.
+
+Think of it almost like a Tamagotchi.
+
+The cube lives on the website.
+
+It reacts.
+
+Homepage:
+
+Stress Level: ████████░░
+
+Cube spins rapidly.
+
+As user scrolls:
+
+Stress Level: ██░░░░░░░░
+
+Cube slows.
+
+Then:
+
+Mental State: Out of Office
+Concept 4 (Most "you")
+
+Gamify the entire site.
+
+Cube = Progress Tracker.
+
+Every section visited:
+
+One face gets solved.
+
+Sections:
+
+Escape
+Community
+Activities
+Memories
+Playlist
+Tickets
+
+Final section:
+
+Cube fully solved.
+
+Congratulations.
+
+You are officially Out of Office.
+
+This is very Elliot-coded.
+
+Concept 5
+Cube = Lagos.
+
+Each side represents:
+
+🟥 Work
+🟦 Family
+🟨 Finances
+🟩 Relationships
+🟧 Responsibilities
+⬜ Social life
+
+All mixed up.
+
+As the experience progresses:
+
+The colors become calmer.
+
+Eventually:
+
+The cube turns into:
+
+Ocean colors.
+
+Animation Idea
+
+The cube should never be static.
+
+Small idle movements:
+
+slight rotation
+subtle floating
+responds to cursor.
+
+When user is inactive:
+
+Cube enters sleep mode.
+
+A tiny easter egg.
+
+Hidden Easter Egg
+
+Click the cube 10 times.
+
+It opens:
+
+Auto Reply Generator
+
+"I'm currently unavailable.
+I'm at the beach pretending my problems don't exist."
+
+Or:
+
+Lagos Survival Stats
+
+Traffic avoided: 3 hours
+Emails ignored: 17
+Stress reduced: 68%
+Website Narrative
+Life is messy.
+
+Like a scrambled cube.
+
+Out of Office is where we stop trying
+to solve everything for a moment.
+
+This line alone could become part of your branding.
+
+Another interpretation
+
+The cube itself can become the logo.
+
+Instead of a normal Rubik's Cube:
+
+Create:
+
+The OOO Cube.
+
+A simplified isometric cube where:
+
+one face = sun
+one face = ocean
+one face = paint palette
+
+A puzzle transformed into leisure.
+
+The reason I like keeping the Rubik's Cube is because it represents:
+
+Complexity → Simplicity.
+
+Which is literally:
+
+Lagos → Tarkwa
+Stress → Rest
+Notifications → Presence
+Work → Community
+
+That transition is basically the essence of Out of Office.
+
+Be short and direct, I hope this section are not overlapping themselves n. Such as the concepts and if we can shuffle between them and also include the Easter eggs as you mentioned
+
+No, they don't overlap. Think of them in layers:
+
+Core concept: Rubik's Cube = life's chaos and complexity before going Out of Office.
+Interaction: The cube slowly solves itself as users scroll through the site.
+Progress system: Each section completed solves one face of the cube.
+Visual transitions: The solved colors can transition into beach/ocean colors.
+Easter eggs: Hidden interactions tied to the cube.
+
+You can absolutely combine them.
+
+Suggested flow:
+
+Landing page → Scrambled cube floating.
+Scroll through sections → Cube gradually solves.
+Final section → Fully solved cube + "Out of Office Activated."
+Hidden interactions:
+Click cube multiple times → Auto-reply generator.
+Leave page idle → Cube sleeps.
+Konami code or secret clicks → Lagos stress stats.
+Drag cube around → It reacts or scrambles briefly.
+
+So it becomes:
+
+Chaos (Lagos) → Journey → Reset (Out of Office)
+
+The Rubik's Cube is simply the visual metaphor carrying the user through that journey, while the Easter eggs reinforce the playful, community-driven, gamified vibe that fits your style.

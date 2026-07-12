@@ -71,7 +71,7 @@
   .polaroid img {
     display: block;
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 9 / 16;
     object-fit: cover;
     border-radius: 2px;
   }

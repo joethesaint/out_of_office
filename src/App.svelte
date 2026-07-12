@@ -226,10 +226,15 @@
     cursor: pointer;
     width: clamp(26px, 6vw, 34px);
     height: clamp(26px, 6vw, 34px);
+    border-radius: 50%;
   }
   .icon-btn svg {
     width: 100%;
     height: 100%;
+  }
+  .icon-btn:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 4px;
   }
   .icon-heart {
     left: clamp(0.75rem, 4vw, 1.5rem);

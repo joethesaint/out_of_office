@@ -9,7 +9,7 @@
     Destination: Out of Office. Permission to disconnect, granted.
   </p>
 
-  <a class="cta" href={TICKET_URL} target="_blank" rel="noreferrer">
+  <a class="cta" href={TICKET_URL} target="_blank" rel="noopener noreferrer">
     Get Tickets →
   </a>
 
@@ -60,6 +60,10 @@
   }
   .cta:hover {
     transform: translateY(-2px);
+  }
+  .cta:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 4px;
   }
 
   .fine-print {
