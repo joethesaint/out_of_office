@@ -14,7 +14,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 - [x] **"Activate Auto Reply →" CTA button** in the hero — exact button from brief added right under the hero tagline, smoothly scrolling user down into the 220vh activated zone.
 - [x] **Notification counter** (999+ → 412 → 87 → 12 → 0 muted) wired directly to `progress` in the hero headline (`App.svelte`).
-- [~] **Boat animation** — horizontal scroll-tied boat crossing the screen, representing arrival at Tarkwa Bay (danfo bus = leaving, boat = arriving). The two can coexist. — _In progress (2026-07-12)_
+- [x] **Boat animation** — horizontal scroll-tied boat crossing the screen, representing arrival at Tarkwa Bay (danfo bus = leaving, boat = arriving). The two take turns crossing the hero.
 - [ ] **Scene 1 chaos-desktop layer** — Slack/WhatsApp/calendar/battery-low/email popups overlaid in the hero that dissolve as the cube solves. Currently the boot sequence is a lighter abstraction; this is the full UI-noise version. Design call needed on whether to add it to the boot screen or layer it into the hero scroll.
 
 ---
@@ -23,7 +23,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 - [x] **Click-cube easter egg** — click counter in `RotatingCube.svelte`; at 10 clicks triggers an Auto-Reply Generator modal overlay with copyable, Lagos-themed/OOO auto-reply quotes.
 - [x] **Cube idle / sleep mode** — after 5s of no pointer movement, cube dims and enters a gentle breathing scale + zZz sleep badge. Resets immediately on pointer movement or drag.
-- [~] **OOO favicon / logo** — replace the default Vite scaffold favicon with a simplified "OOO cube" mark (one face = sun, one = ocean, one = paint palette). SVG favicon. — _In progress (2026-07-12)_
+- [x] **OOO favicon / logo** — replaced default Vite scaffold favicon with an isometric 3D cube mark SVG featuring brand colors, heart decal, ocean wave, and OOO dots (`public/favicon.svg`).
 - [ ] **Concept 4 architectural decision** — cube as persistent cross-section progress tracker (one face solves per section visited: Escape/Community/Activities/Memories/Playlist/Tickets). Needs design decision before more sections are added. If yes, cube must persist/reappear across scroll; current one-shot-hero pattern does not support this.
 - [ ] **Dissolving UI layer alongside cube solve** — notifications/traffic-sounds UI decays *simultaneously* with the cube unscrambling. Currently the cube solves alone with no competing digital-clutter layer to dissolve.
 

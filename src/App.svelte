@@ -11,6 +11,7 @@
   import Playlist from "./lib/Playlist.svelte";
   import Tickets from "./lib/Tickets.svelte";
   import DanfoBus from "./lib/DanfoBus.svelte";
+  import Boat from "./lib/Boat.svelte";
 
   let scrollTrack;
   let progress = 0;
@@ -61,6 +62,7 @@
 
         <div class="hero">
           <DanfoBus />
+          <Boat />
 
           <button class="icon-btn icon-heart" aria-label="Like">
             <svg viewBox="0 0 24 24"
