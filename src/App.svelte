@@ -133,9 +133,6 @@
     position: sticky;
     top: 0;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
   }
 
@@ -143,10 +140,6 @@
     position: relative;
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
     overflow: hidden;
   }
 
@@ -161,29 +154,13 @@
 
   .frame {
     position: relative;
-    width: min(100%, 480px);
-    aspect-ratio: 9 / 16;
-    max-height: 100vh;
+    width: 100%;
+    height: 100%;
     background: var(--bg);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.16);
-  }
-
-  @media (max-width: 480px) {
-    .stage-wrap {
-      padding: 0;
-    }
-    .frame {
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      border-radius: 0;
-      box-shadow: none;
-    }
   }
 
   .hero {
