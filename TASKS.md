@@ -31,7 +31,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 ## P2 — Visual-metaphor fidelity (currently shallow nods)
 
-- [~] **Boarding pass UI** — redesign Tickets section as an actual boarding-pass-shaped component (`Tickets.svelte` with stub perforation, gate `TB-01`, flight `OOO-2026`, and barcode). — _In progress (2026-07-12)_
+- [x] **Boarding pass UI** — redesigned Tickets section (`Tickets.svelte`) as an authentic, tactile boarding pass (`LOS → OOO` route, perforated tear notch, gate `TB-01`, `OOO-2026` flight header, and barcode stub).
 - [ ] **Passport stamp graphics** — redesign OOO 001/002/003 timeline badges as ink-stamp / circular stamp visuals rather than plain rounded-rect text badges.
 - [ ] **Glassmorphism** — the moodboard lists it; never appeared anywhere on the site. Consider for at least one section.
 - [ ] **"Life is messy. Like a scrambled cube."** — this line was explicitly flagged as reusable brand copy in the brief; never used as displayed copy anywhere yet.
