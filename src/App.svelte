@@ -18,8 +18,8 @@
   let scrollTrack;
   let progress = 0;
 
-  // Konami Code Easter Egg
-  const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  // Two-key Easter Egg (type 'oo')
+  const KONAMI_CODE = ['o', 'o'];
   let konamiIndex = 0;
   let showStats = false;
   let statsTimer;
