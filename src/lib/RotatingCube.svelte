@@ -9,13 +9,14 @@
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
-  // colors sampled from the source video's frames (see README "Matching the
-  // source cube's look") — one pink hue running light -> deep, plus white
-  const LIGHT_PINK = '#f7a6d0';
-  const DEEP_PINK = '#c4467b';
-  const LIGHT_WHITE = '#ffffff';
-  const DEEP_WHITE = '#e9dee3';
-  const SEAM = '#f4eef1'; // bright/light seam, not dark plastic
+  // Out of Office brand palette, sampled from the real event flyers (see
+  // README "Brand identity: Out of Office (Lagos)") — wordmark blue running
+  // light -> deep, plus paper cream
+  const LIGHT_BLUE = '#6adcff';
+  const DEEP_BLUE = '#0077a8';
+  const LIGHT_CREAM = '#f6f4f1';
+  const DEEP_CREAM = '#dcd4c4';
+  const SEAM = '#f6f4f1'; // bright paper-cream seam, not dark plastic
 
   const AXES = ['x', 'y', 'z'];
 
@@ -97,16 +98,16 @@
     ctx.fillStyle = SEAM;
     ctx.fillRect(x, y, TILE, TILE);
 
-    const isPink = (i + j) % 2 === 0;
+    const isBlue = (i + j) % 2 === 0;
     const inset = TILE * 0.05;
     const r = TILE * 0.15;
     const grad = ctx.createLinearGradient(0, 0, ATLAS, ATLAS);
-    if (isPink) {
-      grad.addColorStop(0, LIGHT_PINK);
-      grad.addColorStop(1, DEEP_PINK);
+    if (isBlue) {
+      grad.addColorStop(0, LIGHT_BLUE);
+      grad.addColorStop(1, DEEP_BLUE);
     } else {
-      grad.addColorStop(0, LIGHT_WHITE);
-      grad.addColorStop(1, DEEP_WHITE);
+      grad.addColorStop(0, LIGHT_CREAM);
+      grad.addColorStop(1, DEEP_CREAM);
     }
     ctx.fillStyle = grad;
     roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
@@ -117,7 +118,7 @@
     roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
     ctx.stroke();
 
-    const decalColor = isPink ? 'rgba(255,255,255,0.5)' : 'rgba(199,74,132,0.45)';
+    const decalColor = isBlue ? 'rgba(255,255,255,0.5)' : 'rgba(8,202,189,0.45)';
     DECALS[decalKey](ctx, ATLAS, decalColor);
 
     const texture = new THREE.CanvasTexture(el);
