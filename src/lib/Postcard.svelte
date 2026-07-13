@@ -9,7 +9,7 @@
     <span class="stamp">
       <svg viewBox="0 0 40 40" aria-hidden="true">
         <circle cx="20" cy="20" r="18" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 2" />
-        <text x="20" y="17" text-anchor="middle" font-size="7" fill="#fff" font-family="var(--tag)">OOO</text>
+        <text x="20" y="17" text-anchor="middle" font-size="7" fill="#fff" font-family="var(--bungee)">OOO</text>
         <text x="20" y="27" text-anchor="middle" font-size="6" fill="#fff" font-family="var(--sans)">LAGOS</text>
       </svg>
     </span>
