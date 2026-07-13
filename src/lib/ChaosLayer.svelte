@@ -16,7 +16,7 @@
     aria-hidden="true"
   >
     <!-- WhatsApp Alert -->
-    <div class="popup-card whatsapp" style="top: 8%; left: 3%; transform: rotate(-4deg);">
+    <div class="popup-card whatsapp" style="top: calc(clamp(52px, 9vh, 72px) + 6.5rem); left: 3%; transform: rotate(-4deg);">
       <div class="popup-header">
         <span class="icon">💬</span>
         <span class="app-name">WhatsApp · Boss (Urgent!)</span>
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Email Alert -->
-    <div class="popup-card email" style="top: 12%; right: 4%; transform: rotate(5deg);">
+    <div class="popup-card email" style="top: calc(clamp(52px, 9vh, 72px) + 6.5rem); right: 4%; transform: rotate(5deg);">
       <div class="popup-header">
         <span class="icon">✉️</span>
         <span class="app-name">Mail · 14 Unread</span>
@@ -147,7 +147,9 @@
       padding: 0.6rem 0.75rem;
     }
     .popup-card.slack,
-    .popup-card.calendar {
+    .popup-card.calendar,
+    .popup-card.email,
+    .popup-card.whatsapp {
       display: none;
     }
   }

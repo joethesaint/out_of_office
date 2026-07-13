@@ -302,6 +302,15 @@
     scene.add(fill);
 
     // --- whole-cube tumble: auto-spin, drag-to-spin, pointer parallax ---
+    // The scroll-driven solve twists below are user-controlled (tied to
+    // scroll position), so they're left alone; only the autonomous idle
+    // spin/breathing — which runs continuously with no user action — is
+    // gated behind the OS-level motion preference, since it's driven by
+    // rAF rather than CSS and isn't covered by the app.css reduced-motion
+    // block.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let pointerX = 0;
     let pointerY = 0;
     let dragging = false;
@@ -309,8 +318,8 @@
     let dragStartY = 0;
     let lastX = 0;
     let lastY = 0;
-    let velX = 0.004;
-    let velY = 0.007;
+    let velX = prefersReducedMotion ? 0 : 0.004;
+    let velY = prefersReducedMotion ? 0 : 0.007;
 
     // --- Sleep mode for inactivity ---
     let isSleeping = false;
@@ -544,7 +553,9 @@
         isSleeping = true;
       }
 
-      if (!dragging) {
+      if (prefersReducedMotion) {
+        cubeGroup.scale.set(1, 1, 1);
+      } else if (!dragging) {
         if (isSleeping) {
           velX += (0.001 - velX) * 0.02;
           velY += (0.0018 - velY) * 0.02;
@@ -558,8 +569,10 @@
       } else {
         cubeGroup.scale.set(1, 1, 1);
       }
-      cubeGroup.rotation.x += velX;
-      cubeGroup.rotation.y += velY;
+      if (!prefersReducedMotion || dragging) {
+        cubeGroup.rotation.x += velX;
+        cubeGroup.rotation.y += velY;
+      }
 
       camera.position.x += (pointerX * 0.6 - camera.position.x) * 0.04;
       camera.position.y += (-pointerY * 0.6 - camera.position.y) * 0.04;

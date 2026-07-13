@@ -91,7 +91,6 @@
 
         <div class="hero">
           <DanfoBus />
-          <Boat />
 
           <button class="icon-btn icon-heart" aria-label="Like">
             <svg viewBox="0 0 24 24"
@@ -100,11 +99,6 @@
                 d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
               /></svg
             >
-            {#if progress < 0.99}
-              <div class="notification-badge">
-                {Math.ceil(999 * Math.pow(1 - progress, 3)) || 1}{#if progress === 0}+{/if}
-              </div>
-            {/if}
           </button>
           <button class="icon-btn icon-share" aria-label="Share">
             <svg viewBox="0 0 24 24"
@@ -311,22 +305,6 @@
   }
   .icon-share {
     right: clamp(0.75rem, 4vw, 1.5rem);
-  }
-
-  .notification-badge {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background: #ff3b30;
-    color: white;
-    font-family: var(--sans);
-    font-weight: 700;
-    font-size: 0.6rem;
-    padding: 0.2em 0.5em;
-    border-radius: 99px;
-    border: 2px solid var(--bg);
-    line-height: 1;
-    pointer-events: none;
   }
 
   .headline {

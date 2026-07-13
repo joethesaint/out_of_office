@@ -42,7 +42,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 
 - [ ] **Real community / attendee photos** — Community section currently uses event flyers as polaroid stand-ins. Replace with real disposable-camera-style candid photos when available.
 - [ ] **Playlist tracks** — currently 5 fictional tracks. Replace with a real curated list or link to a real Spotify/Apple Music playlist.
-- [ ] **OG image** — `og-image.jpg` is referenced in `index.html` meta tags but the file doesn't exist yet. Create a branded 1200×630 image.
+- [x] **OG image** — added `public/og-image.jpg` (1200×630), reusing the favicon's isometric cube mark for brand consistency.
 
 ---
 
@@ -77,3 +77,20 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 - [x] Body baseline — `line-height`, antialiased, `text-rendering`
 - [x] Polaroid `aspect-ratio: 9/16` matching real flyer proportions
 - [x] Project SKILL.md for agents (`.gemini/skills/out-of-office-project/`)
+- [x] Merge-artifact cleanup (2026-07-13) — removed the duplicate `<Boat />`
+  instance and the duplicate notification-badge/notification-pill UI in
+  `App.svelte`; deleted dead `DigitalClutter.svelte` (superseded by
+  `ChaosLayer.svelte`, which was still imported and rendering).
+- [x] `ChaosLayer` hero collisions — repositioned WhatsApp/Mail cards to
+  clear `HeaderBar` and the icon buttons on desktop; hid WhatsApp + Mail
+  on mobile alongside the already-hidden Slack/Calendar, since they were
+  clipping the notification pill. Verified via screenshot + bounding-box
+  checks at 1280×900 and 390×844.
+- [x] Boat/cube mobile collision — `Boat.svelte` now drops to `bottom: 2%`
+  under `max-width: 700px` so it clears the cube in the stacked layout.
+- [x] Reduced-motion for the Three.js cube — the autonomous idle
+  tumble/breathing in `RotatingCube.svelte` is now gated behind
+  `matchMedia('(prefers-reduced-motion: reduce)')`; drag-to-spin and the
+  scroll-driven solve twists are untouched since those are user-initiated.
+  Verified: zero pixel diff across 800ms with reduced-motion emulated,
+  full-frame diff without it.

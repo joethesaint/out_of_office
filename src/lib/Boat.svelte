@@ -48,6 +48,15 @@
     overflow: visible;
   }
 
+  /* On the mobile stacked hero layout the cube sits in this same vertical
+     band; drop the boat below it so they don't cross. */
+  @media (max-width: 700px) {
+    .boat-track {
+      bottom: 2%;
+      height: 44px;
+    }
+  }
+
   .boat-travel {
     position: absolute;
     top: 0;
