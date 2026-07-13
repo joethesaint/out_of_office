@@ -143,6 +143,207 @@ There's also a structural tension worth naming: you explicitly reframed the cube
 17. Build a genuine scroll-tied typography transformation (corporate/grotesk → handwritten/marker) rather than the current fixed-per-element font assignment (Fredoka always headers, Permanent Marker always captions, etc.) — this is a distinct, unrealized mechanic from the brief, not just "did we use nice fonts."
 18. Revisit the color-direction question directly with the user: is the flyer-sampled blue/pink/teal/cream palette final, or should sunset-orange/warm-sand/muted-green accents from the original brief be reintroduced somewhere (e.g. in later/calmer sections, to visually complete the "chaos → calm" color arc the brief implies)?
 
+## Review: multi-agent implementation wave (2026-07-13)
+
+This project is now being worked by **multiple agents concurrently**,
+coordinating through `TASKS.md` (a claim-based task board — check it before
+starting new work; don't re-implement anything marked `[x]`) and
+`.gemini/skills/out-of-office-project/SKILL.md` (a project-rules file one
+agent wrote for future agents to follow). Between the first audit above and
+this entry, at least three separate lines of commits landed and were
+merged into each other (`692f95b`…`1f86374`, ~14 commits total): scroll
+reveals, zine decorations, a boat animation, a notification counter, two
+independently-built "digital clutter" implementations (`DigitalClutter.svelte`,
+now dead code, and `ChaosLayer.svelte`, the one actually rendered — see
+below), a floating/persistent cube with sleep mode, two easter eggs (one
+of which was itself upgraded mid-batch from a toast to a real modal), a
+new isometric-cube favicon, a boarding-pass redesign of Tickets, an
+"Activate Auto Reply" CTA button, and a real accessibility/SEO pass.
+
+This review covers the **final merged state**, not any single commit in
+isolation — pulled fresh, built, run, and interacted with (clicked the CTA,
+triggered both easter eggs, screenshotted desktop and mobile), evaluated
+against UX principles rather than "does a matching commit message exist."
+Because this happened as a genuine multi-agent race, some findings below
+describe bugs that were introduced *by the merge itself* — two agents each
+correctly solved the same problem independently, and nobody checked what
+happened when both solutions landed on the same page.
+
+### What's genuinely good
+
+- **Floating cube overlay** (`.cube-floating-container.is-floating` in
+  `App.svelte`, docks bottom-right once `activated` is true) — still the
+  single best response in the batch. Directly answers the sharpest
+  critique from the first audit ("nothing persists the way Concept 4
+  imagined"). Verified live at desktop and mobile: small, unobtrusive,
+  doesn't collide with the Tickets CTA.
+- **Boarding-pass Tickets redesign** (`Tickets.svelte`, rewritten from
+  ~46 lines to 431) — a real, tactile answer to the "boarding-pass-shaped
+  ticket" item from the first audit's P2 list: `LOS → OOO` route display,
+  `FLIGHT: OOO-2026` header, gate `TB-01`, boarding time "IMMEDIATELY,"
+  special instructions ("Mute work Slack · Leave problems at Marina
+  jetty"). This is the kind of visual-metaphor fidelity the brief asked
+  for and the first audit found mostly missing.
+- **The click-cube easter egg was upgraded from a toast to a real
+  modal** (`RotatingCube.svelte`) since the last check: `role="dialog"`,
+  `aria-label="Auto-Reply Generator"`, a close button, a "Shuffle Reply"
+  button, and a "Copy" button wired to `navigator.clipboard`. Properly
+  scoped (`position: absolute; inset: 0` on the cube stage, not the
+  viewport). Genuinely better than what the previous pass of this review
+  tested.
+- **`ChaosLayer.svelte`** (the file actually rendered now — see the bug
+  list below for its sibling) has a real mobile accommodation
+  `DigitalClutter.svelte` never had: a `@media (max-width: 680px)` block
+  that shrinks the popup cards and hides two of the five outright (Slack,
+  Calendar) rather than just letting all five collide on a phone screen.
+- **`sessionStorage` skip on the boot sequence for return visits**
+  (`BootSequence.svelte`) — good unprompted UX judgment: nobody wants to
+  re-watch a 3-second loading animation on every revisit in a session.
+- **Boat/DanfoBus choreography** — `Boat.svelte`'s keyframes are timed
+  via a code comment against `DanfoBus.svelte` so the two animals of
+  transport take turns crossing the hero (boat during 8–45% of the
+  cycle, bus during 58–88%) instead of colliding mid-scroll. A nice
+  detail, undercut by the duplicate-render bug below.
+- **Real accessibility/SEO work** (commit `1ab7d6d`, unchanged since the
+  first pass of this review): `aria-live` on the boot sequence,
+  `:focus-visible` outlines on icon buttons and the Tickets CTA, explicit
+  `rel="noopener noreferrer"`, a global `prefers-reduced-motion` block
+  for CSS animations/transitions, and full OG/Twitter meta tags.
+
+### Where it does not tally — verified, concrete problems
+
+1. **`<Boat />` is rendered twice in the same hero.** `App.svelte:94` has
+   a bare `<Boat />` (no `progress` prop) left over from one commit
+   line; `App.svelte:179` has the live `<Boat {progress} />` from
+   another. Because `Boat.svelte` ignores its `progress` prop entirely
+   and animates purely via CSS keyframes (confirmed by a Vite build
+   warning: `unused export property 'progress'`), both instances play
+   the identical animation and land exactly on top of each other at
+   `bottom: 16%` — so there's no *visible* double-boat, but it's two full
+   SVG trees animating in the DOM for one decorative element, and it's
+   unambiguous evidence nobody diffed what the merge actually produced.
+2. **The notification count is rendered twice, via two different
+   formulas.** The old `.notification-badge` on the heart icon (line
+   104, `Math.ceil(999 * (1-progress)^3)`) and the new
+   `.notification-pill` in the headline (line 124, a four-tier stepped
+   formula: 999+ → 840·(1-p) → 420·(1-p) → 60·(1-p) → 0) both answer the
+   brief's "999+ notifications counting down to 0" idea, both ship
+   simultaneously, and disagree with each other at every scroll position
+   except the two endpoints. One commit added the pill without checking
+   whether the badge already existed.
+3. **`ChaosLayer` collides with hero content — the mobile media query
+   didn't fix the underlying problem, it just resized it.** Screenshotted
+   at 1280×900 and 390×844: the WhatsApp card (`top: 8%; left: 3%`)
+   overlaps `HeaderBar`'s "STATUS: AWAY" text at *both* sizes; on mobile
+   the Mail card clips the new notification-pill text down to
+   "Pending No…". Root cause: `ChaosLayer` is `position: fixed; inset: 0`
+   (viewport-relative), and `SKILL.md`'s full-bleed rule means `.frame`
+   now fills the whole viewport too — there's no card margin left for
+   the popups to sit "outside of" the way they may have been designed
+   to. Shrinking the cards on narrow screens didn't address that they're
+   positioned against the same content on every screen.
+4. **The boat overlaps the cube on mobile.** `Boat.svelte`'s
+   `.boat-track` is hardcoded to `bottom: 16%` at every viewport, but the
+   mobile layout (`@media (max-width: 700px) { .hero-row { flex-direction:
+   column } }`) stacks the cube below the headline text — landing the
+   cube in the same vertical band the boat travels through.
+5. **`og:image` still points at a file that doesn't exist.**
+   `index.html` references `/og-image.jpg`; `public/` has no such file.
+   `TASKS.md` itself still lists this unclaimed under P3. Share this
+   link in a WhatsApp group — the primary distribution channel this
+   brand actually depends on — and the preview card shows a broken image.
+6. **The checkerboard-legibility issue from the first audit is still not
+   fixed**, despite a commit that reads like it addresses it. "Flatten
+   cube stickers to solid colors" (`51a3c32`) removed the light→dark
+   *gradient* within each tile — a real, if partial, improvement — but
+   the checkerboard *pattern* itself (alternating blue/cream per tile,
+   `(i + j) % 2` in `makeTileTexture`) is untouched. "Solved" still reads
+   as a checkerboard, not a single clean color per face.
+7. **Reduced-motion coverage still doesn't reach the cube.** The
+   `prefers-reduced-motion` block in `app.css` correctly disables CSS
+   animations/transitions — the boat, the floating badge, the toast
+   float. But the cube's own tumble is a JS `requestAnimationFrame` loop
+   incrementing rotation directly, entirely outside that block, so it's
+   the one continuously-moving, visually dominant object on the page
+   that ignores the user's OS-level motion preference.
+8. **`DigitalClutter.svelte` is dead code left in the tree.** It's no
+   longer imported anywhere — `ChaosLayer.svelte` replaced it in
+   `App.svelte` — but the 167-line file is still on disk with no
+   indication it's superseded, which risks a future agent editing the
+   wrong one.
+9. **The "Activate Auto Reply →" CTA has a narrative-skip tension.**
+   Verified working: clicking it smooth-scrolls straight to the
+   "Activated" section (confirmed `scrollY` jump from 0 to ~1350px). That's
+   good friction-reduction UX in isolation, but the scroll-driven cube
+   solve *is* the site's core mechanic (Concept 1) — this button lets a
+   visitor skip past all of it on their very first interaction. Not a
+   bug, but worth a conscious call on whether the CTA should exist at
+   all, or scroll partway rather than all the way.
+10. **Process concern, unchanged from the last pass: `SKILL.md` silently
+    overrode an explicit user instruction** about a landscape *card* hero
+    in favor of a self-authored "full-bleed, no card, ever" rule, without
+    the user's sign-off. Left as-is pending a decision; not reverted.
+11. **Two separate easter eggs where the brief described one, offered as
+    alternatives** — unchanged finding, though the click-based one is now
+    meaningfully better built (see above). The "oo" keyboard sequence
+    still has zero in-UI discoverability.
+
+### UX-principle summary
+
+- **Aesthetic and minimalist design (Nielsen)** — fails harder than the
+  first pass found: the duplicate boat and duplicate notification UI
+  both add rendering weight and (in the notification case) contradictory
+  information without adding any signal, on top of the existing
+  toast/spine/barcode/badge/headline/cube density. Ironic for a brand
+  whose thesis is escaping exactly this kind of clutter.
+- **Consistency across viewports** — still fails, now on `ChaosLayer`
+  instead of `DigitalClutter` (finding #3), plus a new mobile-specific
+  boat/cube collision (finding #4).
+- **Error prevention / robustness** — the duplicate-Boat and
+  duplicate-notification bugs are both classic merge-without-diffing
+  failures; the `og:image` 404 is a ship-without-checking failure.
+- **User control and freedom (WCAG 2.2.2, pause/stop/hide)** — the
+  persistent floating cube still animates indefinitely with no dismiss
+  control.
+- **Match between system and real world / affordance** — the heart icon
+  still carries a notification-style badge (separately from the new
+  headline pill), sending a mixed "likes vs. unread" signal.
+- **Recognition over recall / discoverability** — the sessionStorage
+  boot-skip is good judgment; the modal easter egg's real dialog
+  semantics (`role="dialog"`, `aria-label`, an explicit close button) are
+  a genuine step up from a toast. The "oo" egg remains undiscoverable by
+  design, for better or worse.
+- **Positive, unchanged**: focus-visible states, `aria-live` on the boot
+  sequence, `aria-hidden` on decorative layers, and the reduced-motion
+  CSS block are all genuine, correctly-applied wins.
+
+### Action list from this review
+
+**Being fixed in the immediate follow-up to this entry** (see commit
+history right after this README change for what actually landed — treat
+that as the source of truth over this list if they ever diverge):
+1. Remove the duplicate `<Boat />` at `App.svelte:94`, keep the wired
+   `<Boat {progress} />`.
+2. Consolidate the duplicate notification UI to one implementation.
+3. Reposition `ChaosLayer` popup cards so they don't overlap `HeaderBar`
+   text or the notification pill, at both desktop and mobile widths.
+4. Fix the boat/cube mobile collision — adjust `Boat.svelte`'s vertical
+   position (or hide it) under the mobile stacked layout.
+5. Add a real `public/og-image.jpg` (1200×630) so link previews work.
+6. Gate the Three.js cube's autonomous rotation behind
+   `matchMedia('(prefers-reduced-motion: reduce)')`.
+7. Delete the now-dead `DigitalClutter.svelte`.
+
+**Left open, needs a decision rather than a fix:**
+8. Checkerboard vs. solid-color solved-state legibility.
+9. Full-bleed (`SKILL.md` rule) vs. landscape-card as permanent policy.
+10. Whether to keep both easter eggs or consolidate to one.
+11. A dismiss/pause control for the persistent floating cube
+    (WCAG 2.2.2 compliance).
+12. Heart-icon-carries-notification-badge semantic mismatch.
+13. Whether the "Activate Auto Reply" CTA should skip the entire cube
+    scroll narrative, or only part of it.
+
 ## Brand identity: Out of Office (Lagos)
 
 ### Positioning
