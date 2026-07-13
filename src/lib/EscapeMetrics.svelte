@@ -1,4 +1,6 @@
 <script>
+  import MorphText from './MorphText.svelte';
+
   export let visible = false;
 
   const STATS = [
@@ -10,7 +12,7 @@
 </script>
 
 <section class="metrics">
-  <p class="eyebrow" class:visible>The auto reply</p>
+  <p class="eyebrow" class:visible><MorphText text="The auto reply" /></p>
   <h2 class="heading" class:visible>I am currently unavailable.</h2>
   <p class="body" class:visible>
     I'm painting. Playing board games. Watching sunsets. Making memories.

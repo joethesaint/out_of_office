@@ -1,11 +1,13 @@
 <script>
+  import MorphText from './MorphText.svelte';
+
   export let visible = false;
   const TICKET_URL = 'https://tix.africa/discover/outofofficeng';
 </script>
 
 <section class="tickets-section">
   <div class="header-text" class:visible>
-    <p class="eyebrow">Boarding pass</p>
+    <p class="eyebrow"><MorphText text="Boarding pass" boost={1.3} /></p>
     <h2 class="heading">Your ticket out of yellow Lagos.</h2>
     <p class="subheading">Destination: Out of Office. Permission to disconnect, granted.</p>
   </div>

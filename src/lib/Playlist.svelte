@@ -1,4 +1,6 @@
 <script>
+  import MorphText from './MorphText.svelte';
+
   export let visible = false;
 
   const TRACKS = [
@@ -11,7 +13,7 @@
 </script>
 
 <section class="playlist">
-  <p class="eyebrow">The mood</p>
+  <p class="eyebrow"><MorphText text="The mood" boost={1.15} /></p>
   <h2 class="heading">Out of Office, the mixtape</h2>
   <p class="body">Five tracks for disconnecting. Press play, put the phone face down.</p>
 

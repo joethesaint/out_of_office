@@ -2,6 +2,7 @@
   import tarkwaBay from '../../docs/brand-reference/flyer-post-nysc-hangout-tarkwa-bay.png';
   import openCanvas from '../../docs/brand-reference/flyer-open-canvas-jaekel-house.png';
   import saveTheDate from '../../docs/brand-reference/flyer-save-the-date-painting.png';
+  import MorphText from './MorphText.svelte';
 
   export let visible = false;
 
@@ -13,7 +14,7 @@
 </script>
 
 <section class="community">
-  <p class="eyebrow">Community</p>
+  <p class="eyebrow"><MorphText text="Community" /></p>
   <h2 class="heading">Leaving yellow Lagos, entering blue Lagos.</h2>
 
   <div class="wall">

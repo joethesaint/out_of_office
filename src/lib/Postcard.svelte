@@ -1,11 +1,12 @@
 <script>
   import postcardImg from '../../docs/brand-reference/postcard-greetings-from-out-of-office.jpg';
+  import MorphText from './MorphText.svelte';
 
   export let visible = false;
 </script>
 
 <section class="postcard-section">
-  <p class="eyebrow" class:visible>Wish you were here</p>
+  <p class="eyebrow" class:visible><MorphText text="Wish you were here" /></p>
   <figure class="postcard" class:visible>
     <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
     <span class="stamp">

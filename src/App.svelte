@@ -15,6 +15,7 @@
   import ScrollReveal from "./lib/ScrollReveal.svelte";
   import Boat from "./lib/Boat.svelte";
   import ChaosLayer from "./lib/ChaosLayer.svelte";
+  import { pageProgress } from "./lib/scrollProgress.js";
 
   let scrollTrack;
   let progress = 0;
@@ -49,6 +50,13 @@
     const total = rect.height - window.innerHeight;
     progress = total <= 0 ? 1 : Math.max(0, Math.min(1, -rect.top / total));
     if (prefersReducedMotion) smoothedProgress = progress;
+
+    // Whole-document scroll fraction, for the corporate->handwritten
+    // typography morph (concept.txt) — separate from the hero-only
+    // `progress` above, piggybacked on the same rAF batch.
+    const docTotal = document.documentElement.scrollHeight - window.innerHeight;
+    pageProgress.set(docTotal <= 0 ? 0 : Math.max(0, Math.min(1, window.scrollY / docTotal)));
+
     ticking = false;
   }
 

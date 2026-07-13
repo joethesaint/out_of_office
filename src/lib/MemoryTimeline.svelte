@@ -1,4 +1,6 @@
 <script>
+  import MorphText from './MorphText.svelte';
+
   export let visible = false;
 
   const MEMORIES = [
@@ -28,7 +30,7 @@
 </script>
 
 <section class="timeline">
-  <p class="eyebrow">Memory timeline</p>
+  <p class="eyebrow"><MorphText text="Memory timeline" /></p>
   <h2 class="heading">Every escape gets a stamp.</h2>
 
   <ol class="list">

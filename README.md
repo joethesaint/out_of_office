@@ -810,6 +810,29 @@ removed that runtime dependency entirely and was verified via screenshot
 (Fredoka's rounded terminals, Bungee's blocky caps, and Permanent Marker's
 script are all visibly rendering, not falling back).
 
+### Corporate → handwritten typography morph
+
+Resolves audit item P4 #17 ("build a genuine scroll-tied typography
+transformation... not just did we use nice fonts"). `src/lib/scrollProgress.js`
+is a small Svelte store, `pageProgress`, holding the *whole-document* scroll
+fraction (0 at the top of the page, 1 at the bottom) — distinct from
+`App.svelte`'s existing `progress`/`smoothedProgress`, which only track the
+220vh hero cube track. It's updated inside the same rAF-batched scroll
+handler that already drives the hero, so there's no second scroll listener.
+
+`src/lib/MorphText.svelte` renders a section eyebrow label as two
+absolutely-stacked spans in one CSS grid cell — tracked-out uppercase
+Space Grotesk and lowercase Permanent Marker — and crossfades their opacity
+by `$pageProgress` (times an optional `boost` prop, so a section that
+appears late, like Tickets, can lean fully handwritten before the literal
+bottom of the document). A visually-hidden third span carries the real text
+for screen readers, since both visible spans are `aria-hidden`. Wired into
+the six post-activation section eyebrows (Postcard, EscapeMetrics,
+Community, MemoryTimeline, Playlist, Tickets); the hero and "Activated"
+eyebrows are deliberately left alone as pure corporate/grotesk, since
+they're the "before" moment the brief describes, not part of the "after"
+arc.
+
 ### Boot sequence
 
 `src/lib/BootSequence.svelte` is a fixed-position overlay (dark `#181818`
