@@ -40,17 +40,26 @@
     overflow: hidden;
   }
 
+  /* Vertical spine text, pinned to the card's true far-left edge.
+     Previously this rotated a full-width nowrap block around its own
+     center, which — since that box was as wide as the whole sentence —
+     put the rotated text's midpoint out near the card's horizontal
+     center instead of at `left`, so it crossed straight through the
+     headline. writing-mode lays it out vertically natively, so its
+     footprint is just the (thin) font size, and it stays put at the
+     left edge regardless of how long the sentence is. */
   .spine {
     position: absolute;
-    left: clamp(0.5rem, 1.5vw, 1.25rem);
+    left: clamp(0.6rem, 1.8vw, 1.1rem);
     top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: translateY(-50%);
     white-space: nowrap;
     font-family: var(--sans);
-    font-size: clamp(0.4rem, 1vw, 0.55rem);
+    font-size: clamp(0.45rem, 1vw, 0.6rem);
     letter-spacing: 0.15em;
-    color: #a0a0a0;
+    color: #6b6b6b;
     text-transform: uppercase;
   }
 

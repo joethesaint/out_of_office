@@ -84,30 +84,29 @@
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
-  // One solid brand color per face — six distinct hues (drawn from the
-  // full site palette, brand + escape) rather than the old blue/cream
-  // checkerboard-per-tile scheme. This is what makes "solved" instantly
-  // legible: every tile on a face converges on the same color instead of
-  // alternating two, a real Rubik's-cube tell instead of a busy pattern.
+  // The six standard Rubik's-cube colors, one solid hue per face — reads
+  // as an actual Rubik's cube instead of a brand-palette abstraction.
+  // Every tile on a face converges on the same color when solved, a real
+  // Rubik's-cube tell instead of a busy pattern.
   const FACE_COLORS = {
-    px: '#00bfff', // blue — wordmark
-    nx: '#e0568f', // deep pink — brand accent
-    py: '#08cabd', // teal — ocean
-    ny: '#e8c9a0', // warm sand — Tarkwa Bay
-    pz: '#ff7b4d', // sunset orange
-    nz: '#7c9473', // muted green — escape palette
+    px: '#0051ba', // blue
+    nx: '#009b48', // green (opposite blue)
+    py: '#ffd500', // yellow
+    ny: '#ffffff', // white (opposite yellow)
+    pz: '#ff5800', // orange
+    nz: '#c41e3a', // red (opposite orange)
   };
   // Mainland/chaos colors (concept.txt) — tiles blend toward these, in a
   // per-tile checkerboard, the more scrambled the cube is; the blend fades
   // to 0 at fully solved, so "life is messy" reads as literal color noise
-  // that resolves into the six clean brand hues as the cube (and the page)
+  // that resolves into the six clean colors as the cube (and the page)
   // calms down.
   const CHAOS_YELLOW = '#ffc72c';
   const CHAOS_RED = '#e5383b';
-  // pure white, not the page's own cream (#f6f4f1) — the two used to be
-  // identical, so the cube's "bright seam" edges had almost no contrast
-  // against the page background and the whole object visually thinned out
-  const SEAM = '#ffffff';
+  // Obsidian black plastic body/seams — a real Rubik's cube's body color,
+  // and it makes every sticker (including the white face) pop with real
+  // contrast instead of bleeding into a pale background.
+  const SEAM = '#0c0c0f';
 
   function hexToRgb(hex) {
     const n = parseInt(hex.slice(1), 16);
@@ -282,10 +281,10 @@
     const plasticMaterial = new THREE.MeshPhysicalMaterial({
       map: plasticTexture,
       transparent: true,
-      opacity: 0.9,
-      roughness: 0.3,
-      clearcoat: 0.4,
-      clearcoatRoughness: 0.2,
+      opacity: 1,
+      roughness: 0.18,
+      clearcoat: 0.7,
+      clearcoatRoughness: 0.15,
       metalness: 0,
     });
     const geometry = new RoundedBoxGeometry(CUBIE, CUBIE, CUBIE, 3, CUBIE * 0.12);
@@ -302,11 +301,12 @@
     };
 
     // approximate motion blur: each trail step re-evaluates the same twist
-    // motion function at an earlier timestamp, no history buffer needed
+    // motion function at an earlier timestamp, no history buffer needed.
+    // Kept light — just enough to read as a fast turn, not a smear — so
+    // the solved-color reveal stays crisp instead of getting muddied.
     const TRAIL_STEPS = [
-      { lagMs: 50, opacity: 0.32 },
-      { lagMs: 100, opacity: 0.16 },
-      { lagMs: 160, opacity: 0.07 },
+      { lagMs: 45, opacity: 0.14 },
+      { lagMs: 90, opacity: 0.05 },
     ];
 
     // exterior sticker material for cubie (gx,gy,gz)'s face pointing `dir`
@@ -640,7 +640,7 @@
       const now = performance.now();
       updateTwist(now);
 
-      if (!dragging && now - lastActivityTime > 5000) {
+      if (!dragging && now - lastActivityTime > 20000) {
         isSleeping = true;
       }
 
