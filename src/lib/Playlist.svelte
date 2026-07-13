@@ -77,7 +77,7 @@
     border-bottom: none;
   }
   .index {
-    font-family: var(--tag);
+    font-family: var(--bungee);
     font-size: 0.7rem;
     color: var(--pink-deep);
     flex: none;

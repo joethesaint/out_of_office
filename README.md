@@ -670,9 +670,9 @@ sections.
       Grotesk (body/labels/tags), per the
       [Brand identity](#brand-identity-out-of-office-lagos) direction —
       replaces the Archivo Black + Inter used in the Pinterest-spec build.
-- [x] Responsive layout: centered landscape card on wide viewports, true
-      full-bleed single viewport under 700px width — updated from a
-      portrait 9/16 phone-frame to a 16/9 landscape frame, see
+- [x] Responsive layout: true full-bleed on all screen sizes, per the
+      `SKILL.md` constraints — updated from a portrait 9/16 phone-frame
+      to a full-bleed 100% viewport layout, see
       [Implementation notes](#implementation-notes) for the layout rework
       this required (cube moved from absolute-overlap positioning to a
       flex-row sibling of the headline).

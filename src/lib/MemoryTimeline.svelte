@@ -90,7 +90,7 @@
 
   .stamp {
     flex: none;
-    font-family: var(--tag);
+    font-family: var(--bungee);
     font-size: 0.75rem;
     color: #fff;
     background: var(--blue);

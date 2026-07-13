@@ -83,7 +83,7 @@
     height: clamp(15px, 3vh, 25px);
   }
   .barcode .code {
-    font-family: var(--tag);
+    font-family: var(--bungee);
     font-size: clamp(0.35rem, 0.8vw, 0.5rem);
     letter-spacing: 0.05em;
   }
