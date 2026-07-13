@@ -1,4 +1,6 @@
 <script>
+  export let visible = false;
+
   const TRACKS = [
     { title: 'Salt Air', artist: 'Late Bloom', length: '3:12' },
     { title: 'Slow Tide', artist: 'Nightswim', length: '4:01' },
@@ -15,7 +17,7 @@
 
   <ol class="tracks">
     {#each TRACKS as t, i}
-      <li class="track">
+      <li class="track" class:visible style="--i: {i};">
         <span class="index">{String(i + 1).padStart(2, '0')}</span>
         <span class="names">
           <span class="title">{t.title}</span>
@@ -72,6 +74,14 @@
     gap: 1rem;
     padding: 0.9rem 1.25rem;
     border-bottom: 1px solid #f0ece5;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+  .track.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
   .track:last-child {
     border-bottom: none;

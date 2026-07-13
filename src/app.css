@@ -51,6 +51,12 @@
   --bungee: "Bungee", system-ui, sans-serif;
   --marker: "Permanent Marker", cursive;
   --serif: "Fraunces", Georgia, serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 0.2s;
+  --dur-base: 0.4s;
+  --dur-slow: 0.8s;
 }
 
 * {

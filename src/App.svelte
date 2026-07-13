@@ -18,6 +18,10 @@
 
   let scrollTrack;
   let progress = 0;
+  let smoothedProgress = 0;
+  let ticking = false;
+  let smoothRafId;
+  let prefersReducedMotion = false;
 
   // Two-key Easter Egg (type 'oo')
   const KONAMI_CODE = ['o', 'o'];
@@ -39,41 +43,103 @@
     }
   }
 
-  function updateProgress() {
+  function readProgress() {
     if (!scrollTrack) return;
     const rect = scrollTrack.getBoundingClientRect();
     const total = rect.height - window.innerHeight;
-    if (total <= 0) {
-      progress = 1;
-      return;
-    }
-    progress = Math.max(0, Math.min(1, -rect.top / total));
+    progress = total <= 0 ? 1 : Math.max(0, Math.min(1, -rect.top / total));
+    if (prefersReducedMotion) smoothedProgress = progress;
+    ticking = false;
+  }
+
+  function updateProgress() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(readProgress);
+  }
+
+  // Lerped copy of `progress`, fed to the decorative scroll-tied elements
+  // (chaos layer, notification counter, boat/danfo) so fast/flicked
+  // scrolling doesn't snap them frame-to-frame. The cube is deliberately
+  // NOT fed this value — it has its own twist-queue easing and would
+  // double-lag if chained behind another smoothing layer.
+  //
+  // Uses delta-time-corrected exponential smoothing (not a fixed
+  // per-frame multiplier) so convergence speed stays consistent
+  // regardless of actual frame rate — a fixed 0.15-per-frame factor
+  // converges in ~200ms at 60fps but takes 4-6x longer on a throttled
+  // or heavily-loaded tab (e.g. competing with the Three.js cube's own
+  // render loop), which would make the "smoothing" feel laggy exactly
+  // when the page is already struggling.
+  const SMOOTH_TAU_MS = 90; // time constant: ~63% of the way there per tau
+  let lastSmoothTime = 0;
+  function smoothTick(now) {
+    const dt = lastSmoothTime ? now - lastSmoothTime : 16;
+    lastSmoothTime = now;
+    const delta = progress - smoothedProgress;
+    const factor = 1 - Math.exp(-dt / SMOOTH_TAU_MS);
+    smoothedProgress = Math.abs(delta) < 0.0005 ? progress : smoothedProgress + delta * factor;
+    smoothRafId = requestAnimationFrame(smoothTick);
   }
 
   onMount(() => {
+    prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     updateProgress();
     window.addEventListener("scroll", updateProgress, { passive: true });
     window.addEventListener("resize", updateProgress);
     window.addEventListener("keydown", onKeyDown);
+    if (!prefersReducedMotion) {
+      smoothRafId = requestAnimationFrame(smoothTick);
+    }
   });
   onDestroy(() => {
     window.removeEventListener("scroll", updateProgress);
     window.removeEventListener("resize", updateProgress);
     window.removeEventListener("keydown", onKeyDown);
     clearTimeout(statsTimer);
+    if (smoothRafId) cancelAnimationFrame(smoothRafId);
   });
+
+  // Custom eased scroll for the "Activate Auto Reply ->" CTA — deliberately
+  // slower than native smooth-scroll so the cube-solve narrative is glimpsed
+  // in transit rather than skipped in one jump. Falls back to an instant
+  // jump under prefers-reduced-motion.
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+  function easedScrollTo(targetY, duration = 1400) {
+    if (prefersReducedMotion) {
+      window.scrollTo(0, targetY);
+      return;
+    }
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      window.scrollTo(0, startY + distance * easeInOutCubic(t));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function onActivateClick() {
+    if (!scrollTrack) return;
+    const rect = scrollTrack.getBoundingClientRect();
+    easedScrollTo(window.scrollY + rect.top + window.innerHeight * 1.5);
+  }
 
   $: activated = progress >= 0.995;
 
   $: notificationCount =
-    progress < 0.05
+    smoothedProgress < 0.05
       ? "999+"
-      : progress < 0.25
-        ? Math.floor(840 * (1 - progress))
-        : progress < 0.65
-          ? Math.floor(420 * (1 - progress))
-          : progress < 0.95
-            ? Math.max(1, Math.floor(60 * (1 - progress)))
+      : smoothedProgress < 0.25
+        ? Math.floor(840 * (1 - smoothedProgress))
+        : smoothedProgress < 0.65
+          ? Math.floor(420 * (1 - smoothedProgress))
+          : smoothedProgress < 0.95
+            ? Math.max(1, Math.floor(60 * (1 - smoothedProgress)))
             : 0;
 </script>
 
@@ -84,13 +150,13 @@
     <div class="stage-wrap">
       <div class="grain"></div>
       <!-- Chaos Layer chat bubbles outside of the main postcard card to frame the digital noise around our escape -->
-      <ChaosLayer {progress} />
+      <ChaosLayer progress={smoothedProgress} />
       <main class="frame">
         <HeaderBar />
         <ZineDecorations />
 
         <div class="hero">
-          <DanfoBus />
+          <DanfoBus progress={smoothedProgress} />
 
           <button class="icon-btn icon-heart" aria-label="Like">
             <svg viewBox="0 0 24 24"
@@ -148,18 +214,7 @@
                 <span class="sub">Auto replies enabled. Stress disabled.</span>
               </div>
               <div class="hero-cta-wrap">
-                <button
-                  class="activate-cta"
-                  on:click={() => {
-                    if (scrollTrack) {
-                      const rect = scrollTrack.getBoundingClientRect();
-                      window.scrollTo({
-                        top: window.scrollY + rect.top + window.innerHeight * 1.5,
-                        behavior: "smooth"
-                      });
-                    }
-                  }}
-                >
+                <button class="activate-cta" on:click={onActivateClick}>
                   Activate Auto Reply →
                 </button>
               </div>
@@ -170,7 +225,7 @@
               </div>
             </div>
           </div>
-          <Boat {progress} />
+          <Boat progress={smoothedProgress} />
         </div>
 
         <FooterBar />
@@ -185,12 +240,12 @@
   <p class="activated-sub">You've found a little order and peace.</p>
 </section>
 
-<ScrollReveal><Postcard /></ScrollReveal>
-<ScrollReveal><EscapeMetrics /></ScrollReveal>
-<ScrollReveal><Community /></ScrollReveal>
-<ScrollReveal><MemoryTimeline /></ScrollReveal>
-<ScrollReveal><Playlist /></ScrollReveal>
-<ScrollReveal><Tickets /></ScrollReveal>
+<ScrollReveal let:visible><Postcard {visible} /></ScrollReveal>
+<ScrollReveal let:visible><EscapeMetrics {visible} /></ScrollReveal>
+<ScrollReveal let:visible><Community {visible} /></ScrollReveal>
+<ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
+<ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
+<ScrollReveal let:visible><Tickets {visible} /></ScrollReveal>
 
 <div class="stats-toast" class:visible={showStats} role="status">
   <p class="stats-title">Lagos Survival Stats</p>
@@ -392,7 +447,9 @@
     font-family: var(--sans);
     font-size: clamp(0.65rem, 1.8vw, 0.75rem);
     width: fit-content;
-    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    transition: background var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
     pointer-events: none;
   }
   .notification-pill.zero {
@@ -407,7 +464,7 @@
     font-family: var(--display);
     font-weight: 700;
     color: #e63946;
-    transition: color 0.3s ease;
+    transition: color var(--dur-base) var(--ease-standard);
   }
   .notification-pill.zero .notif-count {
     color: var(--blue, #00bfff);
@@ -427,7 +484,9 @@
     border-radius: 999px;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(0, 191, 255, 0.32);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: transform var(--dur-fast) var(--ease-standard),
+                box-shadow var(--dur-fast) var(--ease-standard),
+                background var(--dur-fast) var(--ease-standard);
   }
   .activate-cta:hover {
     transform: translateY(-2px);
@@ -455,9 +514,9 @@
   .cube-floating-container {
     width: 100%;
     height: 100%;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.6s var(--ease-out-expo),
+                width 0.6s var(--ease-out-expo),
+                height 0.6s var(--ease-out-expo);
   }
 
   .cube-floating-container.is-floating {
@@ -488,7 +547,7 @@
     padding: 2rem;
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition: opacity 0.6s var(--ease-standard), transform 0.6s var(--ease-standard);
   }
   .activated.visible {
     opacity: 1;
@@ -530,7 +589,7 @@
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
   }
   .stats-toast.visible {
     opacity: 1;

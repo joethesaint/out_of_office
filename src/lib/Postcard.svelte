@@ -1,10 +1,12 @@
 <script>
   import postcardImg from '../../docs/brand-reference/postcard-greetings-from-out-of-office.jpg';
+
+  export let visible = false;
 </script>
 
 <section class="postcard-section">
-  <p class="eyebrow">Wish you were here</p>
-  <figure class="postcard">
+  <p class="eyebrow" class:visible>Wish you were here</p>
+  <figure class="postcard" class:visible>
     <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
     <span class="stamp">
       <svg viewBox="0 0 40 40" aria-hidden="true">
@@ -14,7 +16,7 @@
       </svg>
     </span>
   </figure>
-  <p class="caption">A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
+  <p class="caption" class:visible>A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
 </section>
 
 <style>
@@ -24,11 +26,29 @@
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
     text-align: center;
   }
+  .eyebrow,
+  .postcard,
+  .caption {
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+  }
+  .eyebrow.visible,
+  .postcard.visible,
+  .caption.visible {
+    opacity: 1;
+  }
+  .postcard.visible { transition-delay: 100ms; }
+  .caption.visible { transition-delay: 220ms; }
+
   .eyebrow {
     margin: 0 0 1.5rem;
     font-family: var(--marker);
     font-size: clamp(1.1rem, 3vw, 1.5rem);
     color: var(--pink-deep);
+    transform: translateY(16px);
+  }
+  .eyebrow.visible {
+    transform: translateY(0);
   }
 
   .postcard {
@@ -39,7 +59,10 @@
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
-    transform: rotate(-1.5deg);
+    transform: translateY(24px) rotate(-1.5deg);
+  }
+  .postcard.visible {
+    transform: translateY(0) rotate(-1.5deg);
   }
   .postcard img {
     display: block;
@@ -66,5 +89,9 @@
     font-family: var(--sans);
     font-size: 0.85rem;
     color: #6b6b6b;
+    transform: translateY(16px);
+  }
+  .caption.visible {
+    transform: translateY(0);
   }
 </style>

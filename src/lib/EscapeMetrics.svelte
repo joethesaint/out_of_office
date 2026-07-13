@@ -1,4 +1,6 @@
 <script>
+  export let visible = false;
+
   const STATS = [
     { value: '87', label: 'Emails ignored', color: 'var(--blue)' },
     { value: '62%', label: 'Stress reduced', color: 'var(--pink-deep)' },
@@ -8,16 +10,16 @@
 </script>
 
 <section class="metrics">
-  <p class="eyebrow">The auto reply</p>
-  <h2 class="heading">I am currently unavailable.</h2>
-  <p class="body">
+  <p class="eyebrow" class:visible>The auto reply</p>
+  <h2 class="heading" class:visible>I am currently unavailable.</h2>
+  <p class="body" class:visible>
     I'm painting. Playing board games. Watching sunsets. Making memories.
     I will return when my soul battery is charged.
   </p>
 
   <div class="grid">
-    {#each STATS as stat}
-      <div class="tile">
+    {#each STATS as stat, i}
+      <div class="tile" class:visible style="--i: {i};">
         <span class="value" style="color: {stat.color}">{stat.value}</span>
         <span class="label">{stat.label}</span>
       </div>
@@ -32,6 +34,25 @@
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
     text-align: center;
   }
+  .eyebrow,
+  .heading,
+  .body,
+  .tile {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+  }
+  .eyebrow.visible,
+  .heading.visible,
+  .body.visible,
+  .tile.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .heading.visible { transition-delay: 90ms; }
+  .body.visible { transition-delay: 160ms; }
+  .tile.visible { transition-delay: calc(220ms + var(--i, 0) * 90ms); }
+
   .eyebrow {
     margin: 0 0 0.5rem;
     font-family: var(--sans);

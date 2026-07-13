@@ -15,6 +15,33 @@
   let isSleeping = false;
   let lastActivityTime = performance.now();
 
+  // One-time "psst, try clicking me" nudge — the 10-click easter egg has
+  // zero in-UI discoverability otherwise. Shown once per session, a few
+  // seconds after the cube docks in its floating position, and only if the
+  // egg hasn't already been found.
+  let showNudge = false;
+  let nudgeScheduled = false;
+  let nudgeTimer;
+  const NUDGE_KEY = 'ooo-cube-nudge-shown';
+
+  function dismissNudge() {
+    showNudge = false;
+    clearTimeout(nudgeTimer);
+  }
+
+  function maybeScheduleNudge() {
+    if (nudgeScheduled) return;
+    nudgeScheduled = true;
+    if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(NUDGE_KEY)) return;
+    nudgeTimer = setTimeout(() => {
+      if (clickCount === 0 && !showEasterEgg) {
+        showNudge = true;
+        if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(NUDGE_KEY, '1');
+        nudgeTimer = setTimeout(dismissNudge, 5000);
+      }
+    }, 4000);
+  }
+
   const AUTO_REPLIES = [
     "I'm currently unavailable. I'm at the beach pretending my problems don't exist.",
     "Gone to touch grass at Tarkwa Bay. Back soon.",
@@ -25,6 +52,7 @@
   let currentReply = AUTO_REPLIES[0];
 
   function handleCubeClick() {
+    dismissNudge();
     clickCount = (clickCount + 1) % 11;
     if (clickCount === 10) {
       showEasterEgg = true;
@@ -48,6 +76,7 @@
       lastActivityTime = performance.now();
       isSleeping = false;
     }
+    if (liveProgress !== null && liveProgress >= 0.995) maybeScheduleNudge();
   }
 
   let easterEggTimer;
@@ -592,6 +621,7 @@
       cancelAnimationFrame(frameId);
       clearTimeout(easterEggTimer);
       clearTimeout(sleepTimer);
+      clearTimeout(nudgeTimer);
       ro.disconnect();
       container.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);
@@ -615,6 +645,10 @@
       <span class="zzz">zZz</span>
       <span class="sleep-text">Cube sleeping · Click or drag to wake</span>
     </div>
+  {/if}
+
+  {#if showNudge && !showEasterEgg}
+    <div class="nudge-tooltip" role="status">psst — try clicking me 👀</div>
   {/if}
 
   {#if showEasterEgg}
@@ -686,6 +720,37 @@
     font-size: 0.68rem;
     color: #f6f4f1;
     letter-spacing: 0.04em;
+  }
+
+  .nudge-tooltip {
+    position: absolute;
+    bottom: calc(100% + 0.6rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink, #181818);
+    color: #f6f4f1;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    animation: nudgeFloat 0.4s var(--ease-out-expo);
+  }
+  .nudge-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--ink, #181818);
+  }
+  @keyframes nudgeFloat {
+    from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 
   .easter-egg-modal {

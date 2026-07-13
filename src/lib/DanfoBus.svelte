@@ -1,5 +1,23 @@
+<script>
+  export let progress = 0;
+
+  // Danfo bus crosses left-to-right during the second half of the scroll
+  // journey (boat takes the first half, see Boat.svelte) — "leaving yellow
+  // Lagos," now tied to actual scroll position instead of a wall-clock loop.
+  const START = 0.58;
+  const END = 0.88;
+  const FADE = 0.1;
+
+  $: t = Math.max(0, Math.min(1, (progress - START) / (END - START)));
+  $: left = progress <= START ? -25 : progress >= END ? 132 : -25 + (108 - -25) * t;
+  $: opacity =
+    progress <= START || progress >= END
+      ? 0
+      : Math.min(1, t / FADE, (1 - t) / FADE);
+</script>
+
 <div class="bus-track" aria-hidden="true">
-  <div class="bus-travel">
+  <div class="bus-travel" style="left: {left}%; opacity: {opacity};">
     <div class="bus-rig">
       <svg viewBox="0 0 150 90" class="bus-svg">
         <!-- danfo: Lagos yellow minibus, VW-van silhouette with roof
@@ -51,7 +69,7 @@
     top: 0;
     width: 130px;
     height: 100%;
-    animation: travel 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transition: opacity var(--dur-base) var(--ease-standard);
   }
 
   .bus-rig {
@@ -66,28 +84,9 @@
     overflow: visible;
   }
 
-  /* long rest phase off-screen left, then a quick zoom-off across and past
-     the right edge, looping — "leaving yellow Lagos" as a recurring beat
-     rather than a constant distraction */
-  @keyframes travel {
-    0%,
-    55% {
-      left: -25%;
-      opacity: 0;
-    }
-    58% {
-      opacity: 1;
-    }
-    88% {
-      left: 108%;
-      opacity: 1;
-    }
-    93%,
-    100% {
-      left: 132%;
-      opacity: 0;
-    }
-  }
+  /* horizontal position/opacity now come from the `progress` prop (see
+     script block) so the bus's crossing is tied to actual scroll rather
+     than a wall-clock loop; this keyframe only handles the idle bounce. */
 
   @keyframes bounce {
     0%,

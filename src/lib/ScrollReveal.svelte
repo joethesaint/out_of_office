@@ -25,15 +25,15 @@
 </script>
 
 <div bind:this={node} class="reveal-wrapper" class:visible>
-  <slot />
+  <slot {visible} />
 </div>
 
 <style>
   .reveal-wrapper {
     opacity: 0;
     transform: translateY(40px);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity var(--dur-slow) var(--ease-out-expo),
+                transform var(--dur-slow) var(--ease-out-expo);
     will-change: opacity, transform;
   }
   .reveal-wrapper.visible {

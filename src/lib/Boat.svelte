@@ -1,9 +1,24 @@
 <script>
   export let progress = 0;
+
+  // Boat crosses right-to-left during the first half of the scroll journey
+  // (danfo bus takes the second half, see DanfoBus.svelte) — mirrors the
+  // brief's "boat = arrival" beat, now tied to actual scroll position
+  // instead of a wall-clock timer.
+  const START = 0.08;
+  const END = 0.45;
+  const FADE = 0.12; // fraction of the [START,END] window used for fade in/out
+
+  $: t = Math.max(0, Math.min(1, (progress - START) / (END - START)));
+  $: left = progress <= START ? 115 : progress >= END ? -40 : 115 + (-30 - 115) * t;
+  $: opacity =
+    progress <= START || progress >= END
+      ? 0
+      : Math.min(1, t / FADE, (1 - t) / FADE);
 </script>
 
 <div class="boat-track" aria-hidden="true">
-  <div class="boat-travel">
+  <div class="boat-travel" style="left: {left}%; opacity: {opacity};">
     <div class="boat-rig">
       <svg viewBox="0 0 160 90" class="boat-svg">
         <!-- Water wake / ripples -->
@@ -12,13 +27,13 @@
 
         <!-- Boat Hull (sleek Tarkwa Bay speed/ferry boat) -->
         <path d="M15 52 L135 52 L120 72 L30 72 Z" fill="#f6f4f1" stroke="#181818" stroke-width="3.5" stroke-linejoin="round" />
-        
+
         <!-- Hull Stripe -->
         <path d="M22 62 L127 62 L122 68 L28 68 Z" fill="var(--blue, #00bfff)" />
 
         <!-- Cabin / Canopy -->
         <path d="M45 52 L55 30 L105 30 L115 52 Z" fill="var(--pink-deep, #fc9ce0)" stroke="#181818" stroke-width="3" stroke-linejoin="round" />
-        
+
         <!-- Windows -->
         <rect x="58" y="36" width="12" height="10" rx="2" fill="#181818" />
         <rect x="74" y="36" width="12" height="10" rx="2" fill="#181818" />
@@ -62,7 +77,7 @@
     top: 0;
     width: 140px;
     height: 100%;
-    animation: boatTravel 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transition: opacity var(--dur-base) var(--ease-standard);
   }
 
   .boat-rig {
@@ -77,28 +92,9 @@
     overflow: visible;
   }
 
-  /* Boat travels from right to left across the screen during the first half (10% to 45%),
-     while Danfo bus travels left to right during the second half (58% to 88%) */
-  @keyframes boatTravel {
-    0%,
-    8% {
-      left: 115%;
-      opacity: 0;
-    }
-    12% {
-      opacity: 1;
-    }
-    45% {
-      left: -30%;
-      opacity: 1;
-    }
-    50%,
-    100% {
-      left: -40%;
-      opacity: 0;
-    }
-  }
-
+  /* horizontal position/opacity now come from the `progress` prop (see
+     script block) so the boat's crossing is tied to actual scroll rather
+     than a wall-clock loop; this keyframe only handles the idle bob/rock. */
   @keyframes boatBob {
     0%,
     10% {

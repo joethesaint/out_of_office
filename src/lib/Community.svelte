@@ -3,6 +3,8 @@
   import openCanvas from '../../docs/brand-reference/flyer-open-canvas-jaekel-house.png';
   import saveTheDate from '../../docs/brand-reference/flyer-save-the-date-painting.png';
 
+  export let visible = false;
+
   const POLAROIDS = [
     { src: tarkwaBay, caption: 'Tarkwa Bay 🌊', rotate: -4 },
     { src: openCanvas, caption: 'Open Canvas 🎨', rotate: 3 },
@@ -15,8 +17,8 @@
   <h2 class="heading">Leaving yellow Lagos, entering blue Lagos.</h2>
 
   <div class="wall">
-    {#each POLAROIDS as p}
-      <figure class="polaroid" style="--rotate: {p.rotate}deg">
+    {#each POLAROIDS as p, i}
+      <figure class="polaroid" class:visible style="--rotate: {p.rotate}deg; --i: {i};">
         <img src={p.src} alt={p.caption} loading="lazy" />
         <figcaption>{p.caption}</figcaption>
       </figure>
@@ -62,10 +64,17 @@
     padding: 0.6rem 0.6rem 1.1rem;
     border-radius: 4px;
     box-shadow: 0 16px 30px rgba(0, 0, 0, 0.14);
-    transform: rotate(var(--rotate));
-    transition: transform 0.25s ease;
+    opacity: 0;
+    transform: translateY(28px) rotate(var(--rotate));
+    transition: transform 0.6s var(--ease-out-expo), opacity 0.6s var(--ease-out-expo);
+    transition-delay: calc(var(--i, 0) * 110ms);
   }
-  .polaroid:hover {
+  .polaroid.visible {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--rotate));
+  }
+  .polaroid.visible:hover {
+    transition-delay: 0s;
     transform: rotate(0deg) scale(1.03);
   }
   .polaroid img {

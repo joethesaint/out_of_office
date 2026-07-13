@@ -1,4 +1,6 @@
 <script>
+  export let visible = false;
+
   const MEMORIES = [
     {
       stamp: 'OOO 001',
@@ -27,8 +29,8 @@
   <h2 class="heading">Every escape gets a stamp.</h2>
 
   <ol class="list">
-    {#each MEMORIES as m}
-      <li class="entry" class:pending={m.pending}>
+    {#each MEMORIES as m, i}
+      <li class="entry" class:pending={m.pending} class:visible style="--i: {i};">
         <span class="stamp">{m.stamp}</span>
         <div class="details">
           <span class="title">{m.title}</span>
@@ -83,6 +85,14 @@
     margin-left: -2px;
     border-left: 2px solid var(--blue);
     position: relative;
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+    transition-delay: calc(var(--i, 0) * 130ms);
+  }
+  .entry.visible {
+    opacity: 1;
+    transform: translateX(0);
   }
   .entry.pending {
     border-left-color: #d8d2c8;

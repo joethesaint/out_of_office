@@ -1,16 +1,16 @@
 <script>
-  export let progress = 0;
+  export let visible = false;
   const TICKET_URL = 'https://tix.africa/discover/outofofficeng';
 </script>
 
 <section class="tickets-section">
-  <div class="header-text">
+  <div class="header-text" class:visible>
     <p class="eyebrow">Boarding pass</p>
     <h2 class="heading">Your ticket out of yellow Lagos.</h2>
     <p class="subheading">Destination: Out of Office. Permission to disconnect, granted.</p>
   </div>
 
-  <div class="boarding-pass">
+  <div class="boarding-pass" class:visible>
     <!-- Main Pass Body -->
     <div class="pass-main">
       <div class="pass-header">
@@ -96,6 +96,13 @@
   .header-text {
     text-align: center;
     margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+  }
+  .header-text.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
   .eyebrow {
     margin: 0 0 0.4rem;
@@ -127,9 +134,18 @@
     display: flex;
     overflow: hidden;
     position: relative;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    opacity: 0;
+    transform: translateY(32px);
+    transition: transform 0.6s var(--ease-out-expo), opacity 0.6s var(--ease-out-expo),
+                box-shadow var(--dur-base) var(--ease-standard);
+    transition-delay: 140ms;
   }
-  .boarding-pass:hover {
+  .boarding-pass.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .boarding-pass.visible:hover {
+    transition-delay: 0s;
     transform: translateY(-4px);
     box-shadow: 0 26px 60px rgba(0, 191, 255, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08);
   }
