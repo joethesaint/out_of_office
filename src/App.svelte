@@ -14,6 +14,7 @@
   import ZineDecorations from "./lib/ZineDecorations.svelte";
   import ScrollReveal from "./lib/ScrollReveal.svelte";
   import Boat from "./lib/Boat.svelte";
+  import DigitalClutter from "./lib/DigitalClutter.svelte";
 
   let scrollTrack;
   let progress = 0;
@@ -76,6 +77,7 @@
         <ZineDecorations />
 
         <div class="hero">
+          <DigitalClutter {progress} />
           <DanfoBus />
 
           <button class="icon-btn icon-heart" aria-label="Like">
