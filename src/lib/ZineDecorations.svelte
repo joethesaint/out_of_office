@@ -15,19 +15,6 @@
     <span class="code">OOO-001-002</span>
   </div>
 
-  <!-- Smiley-flower sticker (top right) -->
-  <svg class="flower" viewBox="0 0 100 100">
-    <circle cx="50" cy="20" r="16" fill="var(--blue)"/>
-    <circle cx="78" cy="40" r="16" fill="var(--pink)"/>
-    <circle cx="68" cy="74" r="16" fill="var(--accent)"/>
-    <circle cx="32" cy="74" r="16" fill="#c2c100"/>
-    <circle cx="22" cy="40" r="16" fill="var(--blue)"/>
-    <circle cx="50" cy="50" r="22" fill="#fff"/>
-    <circle cx="43" cy="45" r="3" fill="var(--ink)"/>
-    <circle cx="57" cy="45" r="3" fill="var(--ink)"/>
-    <path d="M38 55 Q50 68 62 55" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-  </svg>
-
   <!-- Care Label Icons (bottom center/left) -->
   <div class="care-icons">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8l2 12h12l2-12H4z"/><path d="M4 8c0-2 8-2 16 0"/><path d="M8 12c2 1 4-1 6 0"/></svg>
@@ -100,16 +87,6 @@
   .care-icons svg {
     width: clamp(14px, 2.5vw, 20px);
     height: clamp(14px, 2.5vw, 20px);
-  }
-
-  .flower {
-    position: absolute;
-    top: clamp(4rem, 8vh, 6rem);
-    right: clamp(2rem, 5vw, 4rem);
-    width: clamp(35px, 7vw, 55px);
-    height: auto;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    transform: rotate(15deg);
   }
 
   .splat {

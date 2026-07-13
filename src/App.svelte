@@ -105,6 +105,7 @@
     window.removeEventListener("resize", updateProgress);
     window.removeEventListener("keydown", onKeyDown);
     clearTimeout(statsTimer);
+    clearTimeout(shareToastTimer);
     if (smoothRafId) cancelAnimationFrame(smoothRafId);
   });
 
@@ -135,6 +136,26 @@
     if (!scrollTrack) return;
     const rect = scrollTrack.getBoundingClientRect();
     easedScrollTo(window.scrollY + rect.top + window.innerHeight * 1.5);
+  }
+
+  let shareConfirmed = false;
+  let shareToastTimer;
+  async function handleShare() {
+    const shareData = {
+      title: "Out of Office",
+      text: "Auto-reply for real life. Leaving yellow Lagos, entering blue Lagos.",
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch { /* user cancelled */ }
+      return;
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareData.url);
+      shareConfirmed = true;
+      clearTimeout(shareToastTimer);
+      shareToastTimer = setTimeout(() => { shareConfirmed = false; }, 2000);
+    }
   }
 
   $: activated = progress >= 0.995;
@@ -172,15 +193,7 @@
         <div class="hero">
           <DanfoBus progress={smoothedProgress} />
 
-          <button class="icon-btn icon-heart" aria-label="Like">
-            <svg viewBox="0 0 24 24"
-              ><path
-                fill="#00bfff"
-                d="M12 21s-7.5-4.6-10.2-9.3C-.1 8.1 1.4 4 5.3 3.2c2.1-.4 4.1.5 5.3 2.2C11.8 3.7 13.8 2.8 15.9 3.2c3.9.8 5.4 4.9 3.5 8.5C19.5 16.4 12 21 12 21z"
-              /></svg
-            >
-          </button>
-          <button class="icon-btn icon-share" aria-label="Share">
+          <button class="icon-btn icon-share" aria-label="Share this page" on:click={handleShare}>
             <svg viewBox="0 0 24 24"
               ><path
                 fill="none"
@@ -192,6 +205,9 @@
               /></svg
             >
           </button>
+          {#if shareConfirmed}
+            <span class="share-toast" role="status">Link copied</span>
+          {/if}
 
           <div class="hero-row">
             <div class="headline">
@@ -357,6 +373,7 @@
   .icon-btn {
     position: absolute;
     top: clamp(0.75rem, 2.5vh, 1.5rem);
+    right: clamp(0.75rem, 4vw, 1.5rem);
     background: none;
     border: none;
     padding: 0;
@@ -373,11 +390,18 @@
     outline: 2px solid var(--blue);
     outline-offset: 4px;
   }
-  .icon-heart {
-    left: clamp(0.75rem, 4vw, 1.5rem);
-  }
-  .icon-share {
+  .share-toast {
+    position: absolute;
+    top: clamp(3.2rem, 6.5vh, 4rem);
     right: clamp(0.75rem, 4vw, 1.5rem);
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    z-index: 3;
   }
 
   .headline {
@@ -531,9 +555,23 @@
     z-index: 2;
     flex: none;
     pointer-events: auto;
-    width: clamp(150px, 20vw, 260px);
-    height: clamp(150px, 20vw, 260px);
+    width: clamp(200px, 27vw, 340px);
+    height: clamp(200px, 27vw, 340px);
     margin-left: clamp(-1.5rem, -3vw, -0.5rem);
+  }
+  /* Grounding glow — the cube is meant to be the hero object, but its
+     bright/paper-cream seams sat directly on a near-identical cream page
+     background with nothing to separate the two, so it visually thinned
+     out instead of popping. A soft halo gives it an edge regardless of
+     which sticker colors happen to be facing the camera. */
+  .cube-slot::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 191, 255, 0.22), rgba(252, 156, 224, 0.14) 45%, transparent 72%);
+    filter: blur(28px);
   }
 
   .cube-floating-container {

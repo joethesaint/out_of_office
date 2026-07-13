@@ -104,7 +104,10 @@
   // calms down.
   const CHAOS_YELLOW = '#ffc72c';
   const CHAOS_RED = '#e5383b';
-  const SEAM = '#f6f4f1'; // bright paper-cream seam, not dark plastic
+  // pure white, not the page's own cream (#f6f4f1) — the two used to be
+  // identical, so the cube's "bright seam" edges had almost no contrast
+  // against the page background and the whole object visually thinned out
+  const SEAM = '#ffffff';
 
   function hexToRgb(hex) {
     const n = parseInt(hex.slice(1), 16);

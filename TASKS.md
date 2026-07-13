@@ -106,3 +106,27 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
   scroll-driven solve twists are untouched since those are user-initiated.
   Verified: zero pixel diff across 800ms with reduced-motion emulated,
   full-frame diff without it.
+- [x] **Taste pass** (2026-07-13) — user rated the site 5/10 and asked for
+  a critical pass on quality, not more features, before anything else
+  gets added. Fixes:
+  - Cube grounding: seam color was `#f6f4f1`, identical to the page's own
+    `--bg`, so the "hero object" had almost no contrast edge and visually
+    thinned into the background. Changed seam to pure white and added a
+    soft blue/pink glow behind `.cube-slot`; also grew the cube's on-screen
+    size (`clamp(150px,20vw,260px)` → `clamp(200px,27vw,340px)`).
+  - Cut the heart icon-button (pure decoration, no favorite/save function
+    ever existed behind it) and the redundant flower sticker in
+    `ZineDecorations.svelte` (competed with `HeaderBar`'s own OOO mark for
+    the same top-right corner). Wired the share icon-button to
+    `navigator.share`/clipboard-copy instead of leaving it inert, so it's
+    the one piece of hero chrome that now does something real.
+  - `ChaosLayer.svelte` cards used to sit in four separate corners with
+    generous gaps — tidy, not chaotic. WhatsApp/Slack and Email/Calendar
+    now overlap each other in two piles with more rotation variance, so it
+    reads as a stack of competing alerts instead of four neatly placed
+    widgets.
+  - Not done in this pass, flagged as still open: the six-color cube
+    palette itself hasn't been re-judged for whether saturated/pastel is
+    the right call, and the header's own 3-block strip vs. `ZineDecorations`'
+    barcode+spine+splats still hasn't been consolidated into one visual
+    language — see the live site before deciding either is done.

@@ -15,8 +15,9 @@
     style="opacity: {opacity}; filter: blur({blurAmount}px); transform: translateY({translateY}px) scale({scale});"
     aria-hidden="true"
   >
-    <!-- WhatsApp Alert -->
-    <div class="popup-card whatsapp" style="top: calc(clamp(52px, 9vh, 72px) + 6.5rem); left: 3%; transform: rotate(-4deg);">
+    <!-- WhatsApp + Slack pile up on the left, overlapping each other —
+         the point is a stack of competing alerts, not four tidy corners -->
+    <div class="popup-card whatsapp" style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); left: 1%; transform: rotate(-8deg); z-index: 3;">
       <div class="popup-header">
         <span class="icon">💬</span>
         <span class="app-name">WhatsApp · Boss (Urgent!)</span>
@@ -25,8 +26,7 @@
       <p class="popup-body">Where is the updated Q2 budget deck??? We are waiting in the boardroom right now!</p>
     </div>
 
-    <!-- Slack Alert -->
-    <div class="popup-card slack" style="top: 65%; left: 5%; transform: rotate(3deg);">
+    <div class="popup-card slack" style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); left: 9%; transform: rotate(7deg) scale(0.96); z-index: 4;">
       <div class="popup-header">
         <span class="icon">⚡</span>
         <span class="app-name">Slack · #production-incident</span>
@@ -35,8 +35,8 @@
       <p class="popup-body"><strong>@here</strong> Server CPU spiking to 99% across 4 instances in af-south-1. Can someone check logs immediately?</p>
     </div>
 
-    <!-- Email Alert -->
-    <div class="popup-card email" style="top: calc(clamp(52px, 9vh, 72px) + 6.5rem); right: 4%; transform: rotate(5deg);">
+    <!-- Email + Calendar mirror the same overlapping pile on the right -->
+    <div class="popup-card email" style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); right: 1%; transform: rotate(9deg); z-index: 3;">
       <div class="popup-header">
         <span class="icon">✉️</span>
         <span class="app-name">Mail · 14 Unread</span>
@@ -45,8 +45,7 @@
       <p class="popup-body"><strong>ACTION REQUIRED:</strong> Mandatory compliance training overdue. Your access will be restricted by 5 PM.</p>
     </div>
 
-    <!-- Calendar Alert -->
-    <div class="popup-card calendar" style="top: 52%; right: 3%; transform: rotate(-3deg);">
+    <div class="popup-card calendar" style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); right: 8%; transform: rotate(-7deg) scale(0.96); z-index: 4;">
       <div class="popup-header">
         <span class="icon">📅</span>
         <span class="app-name">Calendar Reminder</span>
@@ -55,8 +54,9 @@
       <p class="popup-body"><strong>Quick 15-min Sync</strong> w/ Legal & Finance (Google Meet link inside)</p>
     </div>
 
-    <!-- Battery Low -->
-    <div class="popup-card battery" style="bottom: 5%; left: 42%; transform: rotate(1deg);">
+    <!-- Battery Low, lower center, slightly overlapping the bottom of both
+         piles so nothing reads as evenly spaced -->
+    <div class="popup-card battery" style="bottom: 4%; left: 40%; transform: rotate(-3deg) scale(0.94); z-index: 2;">
       <div class="popup-header">
         <span class="icon">🔋</span>
         <span class="app-name">System Notification</span>
