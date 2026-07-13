@@ -364,8 +364,11 @@
     z-index: 1;
     flex: 1 1 auto;
     display: flex;
-    align-items: center;
-    padding: 0 clamp(1.25rem, 5vw, 3rem);
+    /* Top-aligned, not centered: centering let tall hero-row content
+       overflow evenly top/bottom, clipping into the header bar above
+       (the notification pill was getting cut off at the header's edge). */
+    align-items: flex-start;
+    padding: clamp(0.75rem, 2vh, 1.25rem) clamp(1.25rem, 5vw, 3rem) 0;
     overflow: hidden;
   }
 
@@ -492,8 +495,14 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    background: rgba(229, 56, 58, 0.12);
-    border: 1px solid rgba(229, 56, 58, 0.28);
+    /* Solid glass, not the barely-there tint it used to be: a properly
+       frosted, mostly-opaque panel (unlike the chaos layer's translucent
+       glass popups) so it reads as a fixed piece of the card's UI. */
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(229, 56, 58, 0.32);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
     font-family: var(--sans);
@@ -505,12 +514,10 @@
     pointer-events: none;
   }
   .notification-pill[data-stage="mid"] {
-    background: rgba(255, 199, 44, 0.16);
-    border-color: rgba(255, 199, 44, 0.4);
+    border-color: rgba(255, 199, 44, 0.45);
   }
   .notification-pill[data-stage="zero"] {
-    background: rgba(0, 191, 255, 0.12);
-    border-color: rgba(0, 191, 255, 0.35);
+    border-color: rgba(0, 191, 255, 0.4);
   }
   .notif-label {
     color: var(--ink);
@@ -565,8 +572,8 @@
     z-index: 2;
     flex: none;
     pointer-events: auto;
-    width: clamp(200px, 27vw, 340px);
-    height: clamp(200px, 27vw, 340px);
+    width: clamp(160px, min(27vw, 30vh), 340px);
+    height: clamp(160px, min(27vw, 30vh), 340px);
   }
   /* Grounding glow — the cube is meant to be the hero object, but its
      bright/paper-cream seams sat directly on a near-identical cream page
