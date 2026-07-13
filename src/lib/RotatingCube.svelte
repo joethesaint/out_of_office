@@ -84,13 +84,43 @@
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
-  // Out of Office brand palette, sampled from the real event flyers (see
-  // README "Brand identity: Out of Office (Lagos)"). Flat solid tiles, no
-  // gradient — the pink accent ties in through the decal color instead of
-  // being baked into the tile fill.
-  const MID_BLUE = '#00bfff';
-  const LIGHT_CREAM = '#f6f4f1';
+  // One solid brand color per face — six distinct hues (drawn from the
+  // full site palette, brand + escape) rather than the old blue/cream
+  // checkerboard-per-tile scheme. This is what makes "solved" instantly
+  // legible: every tile on a face converges on the same color instead of
+  // alternating two, a real Rubik's-cube tell instead of a busy pattern.
+  const FACE_COLORS = {
+    px: '#00bfff', // blue — wordmark
+    nx: '#e0568f', // deep pink — brand accent
+    py: '#08cabd', // teal — ocean
+    ny: '#e8c9a0', // warm sand — Tarkwa Bay
+    pz: '#ff7b4d', // sunset orange
+    nz: '#7c9473', // muted green — escape palette
+  };
+  // Mainland/chaos colors (concept.txt) — tiles blend toward these, in a
+  // per-tile checkerboard, the more scrambled the cube is; the blend fades
+  // to 0 at fully solved, so "life is messy" reads as literal color noise
+  // that resolves into the six clean brand hues as the cube (and the page)
+  // calms down.
+  const CHAOS_YELLOW = '#ffc72c';
+  const CHAOS_RED = '#e5383b';
   const SEAM = '#f6f4f1'; // bright paper-cream seam, not dark plastic
+
+  function hexToRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  // blend two hex colors by t, then scale toward black by `shade` — the
+  // shade factor gives tiles a faint (4-6%) light/dark alternation even at
+  // chaosT=0, so a solved face still reads as a tactile sticker grid up
+  // close without the old scheme's illegible two-tone contrast from afar.
+  function mixColor(hexA, hexB, t, shade = 1) {
+    const a = hexToRgb(hexA), b = hexToRgb(hexB);
+    const r = Math.round((a[0] + (b[0] - a[0]) * t) * shade);
+    const g = Math.round((a[1] + (b[1] - a[1]) * t) * shade);
+    const bl = Math.round((a[2] + (b[2] - a[2]) * t) * shade);
+    return `rgb(${r},${g},${bl})`;
+  }
 
   const AXES = ['x', 'y', 'z'];
 
@@ -161,35 +191,44 @@
   // one sticker texture for tile (i, j) of a 3x3 face. Drawing happens in
   // atlas-space (0..ATLAS) with the canvas translated so it's naturally
   // clipped to this tile's TILE x TILE window — that's what makes the
-  // gradient and the big decal shape continue seamlessly from tile to tile.
-  function makeTileTexture(i, j, decalKey) {
+  // decal shape continue seamlessly from tile to tile. Returns a repaint()
+  // closure (not just a texture) so the same canvas can be redrawn in
+  // place as chaosT changes, instead of allocating new textures per frame.
+  function makeTileTexture(i, j, decalKey, faceColor, chaosT0) {
     const el = document.createElement('canvas');
     el.width = el.height = TILE;
     const ctx = el.getContext('2d');
     ctx.translate(-i * TILE, -j * TILE);
 
     const x = i * TILE, y = j * TILE;
-    ctx.fillStyle = SEAM;
-    ctx.fillRect(x, y, TILE, TILE);
-
-    const isBlue = (i + j) % 2 === 0;
     const inset = TILE * 0.05;
     const r = TILE * 0.15;
-    ctx.fillStyle = isBlue ? MID_BLUE : LIGHT_CREAM;
-    roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
-    ctx.fill();
+    const chaosBase = (i + j) % 2 === 0 ? CHAOS_YELLOW : CHAOS_RED;
+    const shade = (i + j) % 2 === 0 ? 1 : 0.94;
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-    ctx.lineWidth = TILE * 0.02;
-    roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
-    ctx.stroke();
+    let texture;
+    function paint(chaosT) {
+      ctx.clearRect(x, y, TILE, TILE);
+      ctx.fillStyle = SEAM;
+      ctx.fillRect(x, y, TILE, TILE);
 
-    const decalColor = isBlue ? 'rgba(255,255,255,0.5)' : 'rgba(224,86,143,0.42)';
-    DECALS[decalKey](ctx, ATLAS, decalColor);
+      ctx.fillStyle = mixColor(faceColor, chaosBase, chaosT, shade);
+      roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
+      ctx.fill();
 
-    const texture = new THREE.CanvasTexture(el);
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.lineWidth = TILE * 0.02;
+      roundRect(ctx, x + inset, y + inset, TILE - inset * 2, TILE - inset * 2, r);
+      ctx.stroke();
+
+      DECALS[decalKey](ctx, ATLAS, 'rgba(255,255,255,0.42)');
+      if (texture) texture.needsUpdate = true;
+    }
+
+    paint(chaosT0);
+    texture = new THREE.CanvasTexture(el);
     texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
+    return { texture, repaint: paint };
   }
 
   function makePlasticTexture() {
@@ -217,6 +256,12 @@
   }
 
   onMount(() => {
+    // needed up-front (before cubies are built) so sticker textures start
+    // at the right chaosT: scroll-driven mode snaps straight to fully
+    // scrambled on the very first frame (see below), autonomous mode
+    // starts solved.
+    const scrollMode = liveProgress !== null;
+
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -244,6 +289,8 @@
 
     const disposableTextures = [plasticTexture];
     const disposableMaterials = [plasticMaterial];
+    const stickerRepaints = [];
+    const initialChaosT = scrollMode ? 1 : 0;
 
     const axisVectors = {
       x: new THREE.Vector3(1, 0, 0),
@@ -265,8 +312,9 @@
       const coord = { x: gx, y: gy, z: gz };
       const i = coord[axes.u] + 1;
       const j = coord[axes.v] + 1;
-      const texture = makeTileTexture(i, j, axes.decal);
+      const { texture, repaint } = makeTileTexture(i, j, axes.decal, FACE_COLORS[dir], initialChaosT);
       disposableTextures.push(texture);
+      stickerRepaints.push(repaint);
       const material = new THREE.MeshPhysicalMaterial({
         map: texture,
         transparent: true,
@@ -415,7 +463,6 @@
     ro.observe(container);
 
     // --- layer twists: real Rubik's-cube face turns ---
-    const scrollMode = liveProgress !== null;
 
     let twist = null;
     let nextTwistAt = scrollMode ? performance.now() : performance.now() + 500;
@@ -428,6 +475,17 @@
     // replay them inverted to solve, on a timer, forever
     let phase = 'scramble';
     let history = [];
+
+    // 0 = solved (fully calm brand colors), 1 = fully scrambled (fully
+    // chaos-tinted) — shared by both modes, since appliedCount/history.length
+    // already carry the same 0..SCRAMBLE_COUNT meaning in each.
+    function currentChaosT() {
+      return (scrollMode ? appliedCount : history.length) / SCRAMBLE_COUNT;
+    }
+    function repaintStickers() {
+      const t = currentChaosT();
+      for (const repaint of stickerRepaints) repaint(t);
+    }
 
     // scroll-mode-only state: a fixed scramble sequence generated once, then
     // driven by how many of its moves are currently "applied" — 0 applied
@@ -569,6 +627,7 @@
           twist = null;
           nextTwistAt = now + PAUSE_MS;
         }
+        repaintStickers();
       }
     }
 

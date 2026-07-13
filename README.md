@@ -692,23 +692,34 @@ replayed inverted so it returns to solved with no drift), plus auto-tumble,
 drag-to-spin, and pointer parallax on the whole assembly.
 
 How the brand look is built:
-- **Checkerboard + gradient stickers**: `makeTileTexture(i, j, decalKey)`
-  generates one canvas texture per sticker (54 total — one per exterior
-  cubie face). Each tile alternates blue/cream by `(i + j) % 2`. Blue tiles
-  are a 3-stop gradient `LIGHT_BLUE → MID_BLUE (#00bfff) → DEEP_PINK
-  (#e0568f)` — sky blue blending into the brand's pink accent, not just a
-  flat/two-tone blue — and cream tiles blend `LIGHT_CREAM → DEEP_CREAM_PINK`
-  (a dusty pink-tinted cream), so the pink accent reaches the cube's base
-  colors, not only its decals. Gradients are defined in whole-face
-  ("atlas") coordinates, then the canvas is `translate()`-shifted so only
-  that tile's window gets drawn — this is what makes the gradient and the
-  big glyph decal (see below) continue seamlessly from tile to tile without
-  needing a real texture atlas.
+- **Six solid brand-color faces, chaos-tinted while scrambled** (2026-07-13
+  rework, resolving the checkerboard-legibility gap flagged in the first
+  audit below and in `TASKS.md`): `makeTileTexture(i, j, decalKey,
+  faceColor, chaosT0)` gives each of the cube's six faces its own solid
+  color from the site's full palette — `px` blue, `nx` deep pink, `py`
+  teal, `ny` warm sand, `pz` sunset orange, `nz` muted green
+  (`FACE_COLORS` in `RotatingCube.svelte`) — instead of the old blue/cream
+  checkerboard shared across opposite face-pairs. Every tile also blends
+  toward a chaos color (`CHAOS_YELLOW`/`CHAOS_RED`, alternating by
+  `(i + j) % 2`) by a `chaosT` factor: `chaosT = appliedCount /
+  SCRAMBLE_COUNT` in scroll-driven mode (1 = fully scrambled, tied
+  directly to how far through the scramble sequence the cube currently
+  is) or `history.length / SCRAMBLE_COUNT` in the autonomous demo loop.
+  At `chaosT = 0` every sticker on a solved face converges on the same
+  clean color — a real, instantly-legible "solved" tell — and at
+  `chaosT = 1` the whole cube reads as scrambled color noise (yellow/red,
+  concept.txt's "mainland" palette), with real hues bleeding through in
+  between as the cube un-scrambles. Textures aren't regenerated from
+  scratch each frame — `makeTileTexture` returns a `repaint(chaosT)`
+  closure over the same canvas/texture, called once per completed twist
+  (in `updateTwist`'s `t >= 1` block), which is already the natural cadence
+  twists happen at. A faint (~6%) per-tile brightness alternation survives
+  even at `chaosT = 0` so a solved face still reads as a tactile sticker
+  grid up close, not a flat, single fill.
 - **Face-spanning decals**: `drawHeart` / `drawRing` / `drawBowtie` draw
   one big shape per face (mapped via `FACE_AXES[dir].decal`) at whole-face
-  scale, semi-transparent — white on blue tiles, brand pink
-  (`rgba(224,86,143,…)`) on cream tiles — so it reads as a decal sitting
-  over the checkerboard rather than a per-tile icon.
+  scale, semi-transparent white, so it reads as a decal sitting over the
+  sticker grid rather than a per-tile icon.
 - **Bright seams**: the base/seam color (`SEAM`, paper cream `#f6f4f1`) and
   interior (non-exterior) faces are light, not dark plastic, and each
   sticker gets a translucent white stroke around its rounded-rect inset to

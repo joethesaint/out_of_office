@@ -69,7 +69,19 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 - [x] Cube idle/tumble + pointer parallax (always-moving, responds to cursor)
 - [x] Self-hosted fonts — all 5 families in `public/fonts/`
 - [x] 16:9 landscape hero card — replaced portrait phone-card
-- [x] Blue/pink/teal palette blended into cube gradient
+- [x] Blue/pink/teal palette blended into cube gradient (superseded
+  2026-07-13 by six solid per-face brand colors, see below)
+- [x] **Cube color rework** (2026-07-13) — replaced the blue/cream
+  checkerboard with six solid brand-palette colors, one per face
+  (`FACE_COLORS` in `RotatingCube.svelte`), fixing the "solved still
+  reads as a checkerboard, not a clean color" legibility gap from the
+  first audit. Every tile also blends toward chaos-yellow/chaos-red by
+  `chaosT = appliedCount / SCRAMBLE_COUNT` (or `history.length /
+  SCRAMBLE_COUNT` in autonomous mode), so the cube itself — not just the
+  page chrome — visibly calms from chaos noise to clean brand color as
+  it solves. Repainted via a cheap `repaint(chaosT)` closure over the
+  existing canvas/texture at each twist completion, not a full
+  texture-recreation per frame.
 - [x] SEO meta tags — title, description, og:*, twitter:*
 - [x] `prefers-reduced-motion` — all animations suppressed
 - [x] `aria-live` on boot sequence, `sessionStorage` skip on return visits
