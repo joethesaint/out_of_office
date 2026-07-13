@@ -32,9 +32,9 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 ## P2 — Visual-metaphor fidelity (currently shallow nods)
 
 - [x] **Boarding pass UI** — redesigned Tickets section (`Tickets.svelte`) as an authentic, tactile boarding pass (`LOS → OOO` route, perforated tear notch, gate `TB-01`, `OOO-2026` flight header, and barcode stub).
-- [ ] **Passport stamp graphics** — redesign OOO 001/002/003 timeline badges as ink-stamp / circular stamp visuals rather than plain rounded-rect text badges.
-- [ ] **Glassmorphism** — the moodboard lists it; never appeared anywhere on the site. Consider for at least one section.
-- [ ] **"Life is messy. Like a scrambled cube."** — this line was explicitly flagged as reusable brand copy in the brief; never used as displayed copy anywhere yet.
+- [x] **Passport stamp graphics** — `MemoryTimeline.svelte` OOO 001/002/003 badges redesigned as circular ink-stamp visuals (double ring, dashed outer border, rotated, per-event color) replacing the plain rounded-rect text badges.
+- [x] **Glassmorphism** — frosted glass panel (`backdrop-filter: blur(14px) saturate(160%)`) added behind the docked floating cube (`App.svelte` `.cube-floating-container.is-floating::before`) — the one place a translucent-canvas UI element makes it read as an affordance rather than decoration.
+- [x] **"Life is messy. Like a scrambled cube."** — added as `.activated-note` right under the "Out of Office Activated" reveal, styled in marker font — the natural landing spot since it's literally the moment the cube finishes unscrambling.
 
 ---
 
@@ -51,7 +51,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 - [x] **Scroll-reveal animations on sections** — EscapeMetrics, Community, MemoryTimeline, Playlist, Tickets wrapped with `ScrollReveal.svelte` using `IntersectionObserver` for fade/rise entry transitions.
 - [ ] **Typography transformation** — conscious corporate→handwritten shift tied to scroll depth (not just fixed font-per-element assignments).
 - [x] **Ticket/zine layout devices** — added `ZineDecorations.svelte` with vertical spine text, care-label icon row, and brand sticker elements (`docs/brand-reference/` flyers).
-- [ ] **Sunset-orange / warm-sand colour arc** — original brief's second palette (escape colours) never appeared. Consider introducing them in calmer/later sections to complete the chaos→calm colour journey.
+- [x] **Sunset-orange / warm-sand colour arc** (2026-07-13) — added `--chaos-yellow`/`--chaos-red` (mainland/pre-activation) and `--sunset-orange`/`--warm-sand`/`--muted-green` (escape/post-activation) to `app.css`. Chaos colors drive the notification pill's red→yellow→blue taper as `progress` climbs (`App.svelte` `notifStage`). Escape colors are woven into `EscapeMetrics` stat tiles, `MemoryTimeline` passport-stamp colors, and a warm-sand radial wash behind `Tickets`. Flyer-sampled blue/pink/teal stays the brand-identity layer (header, wordmark, CTA); it was never replaced, just no longer the only palette in play. Resolves the open question from the first audit (P4 #18).
 
 ---
 

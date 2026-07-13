@@ -141,6 +141,12 @@
           : smoothedProgress < 0.95
             ? Math.max(1, Math.floor(60 * (1 - smoothedProgress)))
             : 0;
+
+  // Chaos -> calm color arc for the notification pill (concept.txt: "the
+  // colors become calmer" as you scroll) — traffic red while the inbox is
+  // still slammed, danfo yellow through the mid-range taper, brand blue once
+  // muted. Mirrors the mainland (red/yellow) -> island (blue) journey.
+  $: notifStage = notificationCount === 0 ? "zero" : smoothedProgress < 0.25 ? "high" : "mid";
 </script>
 
 <BootSequence />
@@ -181,7 +187,7 @@
 
           <div class="hero-row">
             <div class="headline">
-              <div class="notification-pill" class:zero={notificationCount === 0}>
+              <div class="notification-pill" data-stage={notifStage}>
                 <span class="bell-icon">🔔</span>
                 <span class="notif-label">Pending Notifications:</span>
                 <span class="notif-count">{notificationCount === 0 ? "0 (Muted ✓)" : notificationCount}</span>
@@ -238,6 +244,10 @@
   <p class="activated-eyebrow">Status update</p>
   <h2 class="activated-title">Out of Office Activated</h2>
   <p class="activated-sub">You've found a little order and peace.</p>
+  <p class="activated-note">
+    Life is messy. Like a scrambled cube. Out of Office is where we stop
+    trying to solve everything for a moment.
+  </p>
 </section>
 
 <ScrollReveal let:visible><Postcard {visible} /></ScrollReveal>
@@ -440,8 +450,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    background: rgba(255, 60, 60, 0.12);
-    border: 1px solid rgba(255, 60, 60, 0.28);
+    background: rgba(229, 56, 58, 0.12);
+    border: 1px solid rgba(229, 56, 58, 0.28);
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
     font-family: var(--sans);
@@ -452,7 +462,11 @@
                 transform var(--dur-base) var(--ease-standard);
     pointer-events: none;
   }
-  .notification-pill.zero {
+  .notification-pill[data-stage="mid"] {
+    background: rgba(255, 199, 44, 0.16);
+    border-color: rgba(255, 199, 44, 0.4);
+  }
+  .notification-pill[data-stage="zero"] {
     background: rgba(0, 191, 255, 0.12);
     border-color: rgba(0, 191, 255, 0.35);
   }
@@ -463,10 +477,13 @@
   .notif-count {
     font-family: var(--display);
     font-weight: 700;
-    color: #e63946;
+    color: var(--chaos-red);
     transition: color var(--dur-base) var(--ease-standard);
   }
-  .notification-pill.zero .notif-count {
+  .notification-pill[data-stage="mid"] .notif-count {
+    color: #b8860b;
+  }
+  .notification-pill[data-stage="zero"] .notif-count {
     color: var(--blue, #00bfff);
   }
 
@@ -530,6 +547,22 @@
     animation: floatAssistant 4s ease-in-out infinite;
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
   }
+  /* Glassmorphism dock — the moodboard calls for it and the site has none
+     yet; the transparent-canvas cube (renderer alpha: true) sitting over a
+     frosted panel is the one place it reads as a UI affordance rather than
+     decoration. */
+  .cube-floating-container.is-floating::before {
+    content: "";
+    position: absolute;
+    inset: -18%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.32);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+    z-index: -1;
+  }
 
   @keyframes floatAssistant {
     0%, 100% { transform: translateY(0); }
@@ -573,6 +606,15 @@
     margin: 0;
     font-family: var(--sans);
     color: var(--ink);
+  }
+  .activated-note {
+    margin: 0.75rem 0 0;
+    max-width: 32ch;
+    font-family: var(--marker);
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    line-height: 1.4;
+    color: var(--pink-deep);
+    transform: rotate(-1deg);
   }
 
   .stats-toast {

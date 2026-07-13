@@ -91,6 +91,11 @@
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 7rem) 1.5rem clamp(4rem, 12vh, 8rem);
     font-family: var(--sans);
+    /* warm-sand wash — the ticket is the last stop of the journey (Tarkwa Bay
+       arrival), so a beach-sand tint under the boarding pass reads truer to
+       concept.txt's escape palette than plain cream. */
+    background: radial-gradient(ellipse at 50% 100%, rgba(232, 201, 160, 0.4), transparent 70%);
+    border-radius: 32px;
   }
 
   .header-text {

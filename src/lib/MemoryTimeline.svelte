@@ -7,12 +7,14 @@
       title: 'Open Canvas',
       meta: 'Jaekel House Garden · May 30',
       note: 'You don’t need to know how to paint. Just come with an open mind to create.',
+      color: 'var(--blue)',
     },
     {
       stamp: 'OOO 002',
       title: 'The Post-NYSC Hangout',
       meta: 'Tarkwa Bay Beach · Apr 11 · 12pm till daybreak',
       note: 'The calming embrace of ocean waves. The soothing breeze. The tranquility of nature.',
+      color: 'var(--sunset-orange)',
     },
     {
       stamp: 'OOO 003',
@@ -20,6 +22,7 @@
       meta: 'Coming soon',
       note: 'Stay tuned.',
       pending: true,
+      color: 'var(--muted-green)',
     },
   ];
 </script>
@@ -31,7 +34,10 @@
   <ol class="list">
     {#each MEMORIES as m, i}
       <li class="entry" class:pending={m.pending} class:visible style="--i: {i};">
-        <span class="stamp">{m.stamp}</span>
+        <span class="stamp" style="--stamp-color: {m.pending ? '#b8b2a8' : m.color}; --stamp-rotate: {i % 2 ? 6 : -7}deg;">
+          <span class="stamp-brand">OOO</span>
+          <span class="stamp-num">{m.stamp.replace('OOO ', '')}</span>
+        </span>
         <div class="details">
           <span class="title">{m.title}</span>
           <span class="meta">{m.meta}</span>
@@ -98,18 +104,38 @@
     border-left-color: #d8d2c8;
   }
 
+  /* Passport-stamp treatment: circular ink-stamp look (double ring, rotated,
+     transparent center) rather than a plain rounded-rect badge — per
+     concept.txt's "Passport Stamp" visual metaphor for each event. */
   .stamp {
     flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    border: 2px solid var(--stamp-color, var(--blue));
+    outline: 1px dashed var(--stamp-color, var(--blue));
+    outline-offset: 3px;
+    color: var(--stamp-color, var(--blue));
+    background: transparent;
+    transform: rotate(var(--stamp-rotate, -6deg));
+    text-align: center;
+  }
+  .stamp-brand {
     font-family: var(--bungee);
-    font-size: 0.75rem;
-    color: #fff;
-    background: var(--blue);
-    padding: 0.35rem 0.6rem;
-    border-radius: 6px;
-    white-space: nowrap;
+    font-size: 0.42rem;
+    letter-spacing: 0.08em;
+  }
+  .stamp-num {
+    font-family: var(--bungee);
+    font-size: 0.7rem;
+    line-height: 1.2;
   }
   .entry.pending .stamp {
-    background: #b8b2a8;
+    opacity: 0.7;
   }
 
   .details {

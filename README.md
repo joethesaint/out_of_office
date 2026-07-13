@@ -417,6 +417,23 @@ Site-wide, blue/pink/teal are used together: blue for the primary wordmark
 and headings, pink for secondary emphasis (eyebrows, CTA gradient, stat
 tiles), teal for tertiary UI accents (footer, tags).
 
+**Second update (2026-07-13) — resolving the sunset-orange/warm-sand
+question**: `concept.txt`'s original color brief had two palettes — a
+*chaos* set (danfo yellow, traffic red, dark grey concrete) and an *escape*
+set (ocean teal, sunset orange, warm sand, muted green) — neither of which
+made it into the build; the flyer-sampled blue/pink/teal became the entire
+site instead of just the brand-identity layer. The call: **keep** the
+flyer palette as brand identity (header, wordmark, CTA, cube) since it's
+real, sampled, ground-truth material — but stop using it for *everything*.
+Two small palettes now sit alongside it in `app.css`
+(`--chaos-yellow`/`--chaos-red`, `--sunset-orange`/`--warm-sand`/`--muted-green`):
+chaos colors drive the notification pill's red→yellow→blue taper as the
+cube solves (mirrors "the colors become calmer"), and escape colors are
+woven into the post-activation sections — `EscapeMetrics` stat tiles,
+`MemoryTimeline`'s passport-stamp badges, and a warm-sand wash behind
+`Tickets` — so the brief's second palette shows up as texture in the
+"arrival" content rather than replacing the brand's real colors.
+
 ### Typography direction
 
 The flyers use three distinct type treatments; none of the exact typefaces

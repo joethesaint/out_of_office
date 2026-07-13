@@ -3,9 +3,9 @@
 
   const STATS = [
     { value: '87', label: 'Emails ignored', color: 'var(--blue)' },
-    { value: '62%', label: 'Stress reduced', color: 'var(--pink-deep)' },
-    { value: '∞', label: 'New friendships', color: 'var(--accent)' },
-    { value: '100%', label: 'Battery recharged', color: 'var(--blue)' },
+    { value: '62%', label: 'Stress reduced', color: 'var(--sunset-orange)' },
+    { value: '∞', label: 'New friendships', color: 'var(--muted-green)' },
+    { value: '100%', label: 'Battery recharged', color: 'var(--pink-deep)' },
   ];
 </script>
 
