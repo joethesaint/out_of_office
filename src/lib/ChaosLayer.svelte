@@ -1,4 +1,5 @@
 <script>
+  import { onMount, onDestroy } from "svelte";
   export let progress = 0;
 
   // Fade out completely by progress 0.55
@@ -7,6 +8,28 @@
   $: scale = Math.max(0.75, 1 - progress * 0.4);
   $: translateY = progress * -80;
   $: visible = progress < 0.58;
+
+  // The System Notification card keeps "re-popping" at a new spot every
+  // few seconds instead of sitting fixed over the card's footer.
+  const batterySpots = [
+    { style: "top: 3%; left: 14%;", rot: -6 },
+    { style: "top: 3%; right: 16%;", rot: 5 },
+    { style: "top: 46%; left: 6%;", rot: 4 },
+    { style: "top: 46%; right: 7%;", rot: -5 },
+    { style: "bottom: 3%; left: 24%;", rot: 6 },
+    { style: "bottom: 3%; right: 22%;", rot: -4 },
+  ];
+  let batteryIndex = 0;
+  let batteryTimer;
+
+  onMount(() => {
+    batteryTimer = setInterval(() => {
+      batteryIndex = (batteryIndex + 1) % batterySpots.length;
+    }, 4200);
+  });
+  onDestroy(() => clearInterval(batteryTimer));
+
+  $: batterySpot = batterySpots[batteryIndex];
 </script>
 
 {#if visible}
@@ -54,15 +77,67 @@
       <p class="popup-body"><strong>Quick 15-min Sync</strong> w/ Legal & Finance (Google Meet link inside)</p>
     </div>
 
-    <!-- Battery Low, lower center, slightly overlapping the bottom of both
-         piles so nothing reads as evenly spaced -->
-    <div class="popup-card battery" style="bottom: 4%; left: 40%; transform: rotate(-3deg) scale(0.94); z-index: 2;">
+    <!-- Second wave, doubling the pile: same chaos, more channels -->
+    <div class="popup-card twitter" style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); left: 4%; transform: rotate(5deg) scale(0.95); z-index: 3;">
       <div class="popup-header">
-        <span class="icon">🔋</span>
-        <span class="app-name">System Notification</span>
+        <span class="icon">🐦</span>
+        <span class="app-name">X · DM from Investor</span>
+        <span class="time">now</span>
       </div>
-      <p class="popup-body"><strong>Battery Low (9%)</strong> — Connect your Mac to a power adapter soon or it will sleep.</p>
+      <p class="popup-body">Saw the deck. Can we jump on a call before markets open tomorrow?</p>
     </div>
+
+    <div class="popup-card instagram" style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); right: 4%; transform: rotate(-6deg) scale(0.95); z-index: 3;">
+      <div class="popup-header">
+        <span class="icon">📸</span>
+        <span class="app-name">Instagram · Client tagged you</span>
+        <span class="time">8m ago</span>
+      </div>
+      <p class="popup-body">"@you why is our stand still not ready?? event is in 2 days 😭"</p>
+    </div>
+
+    <div class="popup-card zoom" style="bottom: 20%; left: 3%; transform: rotate(-4deg) scale(0.95); z-index: 4;">
+      <div class="popup-header">
+        <span class="icon">🎥</span>
+        <span class="app-name">Zoom · Meeting starting</span>
+        <span class="time">in 1 min</span>
+      </div>
+      <p class="popup-body"><strong>All-hands:</strong> Q2 targets review. Camera on, please.</p>
+    </div>
+
+    <div class="popup-card trello" style="bottom: 20%; right: 3%; transform: rotate(6deg) scale(0.95); z-index: 4;">
+      <div class="popup-header">
+        <span class="icon">📋</span>
+        <span class="app-name">Trello · Card overdue</span>
+        <span class="time">3h ago</span>
+      </div>
+      <p class="popup-body"><strong>"Fix production bug"</strong> is 3 days past due. 4 people are watching.</p>
+    </div>
+
+    <div class="popup-card bank" style="top: 62%; left: 1%; transform: rotate(3deg) scale(0.94); z-index: 2;">
+      <div class="popup-header">
+        <span class="icon">🏦</span>
+        <span class="app-name">GTBank · Debit Alert</span>
+        <span class="time">1m ago</span>
+      </div>
+      <p class="popup-body">Debit of ₦45,000 on card **1234. Generator fuel, again.</p>
+    </div>
+
+    <!-- System Notification — the one that keeps re-popping in a new spot
+         instead of parking itself over the card footer, and reads as
+         frosted glass so the card underneath stays partly visible. -->
+    {#key batteryIndex}
+      <div
+        class="popup-card battery glass"
+        style="{batterySpot.style} --rot: {batterySpot.rot}deg; z-index: 5;"
+      >
+        <div class="popup-header">
+          <span class="icon">🔋</span>
+          <span class="app-name">System Notification</span>
+        </div>
+        <p class="popup-body"><strong>Battery Low (9%)</strong> — Connect your Mac to a power adapter soon or it will sleep.</p>
+      </div>
+    {/key}
   </div>
 {/if}
 
@@ -94,7 +169,12 @@
   .popup-card.slack { animation-delay: -1.2s; border-left: 4px solid #4a154b; }
   .popup-card.email { animation-delay: -2.4s; border-left: 4px solid #0078d4; }
   .popup-card.calendar { animation-delay: -0.7s; border-left: 4px solid #ea4335; }
-  .popup-card.battery { animation-delay: -3.1s; border-left: 4px solid #ff9900; }
+  .popup-card.twitter { animation-delay: -1.8s; border-left: 4px solid #14171a; }
+  .popup-card.instagram { animation-delay: -3.4s; border-left: 4px solid #e1306c; }
+  .popup-card.zoom { animation-delay: -0.4s; border-left: 4px solid #2d8cff; }
+  .popup-card.trello { animation-delay: -2.9s; border-left: 4px solid #0079bf; }
+  .popup-card.bank { animation-delay: -1.5s; border-left: 4px solid #f7931e; }
+  .popup-card.battery { border-left: 4px solid #ff9900; }
 
   .popup-header {
     display: flex;
@@ -140,7 +220,44 @@
     }
   }
 
-  /* Hide on very small screens so they don't cover the mobile text */
+  /* System Notification: re-pops in a new spot on an interval (see
+     batteryIndex/{#key} above), and reads as frosted glass — translucent
+     enough to still make out the card underneath, not a flat white card
+     like the others. */
+  .popup-card.glass {
+    background: rgba(255, 255, 255, 0.24);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    animation: batteryPop 0.5s var(--ease-out-expo) both,
+               floatChaos 4s ease-in-out infinite alternate 0.5s;
+  }
+  .popup-card.glass .popup-header,
+  .popup-card.glass .popup-header .app-name {
+    color: #181818;
+  }
+  .popup-card.glass .popup-body {
+    color: #1c1c1c;
+  }
+
+  @keyframes batteryPop {
+    0% {
+      opacity: 0;
+      transform: scale(0.5) rotate(var(--rot, 0deg));
+    }
+    55% {
+      opacity: 1;
+      transform: scale(1.05) rotate(var(--rot, 0deg));
+    }
+    100% {
+      opacity: 1;
+      transform: scale(0.94) rotate(var(--rot, 0deg));
+    }
+  }
+
+  /* Hide on very small screens so they don't cover the mobile text —
+     the roaming glass battery card stays, since it's translucent. */
   @media (max-width: 680px) {
     .popup-card {
       width: 180px;
@@ -149,7 +266,12 @@
     .popup-card.slack,
     .popup-card.calendar,
     .popup-card.email,
-    .popup-card.whatsapp {
+    .popup-card.whatsapp,
+    .popup-card.twitter,
+    .popup-card.instagram,
+    .popup-card.zoom,
+    .popup-card.trello,
+    .popup-card.bank {
       display: none;
     }
   }

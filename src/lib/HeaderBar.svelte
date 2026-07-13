@@ -28,6 +28,8 @@
 
 <style>
   .bar {
+    position: relative;
+    z-index: 0;
     display: flex;
     width: 100%;
     height: clamp(52px, 9vh, 72px);

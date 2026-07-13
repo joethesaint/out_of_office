@@ -355,6 +355,7 @@
 
   .hero {
     position: relative;
+    z-index: 1;
     flex: 1 1 auto;
     display: flex;
     align-items: center;
