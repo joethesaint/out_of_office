@@ -279,10 +279,13 @@ happened when both solutions landed on the same page.
    visitor skip past all of it on their very first interaction. Not a
    bug, but worth a conscious call on whether the CTA should exist at
    all, or scroll partway rather than all the way.
-10. **Process concern, unchanged from the last pass: `SKILL.md` silently
-    overrode an explicit user instruction** about a landscape *card* hero
-    in favor of a self-authored "full-bleed, no card, ever" rule, without
-    the user's sign-off. Left as-is pending a decision; not reverted.
+10. **Resolved 2026-07-13**: `SKILL.md` had silently overridden an
+    explicit user instruction about a card hero in favor of a
+    self-authored "full-bleed, no card, ever" rule, without the user's
+    sign-off. Per direct user request, the phone-shaped card (`.frame`:
+    480px cap, 9:16 aspect-ratio, border-radius, drop-shadow — the shape
+    from the earliest hero commit, `af86ec4`) has been restored, and
+    `SKILL.md` updated to match.
 11. **Two separate easter eggs where the brief described one, offered as
     alternatives** — unchanged finding, though the click-based one is now
     meaningfully better built (see above). The "oo" keyboard sequence

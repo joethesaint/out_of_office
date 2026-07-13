@@ -92,10 +92,12 @@ CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
 - progress (0->1) from .scroll-track position -> passed to <RotatingCube {progress}/>
 - activated at progress >= 0.995 -> "Out of Office Activated" reveal
 
-### Layout (desktop-first, full-bleed — NO phone-card)
-- .frame fills 100% x 100% of .pinned
-- NO border-radius, box-shadow, aspect-ratio, or max-width on .frame
-- Header/footer bars stretch full width
+### Layout (phone-shaped card, centered)
+- .frame is a portrait card: width min(100%, 480px), aspect-ratio 9/16,
+  max-height 100vh, border-radius 20px, box-shadow
+- .frame goes edge-to-edge (no radius/shadow/aspect-ratio) only under the
+  700px mobile breakpoint
+- Header/footer bars stretch to the card's width, not the viewport's
 
 ### RotatingCube
 - progress=0 -> scrambled (Lagos chaos); progress=1 -> solved (OOO activated)
@@ -109,7 +111,10 @@ CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
 1. Always git fetch before starting and before every push
 2. Never overwrite upstream changes — stash, pull, reapply, resolve
 3. Treat docs/brand-reference/ flyers as ground truth
-4. No phone-card layout — the site is full-bleed on all screen sizes
+4. Phone-shaped card layout — .frame is a centered portrait card (see
+   Architecture above), not full-bleed. This was restored per explicit
+   user instruction on 2026-07-13 after an earlier agent's self-authored
+   "full-bleed, no card" rule had silently overridden it.
 5. Fonts are self-hosted in public/fonts/ — do not switch back to CDN links
 6. Commit messages: "scope: what\n\nwhy + merge decisions"
 7. Before any layout change, understand the scroll-pin architecture first

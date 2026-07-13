@@ -328,26 +328,28 @@
 
   .frame {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: min(100%, 480px);
+    aspect-ratio: 9 / 16;
+    max-height: 100vh;
     background: var(--bg);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.55);
   }
 
   @media (max-width: 700px) {
     .stage-wrap {
       padding: 0;
     }
-    .hero-row {
-      flex-direction: column;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    .cube-slot {
-      margin-left: 0;
+    .frame {
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      box-shadow: none;
     }
   }
 
@@ -364,9 +366,10 @@
     position: relative;
     z-index: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(0.5rem, 2vw, 1.5rem);
+    gap: 0.5rem;
     width: 100%;
   }
 
@@ -557,7 +560,6 @@
     pointer-events: auto;
     width: clamp(200px, 27vw, 340px);
     height: clamp(200px, 27vw, 340px);
-    margin-left: clamp(-1.5rem, -3vw, -0.5rem);
   }
   /* Grounding glow — the cube is meant to be the hero object, but its
      bright/paper-cream seams sat directly on a near-identical cream page
