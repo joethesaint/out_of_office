@@ -19,6 +19,26 @@
   let scrollTrack;
   let progress = 0;
 
+  // Two-key Easter Egg (type 'oo')
+  const KONAMI_CODE = ['o', 'o'];
+  let konamiIndex = 0;
+  let showStats = false;
+  let statsTimer;
+
+  function onKeyDown(e) {
+    if (e.key === KONAMI_CODE[konamiIndex]) {
+      konamiIndex++;
+      if (konamiIndex === KONAMI_CODE.length) {
+        showStats = true;
+        konamiIndex = 0;
+        clearTimeout(statsTimer);
+        statsTimer = setTimeout(() => showStats = false, 6000);
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  }
+
   function updateProgress() {
     if (!scrollTrack) return;
     const rect = scrollTrack.getBoundingClientRect();
@@ -34,10 +54,13 @@
     updateProgress();
     window.addEventListener("scroll", updateProgress, { passive: true });
     window.addEventListener("resize", updateProgress);
+    window.addEventListener("keydown", onKeyDown);
   });
   onDestroy(() => {
     window.removeEventListener("scroll", updateProgress);
     window.removeEventListener("resize", updateProgress);
+    window.removeEventListener("keydown", onKeyDown);
+    clearTimeout(statsTimer);
   });
 
   $: activated = progress >= 0.995;
@@ -148,7 +171,9 @@
               </div>
             </div>
             <div class="cube-slot">
-              <RotatingCube {progress} />
+              <div class="cube-floating-container" class:is-floating={activated}>
+                <RotatingCube {progress} />
+              </div>
             </div>
           </div>
           <Boat {progress} />
@@ -172,6 +197,15 @@
 <ScrollReveal><MemoryTimeline /></ScrollReveal>
 <ScrollReveal><Playlist /></ScrollReveal>
 <ScrollReveal><Tickets /></ScrollReveal>
+
+<div class="stats-toast" class:visible={showStats} role="status">
+  <p class="stats-title">Lagos Survival Stats</p>
+  <ul>
+    <li>Traffic avoided: <strong>3 hours</strong></li>
+    <li>Emails ignored: <strong>17</strong></li>
+    <li>Stress reduced: <strong>68%</strong></li>
+  </ul>
+</div>
 
 <style>
   .scroll-track {
@@ -437,11 +471,32 @@
     pointer-events: auto;
     width: clamp(150px, 20vw, 260px);
     height: clamp(150px, 20vw, 260px);
-    /* sits to the right of "OUT OF / OFFICE" in its own flex column, with
-       a small negative margin so it only nudges into the empty space past
-       the text rather than ever covering a letter — the landscape frame
-       gives it room to sit clear of the words instead of overlapping them */
     margin-left: clamp(-1.5rem, -3vw, -0.5rem);
+  }
+
+  .cube-floating-container {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cube-floating-container.is-floating {
+    position: fixed;
+    bottom: clamp(1.5rem, 5vh, 3rem);
+    right: clamp(1.5rem, 5vw, 3rem);
+    width: clamp(70px, 10vw, 100px);
+    height: clamp(70px, 10vw, 100px);
+    z-index: 100;
+    pointer-events: auto;
+    animation: floatAssistant 4s ease-in-out infinite;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+  }
+
+  @keyframes floatAssistant {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
   }
 
   .activated {
@@ -481,5 +536,50 @@
     margin: 0;
     font-family: var(--sans);
     color: var(--ink);
+  }
+
+  .stats-toast {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    background: rgba(246, 244, 241, 0.95);
+    backdrop-filter: blur(8px);
+    border: 2px solid var(--blue);
+    padding: 1.25rem 1.75rem;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .stats-toast.visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .stats-title {
+    margin: 0 0 0.75rem;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--blue);
+  }
+  .stats-toast ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--ink);
+  }
+  .stats-toast li {
+    margin-bottom: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .stats-toast li strong {
+    color: var(--accent);
   }
 </style>

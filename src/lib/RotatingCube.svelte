@@ -50,6 +50,8 @@
     }
   }
 
+  let easterEggTimer;
+
   const UNIT = 0.72; // spacing between cubie centers
   const CUBIE = 0.68; // cubie edge length (small, near-seamless gap like the source)
 
@@ -310,6 +312,21 @@
     let velX = 0.004;
     let velY = 0.007;
 
+    // --- Sleep mode for inactivity ---
+    let isSleeping = false;
+    let sleepTimer;
+    function resetSleep() {
+      isSleeping = false;
+      clearTimeout(sleepTimer);
+      sleepTimer = setTimeout(() => {
+        isSleeping = true;
+      }, 5000);
+    }
+    window.addEventListener('pointermove', resetSleep);
+    window.addEventListener('scroll', resetSleep);
+    window.addEventListener('keydown', resetSleep);
+    resetSleep();
+
     function onPointerMove(e) {
       wakeUp();
       const rect = container.getBoundingClientRect();
@@ -547,16 +564,28 @@
       camera.position.x += (pointerX * 0.6 - camera.position.x) * 0.04;
       camera.position.y += (-pointerY * 0.6 - camera.position.y) * 0.04;
       camera.lookAt(0, 0, 0);
+
+      // Dim lights when sleeping
+      const targetFill = isSleeping ? 0.3 : 1.2;
+      const targetKey = isSleeping ? 15 : 60;
+      fill.intensity += (targetFill - fill.intensity) * 0.05;
+      key.intensity += (targetKey - key.intensity) * 0.05;
+
       renderer.render(scene, camera);
     }
     animate();
 
     onDestroy(() => {
       cancelAnimationFrame(frameId);
+      clearTimeout(easterEggTimer);
+      clearTimeout(sleepTimer);
       ro.disconnect();
       container.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointermove', resetSleep);
+      window.removeEventListener('scroll', resetSleep);
+      window.removeEventListener('keydown', resetSleep);
       geometry.dispose();
       disposableMaterials.forEach((m) => m.dispose());
       disposableTextures.forEach((t) => t.dispose());
