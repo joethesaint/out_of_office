@@ -1,5 +1,7 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { scale } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
   import RotatingCube from "./lib/RotatingCube.svelte";
   import HeaderBar from "./lib/HeaderBar.svelte";
   import FooterBar from "./lib/FooterBar.svelte";
@@ -250,9 +252,7 @@
               </div>
             </div>
             <div class="cube-slot">
-              <div class="cube-floating-container" class:is-floating={activated}>
-                <RotatingCube {progress} />
-              </div>
+              <RotatingCube {progress} />
             </div>
           </div>
           <Boat progress={smoothedProgress} />
@@ -263,6 +263,12 @@
     </div>
   </div>
 </div>
+
+{#if activated}
+  <div class="cube-companion" in:scale={{ duration: 550, start: 0.4, opacity: 0, easing: cubicOut }}>
+    <RotatingCube progress={1} />
+  </div>
+{/if}
 
 <section class="activated" class:visible={activated}>
   <p class="activated-eyebrow">Status update</p>
@@ -577,15 +583,11 @@
     filter: blur(28px);
   }
 
-  .cube-floating-container {
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s var(--ease-out-expo),
-                width 0.6s var(--ease-out-expo),
-                height 0.6s var(--ease-out-expo);
-  }
-
-  .cube-floating-container.is-floating {
+  /* The hero cube stays put in .cube-slot for the whole scroll-pin —
+     it does not relocate. Once activated, a second, independent cube
+     (.cube-companion below) pops into play instead, docked in the
+     corner for the rest of the scroll. */
+  .cube-companion {
     position: fixed;
     bottom: clamp(1.5rem, 5vh, 3rem);
     right: clamp(1.5rem, 5vw, 3rem);
@@ -600,7 +602,7 @@
      yet; the transparent-canvas cube (renderer alpha: true) sitting over a
      frosted panel is the one place it reads as a UI affordance rather than
      decoration. */
-  .cube-floating-container.is-floating::before {
+  .cube-companion::before {
     content: "";
     position: absolute;
     inset: -18%;
