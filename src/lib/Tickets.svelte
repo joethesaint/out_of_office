@@ -277,7 +277,7 @@
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #777;
+    color: #6b6b6b;
   }
   .detail-item .value {
     font-size: 0.88rem;
@@ -341,7 +341,7 @@
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: #888;
+    color: #6b6b6b;
   }
   .seat-badge {
     background: #181818;
@@ -395,7 +395,7 @@
     font-weight: 700;
     font-size: 0.95rem;
     color: #fff;
-    background: linear-gradient(135deg, var(--blue, #00bfff), var(--pink-deep, #fc9ce0));
+    background: var(--blue, #00bfff);
     padding: 0.9rem 1rem;
     border-radius: 999px;
     text-decoration: none;
@@ -408,7 +408,7 @@
   }
   .fine-print {
     font-size: 0.68rem;
-    color: #888;
+    color: #6b6b6b;
   }
 
   @keyframes boatBob {

@@ -1,4 +1,4 @@
-﻿---
+---
 name: out-of-office-project
 description: >
   Context, rules, and conventions for working on the Out of Office Lagos
@@ -11,6 +11,7 @@ description: >
 ## ALWAYS do this first (multi-agent repo rule)
 
 ```bash
+git branch --show-current   # confirm which branch you're actually on
 git fetch origin
 git status   # if behind/diverged: stash -> pull -> pop -> resolve -> verify
 ```
@@ -19,17 +20,16 @@ If you have local edits and discover new remote commits:
 1. `git stash -u -m "<description>"`
 2. `git pull origin <branch>`
 3. `git stash pop`
-4. Resolve conflicts — favour whichever side is objectively newer/more complete
-5. Verify app still runs before committing
-6. Re-fetch immediately before every push
-
-Current active branch: `claude/pinterest-link-access-qym76c`
+4. Resolve conflicts explicitly after reviewing both sides; preserve upstream and local intent without automatically favoring or discarding either side. Read what each side actually changed and reconcile intentionally.
+5. Confirm your active branch dynamically (`git branch --show-current`); do not hardcode or assume a fixed branch name.
+6. Verify app still runs before committing.
+7. Re-fetch immediately before every push.
 
 ---
 
 ## Project Structure
 
-```
+```text
 src/
   App.svelte              # Page shell: scroll-pin hero, scroll progress, section list
   app.css                 # Brand CSS vars + self-hosted @font-face rules
@@ -55,6 +55,7 @@ public/fonts/             # Self-hosted woff2: fredoka, space-grotesk,
 ## Brand Identity (treat flyers as ground truth)
 
 ### Colours
+
 | Role              | Hex                   |
 |-------------------|-----------------------|
 | Wordmark blue     | #00bfff               |
@@ -68,6 +69,7 @@ public/fonts/             # Self-hosted woff2: fredoka, space-grotesk,
 CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
 
 ### Typography
+
 | Role                  | Font               | CSS var      |
 |-----------------------|--------------------|--------------|
 | Wordmark / headline   | Fredoka Bold       | --display    |
@@ -101,8 +103,8 @@ CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
 
 ### RotatingCube
 - progress=0 -> scrambled (Lagos chaos); progress=1 -> solved (OOO activated)
-- Checkerboard blue/cream stickers, face-spanning decals, MeshPhysicalMaterial
-- Ghost-mesh motion blur on twists; drag-to-spin + pointer parallax
+- Six solid brand-color faces (`#00bfff` blue, `#e0568f` pink, `#08cabd` teal, `#e8c9a0` sand, `#ff7b4d` orange, `#7c9473` green), chaos-tinted checkerboard (`#ffc72c` yellow / `#d92b2b` red) while scrambled, face-spanning decals, `MeshPhysicalMaterial`
+- 27 cubies with ghost-mesh motion blur on layer twists; drag-to-spin + pointer parallax
 
 ---
 

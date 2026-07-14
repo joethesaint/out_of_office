@@ -8,17 +8,13 @@
   </div>
 
   <div class="block block-trend">
-    <span class="tag">NOW ACTIVE</span>
-    <span class="word">ESCAPE</span>
-    <span class="sub">LAGOS TO TARKWA</span>
+    <span class="tag">AUTO-REPLY</span>
+    <span class="word">ENABLED</span>
+    <span class="sub">MAINLAND &rarr; ISLAND</span>
   </div>
 
   <div class="block block-logo">
-    <svg class="ooo-mark" viewBox="0 0 32 20" aria-hidden="true">
-      <circle cx="8" cy="10" r="6.5" fill="none" stroke="#00bfff" stroke-width="1.6" />
-      <circle cx="16" cy="10" r="6.5" fill="none" stroke="#08cabd" stroke-width="1.6" />
-      <circle cx="24" cy="10" r="6.5" fill="none" stroke="#181818" stroke-width="1.6" />
-    </svg>
+    <span class="status-dot" aria-hidden="true"></span>
     <div class="wordmark-col">
       <span class="wordmark">ooo</span>
       <span class="meta">Lagos</span>
@@ -90,9 +86,11 @@
     align-items: center;
     gap: 0.4rem;
   }
-  .ooo-mark {
-    width: clamp(20px, 4vw, 28px);
-    height: auto;
+  .status-dot {
+    width: clamp(7px, 1.4vw, 9px);
+    height: clamp(7px, 1.4vw, 9px);
+    border-radius: 50%;
+    background: #d9a441;
     flex: none;
   }
   .wordmark-col {
