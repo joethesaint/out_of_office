@@ -1,4 +1,4 @@
-﻿---
+---
 name: out-of-office-project
 description: >
   Context, rules, and conventions for working on the Out of Office Lagos
@@ -20,11 +20,10 @@ If you have local edits and discover new remote commits:
 1. `git stash -u -m "<description>"`
 2. `git pull origin <branch>`
 3. `git stash pop`
-4. Resolve conflicts by reviewing both sides — don't auto-favor either; read
-   what each side actually changed (commit messages/dates are context, not a
-   substitute for reading the diff) and reconcile intentionally
-5. Verify app still runs before committing
-6. Re-fetch immediately before every push
+4. Resolve conflicts explicitly after reviewing both sides; preserve upstream and local intent without automatically favoring or discarding either side. Read what each side actually changed and reconcile intentionally.
+5. Confirm your active branch dynamically (`git branch --show-current`); do not hardcode or assume a fixed branch name.
+6. Verify app still runs before committing.
+7. Re-fetch immediately before every push.
 
 ---
 
@@ -102,8 +101,8 @@ CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
 
 ### RotatingCube
 - progress=0 -> scrambled (Lagos chaos); progress=1 -> solved (OOO activated)
-- Checkerboard blue/cream stickers, face-spanning decals, MeshPhysicalMaterial
-- Ghost-mesh motion blur on twists; drag-to-spin + pointer parallax
+- Six solid brand-color faces (`#00bfff` blue, `#e0568f` pink, `#08cabd` teal, `#e8c9a0` sand, `#ff7b4d` orange, `#7c9473` green), chaos-tinted checkerboard (`#ffc72c` yellow / `#d92b2b` red) while scrambled, face-spanning decals, `MeshPhysicalMaterial`
+- 27 cubies with ghost-mesh motion blur on layer twists; drag-to-spin + pointer parallax
 
 ---
 

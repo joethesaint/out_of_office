@@ -535,7 +535,7 @@ The headline is the only content block; everything else is chrome around it.
 
 ### The hero object (cube)
 This is the piece that's implemented so far — see
-[Matching the source cube's look](#matching-the-source-cubes-look) for the
+[Matching the source cube's look](#matching-the-source-cubes-look-legacy-technique-reference-only) for the
 full lighting/color/material breakdown, sampled directly from video frames.
 - Cube reads as a Rubik's-style puzzle, but **only uses two hues** (magenta
   pink + white), not six — it stays on-brand rather than reading as a toy.
