@@ -1,0 +1,60 @@
+language: en-US
+tone_instructions: >
+  Direct and concise. This is a small solo/agent-driven frontend project
+  (Svelte 5 + Vite + Three.js), not an enterprise codebase — skip generic
+  boilerplate advice (adding test suites, CI matrices, monorepo tooling)
+  unless it's clearly missing and relevant to a bug actually introduced
+  in the diff.
+
+early_access: false
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: true
+  auto_review:
+    enabled: true
+    drafts: false
+
+  path_filters:
+    - "!dist/**"
+    - "!node_modules/**"
+    - "!public/fonts/**"
+    - "!docs/brand-reference/**"
+    - "!package-lock.json"
+
+  path_instructions:
+    - path: "src/lib/RotatingCube.svelte"
+      instructions: >
+        This is a hand-rolled 27-cubie Rubik's cube (real twist logic,
+        scramble/solve state, canvas/texture repainting), not a library.
+        Flag correctness bugs in twist/rotation math, state desync between
+        scramble and solve, and perf issues (e.g. full texture recreation
+        per frame instead of incremental repaint). Don't suggest replacing
+        it with a Three.js helper library or generic refactors that ignore
+        why it's built this way.
+    - path: "src/**/*.svelte"
+      instructions: >
+        Project uses Svelte 5 runes ($state, $derived, $effect). Flag
+        incorrect rune usage or reactivity bugs, but don't suggest
+        Svelte 4 patterns (reactive $: statements, stores where a rune
+        would do). Respect prefers-reduced-motion gating on animations —
+        flag any new animation that isn't gated behind it.
+    - path: "src/app.css"
+      instructions: >
+        Brand color tokens are intentional (chaos yellow/red for
+        pre-activation, sunset/sand/ocean for post-activation escape).
+        Don't suggest consolidating or renaming these without flagging
+        it as a design decision, not just a code cleanup.
+
+  tools:
+    eslint:
+      enabled: true
+    markdownlint:
+      enabled: true
+
+chat:
+  auto_reply: true
