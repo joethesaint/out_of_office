@@ -14,7 +14,7 @@
     <span class="sub">MAINLAND &rarr; ISLAND</span>
   </div>
 
-  <button class="block block-theme" on:click={toggleTheme} aria-label="Toggle color theme" title="Switch between Light and Dark mode">
+  <button type="button" class="block block-theme" on:click={toggleTheme} aria-label={$isDark ? 'Switch to DAY theme' : 'Switch to NIGHT theme'} title="Switch between Light and Dark mode">
     <span class="theme-icon">{$isDark ? '🌙' : '☀️'}</span>
     <span class="theme-label">{$isDark ? 'NIGHT' : 'DAY'}</span>
   </button>

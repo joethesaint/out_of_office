@@ -2,8 +2,12 @@ import { writable, derived } from 'svelte/store';
 
 const getInitialTheme = () => {
   if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('ooo_theme');
-    if (stored === 'dark' || stored === 'light') return stored;
+    try {
+      const stored = localStorage.getItem('ooo_theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+    } catch (e) {
+      // Ignore storage errors when cookies/storage are blocked
+    }
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
   }
   return 'light';
@@ -16,8 +20,11 @@ export function toggleTheme() {
   theme.update((current) => {
     const next = current === 'dark' ? 'light' : 'dark';
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ooo_theme', next);
-      document.documentElement.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem('ooo_theme', next);
+      } catch (e) {
+        // Ignore storage errors when cookies/storage are blocked
+      }
     }
     return next;
   });
