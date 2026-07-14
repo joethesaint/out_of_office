@@ -11,6 +11,7 @@ description: >
 ## ALWAYS do this first (multi-agent repo rule)
 
 ```bash
+git branch --show-current   # confirm which branch you're actually on
 git fetch origin
 git status   # if behind/diverged: stash -> pull -> pop -> resolve -> verify
 ```
@@ -19,11 +20,11 @@ If you have local edits and discover new remote commits:
 1. `git stash -u -m "<description>"`
 2. `git pull origin <branch>`
 3. `git stash pop`
-4. Resolve conflicts — favour whichever side is objectively newer/more complete
+4. Resolve conflicts by reviewing both sides — don't auto-favor either; read
+   what each side actually changed (commit messages/dates are context, not a
+   substitute for reading the diff) and reconcile intentionally
 5. Verify app still runs before committing
 6. Re-fetch immediately before every push
-
-Current active branch: `claude/pinterest-link-access-qym76c`
 
 ---
 
