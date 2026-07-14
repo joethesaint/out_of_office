@@ -77,6 +77,12 @@
   --dur-slow: 0.8s;
 }
 
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --ink: #f0ede6;
+  --cream: #181a20;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -91,6 +97,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 #app {

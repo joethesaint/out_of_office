@@ -2,6 +2,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import * as THREE from 'three';
   import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+  import { isDark } from './theme.js';
 
   // 0..1 scroll progress: 0 = fully scrambled, 1 = solved. Leave unset
   // (null) for the autonomous scramble/rest/solve/rest demo loop instead.
@@ -140,10 +141,14 @@
   // calms down.
   const CHAOS_YELLOW = '#ffc72c';
   const CHAOS_RED = '#e5383b';
-  // Obsidian black plastic body/seams — a real Rubik's cube's body color,
-  // and it makes every sticker (including the white face) pop with real
-  // contrast instead of bleeding into a pale background.
-  const SEAM = '#0c0c0f';
+  // Dynamic seam/plastic body color based on dark/light mode (`$isDark`).
+  // White edges around cube colors for light mode, obsidian black for dark mode!
+  $: seamColor = $isDark ? '#0c0c0f' : '#ffffff';
+
+  let activeRepaintAll = null;
+  $: if (activeRepaintAll && seamColor) {
+    activeRepaintAll();
+  }
 
   function hexToRgb(hex) {
     const n = parseInt(hex.slice(1), 16);
@@ -248,7 +253,7 @@
     let texture;
     function paint(chaosT) {
       ctx.clearRect(x, y, TILE, TILE);
-      ctx.fillStyle = SEAM;
+      ctx.fillStyle = seamColor;
       ctx.fillRect(x, y, TILE, TILE);
 
       ctx.fillStyle = mixColor(faceColor, chaosBase, chaosT, shade);
@@ -270,15 +275,19 @@
     return { texture, repaint: paint };
   }
 
+  let plasticTextureRef = null;
+  let plasticCtxRef = null;
   function makePlasticTexture() {
     const size = 64;
     const el = document.createElement('canvas');
     el.width = el.height = size;
     const ctx = el.getContext('2d');
-    ctx.fillStyle = SEAM;
+    ctx.fillStyle = seamColor;
     ctx.fillRect(0, 0, size, size);
     const texture = new THREE.CanvasTexture(el);
     texture.colorSpace = THREE.SRGBColorSpace;
+    plasticCtxRef = ctx;
+    plasticTextureRef = texture;
     return texture;
   }
 
@@ -518,8 +527,14 @@
     }
     function repaintStickers() {
       const t = currentChaosT();
+      if (plasticCtxRef && plasticTextureRef) {
+        plasticCtxRef.fillStyle = seamColor;
+        plasticCtxRef.fillRect(0, 0, 64, 64);
+        plasticTextureRef.needsUpdate = true;
+      }
       for (const repaint of stickerRepaints) repaint(t);
     }
+    activeRepaintAll = repaintStickers;
 
     // scroll-mode-only state: a fixed scramble sequence generated once, then
     // driven by how many of its moves are currently "applied" — 0 applied
@@ -919,7 +934,7 @@
     color: var(--blue, #00bfff);
   }
   .reply-box {
-    background: #f6f4f1;
+    background: var(--bg);
     border-radius: 10px;
     padding: 0.9rem;
     margin: 0.3rem 0;

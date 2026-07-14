@@ -1,4 +1,5 @@
 <script>
+  import { isDark, toggleTheme } from './theme.js';
 </script>
 
 <header class="bar">
@@ -12,6 +13,11 @@
     <span class="word">ENABLED</span>
     <span class="sub">MAINLAND &rarr; ISLAND</span>
   </div>
+
+  <button class="block block-theme" on:click={toggleTheme} aria-label="Toggle color theme" title="Switch between Light and Dark mode">
+    <span class="theme-icon">{$isDark ? '🌙' : '☀️'}</span>
+    <span class="theme-label">{$isDark ? 'NIGHT' : 'DAY'}</span>
+  </button>
 
   <div class="block block-logo">
     <span class="status-dot" aria-hidden="true"></span>
@@ -77,6 +83,37 @@
     font-size: clamp(0.4rem, 1vw, 0.55rem);
     letter-spacing: 0.12em;
     color: #cfcfcf;
+  }
+
+  .block-theme {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15em;
+    padding: 0 clamp(0.6rem, 2.2vw, 1.2rem);
+    transition: background 0.3s ease, color 0.3s ease, transform 0.15s ease;
+  }
+  .block-theme:hover {
+    background: var(--blue);
+    color: #fff;
+  }
+  .block-theme:active {
+    transform: scale(0.95);
+  }
+  .theme-icon {
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    line-height: 1;
+  }
+  .theme-label {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: clamp(0.4rem, 0.9vw, 0.55rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .block-logo {
