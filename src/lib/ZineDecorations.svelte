@@ -2,11 +2,6 @@
 </script>
 
 <div class="decorations" aria-hidden="true">
-  <!-- Left edge vertical spine text -->
-  <div class="spine">
-    <span>ADMITTANCE STRICTLY FOR OUT OF OFFICE PERSONNEL · TERMS AND CONDITIONS APPLY</span>
-  </div>
-
   <!-- Barcode bottom right -->
   <div class="barcode">
     <svg viewBox="0 0 100 30" preserveAspectRatio="none">
@@ -38,20 +33,6 @@
     pointer-events: none;
     z-index: 0;
     overflow: hidden;
-  }
-
-  .spine {
-    position: absolute;
-    left: clamp(0.5rem, 1.5vw, 1.25rem);
-    top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: center;
-    white-space: nowrap;
-    font-family: var(--sans);
-    font-size: clamp(0.4rem, 1vw, 0.55rem);
-    letter-spacing: 0.15em;
-    color: #a0a0a0;
-    text-transform: uppercase;
   }
 
   .barcode {

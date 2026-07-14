@@ -23,6 +23,11 @@
     }
     sessionStorage.setItem('ooo-booted', '1');
 
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      removed = true;
+      return;
+    }
+
     const timers = LINES.map((_, i) =>
       setTimeout(() => { shownCount = i + 1; }, i * LINE_DELAY)
     );

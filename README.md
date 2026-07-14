@@ -988,7 +988,7 @@ npm run preview   # preview the production build
 
 ## Project structure
 
-```
+```text
 docs/
   brand-reference/        # real Out of Office event flyers (ground truth
                            # for brand identity — see that section). Also

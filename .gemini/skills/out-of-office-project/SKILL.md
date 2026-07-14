@@ -29,7 +29,7 @@ Current active branch: `claude/pinterest-link-access-qym76c`
 
 ## Project Structure
 
-```
+```text
 src/
   App.svelte              # Page shell: scroll-pin hero, scroll progress, section list
   app.css                 # Brand CSS vars + self-hosted @font-face rules
@@ -55,6 +55,7 @@ public/fonts/             # Self-hosted woff2: fredoka, space-grotesk,
 ## Brand Identity (treat flyers as ground truth)
 
 ### Colours
+
 | Role              | Hex                   |
 |-------------------|-----------------------|
 | Wordmark blue     | #00bfff               |
@@ -68,6 +69,7 @@ public/fonts/             # Self-hosted woff2: fredoka, space-grotesk,
 CSS vars: --blue, --teal, --accent, --pink, --bg, --ink (in app.css)
 
 ### Typography
+
 | Role                  | Font               | CSS var      |
 |-----------------------|--------------------|--------------|
 | Wordmark / headline   | Fredoka Bold       | --display    |

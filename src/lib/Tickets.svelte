@@ -277,7 +277,7 @@
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #777;
+    color: #6b6b6b;
   }
   .detail-item .value {
     font-size: 0.88rem;
@@ -341,7 +341,7 @@
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: #888;
+    color: #6b6b6b;
   }
   .seat-badge {
     background: #181818;
@@ -408,7 +408,7 @@
   }
   .fine-print {
     font-size: 0.68rem;
-    color: #888;
+    color: #6b6b6b;
   }
 
   @keyframes boatBob {

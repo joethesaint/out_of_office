@@ -116,15 +116,18 @@
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
+  let scrollAnimId = 0;
   function easedScrollTo(targetY, duration = 1400) {
     if (prefersReducedMotion) {
       window.scrollTo(0, targetY);
       return;
     }
+    const animId = ++scrollAnimId;
     const startY = window.scrollY;
     const distance = targetY - startY;
     const startTime = performance.now();
     function step(now) {
+      if (animId !== scrollAnimId) return;
       const t = Math.min(1, (now - startTime) / duration);
       window.scrollTo(0, startY + distance * easeInOutCubic(t));
       if (t < 1) requestAnimationFrame(step);
@@ -163,13 +166,9 @@
   $: notificationCount =
     smoothedProgress < 0.05
       ? "999+"
-      : smoothedProgress < 0.25
-        ? Math.floor(840 * (1 - smoothedProgress))
-        : smoothedProgress < 0.65
-          ? Math.floor(420 * (1 - smoothedProgress))
-          : smoothedProgress < 0.95
-            ? Math.max(1, Math.floor(60 * (1 - smoothedProgress)))
-            : 0;
+      : smoothedProgress >= 0.95
+        ? 0
+        : Math.floor(999 * Math.pow(1 - (smoothedProgress - 0.05) / 0.9, 3));
 
   // Chaos -> calm color arc for the notification pill (concept.txt: "the
   // colors become calmer" as you scroll) — traffic red while the inbox is

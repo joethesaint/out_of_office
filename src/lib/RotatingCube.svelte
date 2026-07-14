@@ -1,7 +1,7 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import * as THREE from 'three';
-  import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+  import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
   // 0..1 scroll progress: 0 = fully scrambled, 1 = solved. Leave unset
   // (null) for the autonomous scramble/rest/solve/rest demo loop instead.
@@ -51,12 +51,49 @@
   ];
   let currentReply = AUTO_REPLIES[0];
 
+  let modalEl;
+  let closeBtnEl;
+  let lastFocusedEl = null;
+
+  async function openEasterEgg() {
+    lastFocusedEl = document.activeElement;
+    showEasterEgg = true;
+    currentReply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
+    await tick();
+    closeBtnEl?.focus();
+  }
+
+  function closeEasterEgg() {
+    showEasterEgg = false;
+    lastFocusedEl?.focus?.();
+  }
+
+  function handleEasterEggKeydown(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeEasterEgg();
+      return;
+    }
+    if (e.key === 'Tab' && modalEl) {
+      const focusables = modalEl.querySelectorAll('button');
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
   function handleCubeClick() {
     dismissNudge();
     clickCount = (clickCount + 1) % 11;
     if (clickCount === 10) {
-      showEasterEgg = true;
-      currentReply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
+      openEasterEgg();
     }
   }
 
@@ -402,7 +439,6 @@
     let velY = prefersReducedMotion ? 0 : 0.007;
 
     // --- Sleep mode for inactivity ---
-    let isSleeping = false;
     let sleepTimer;
     function resetSleep() {
       isSleeping = false;
@@ -428,23 +464,18 @@
         lastY = e.clientY;
       }
     }
-    // separate from lastX/lastY, which onPointerMove overwrites every frame
-    // while dragging — comparing against those in onPointerUp would always
-    // read as "no movement" regardless of the actual drag distance
-    let downX = 0;
-    let downY = 0;
     function onPointerDown(e) {
       wakeUp();
       dragging = true;
+      container.setPointerCapture?.(e.pointerId);
       dragStartX = e.clientX;
       dragStartY = e.clientY;
       lastX = e.clientX;
       lastY = e.clientY;
-      downX = e.clientX;
-      downY = e.clientY;
     }
     function onPointerUp(e) {
       dragging = false;
+      container.releasePointerCapture?.(e.pointerId);
       if (e && Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) < 6) {
         handleCubeClick();
       }
@@ -452,7 +483,7 @@
 
     container.addEventListener('pointermove', onPointerMove);
     container.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointerup', onPointerUp);
+    container.addEventListener('pointerup', onPointerUp);
 
     function resize() {
       if (!container) return;
@@ -677,17 +708,26 @@
 
       renderer.render(scene, camera);
     }
+    function handleVisibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(frameId);
+      } else {
+        animate();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
     animate();
 
     onDestroy(() => {
       cancelAnimationFrame(frameId);
+      document.removeEventListener('visibilitychange', handleVisibility);
       clearTimeout(easterEggTimer);
       clearTimeout(sleepTimer);
       clearTimeout(nudgeTimer);
       ro.disconnect();
       container.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointerup', onPointerUp);
+      container.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointermove', resetSleep);
       window.removeEventListener('scroll', resetSleep);
       window.removeEventListener('keydown', resetSleep);
@@ -714,9 +754,17 @@
   {/if}
 
   {#if showEasterEgg}
-    <div class="easter-egg-modal" role="dialog" aria-label="Auto-Reply Generator">
+    <div
+      class="easter-egg-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Auto-Reply Generator"
+      tabindex="-1"
+      bind:this={modalEl}
+      on:keydown={handleEasterEggKeydown}
+    >
       <div class="modal-content">
-        <button class="close-btn" on:click={() => showEasterEgg = false} aria-label="Close">×</button>
+        <button class="close-btn" on:click={closeEasterEgg} aria-label="Close" bind:this={closeBtnEl}>×</button>
         <p class="modal-eyebrow">Easter Egg · 10 Clicks</p>
         <h3 class="modal-title">Out of Office Auto-Reply</h3>
         <div class="reply-box">
@@ -816,9 +864,9 @@
   }
 
   .easter-egg-modal {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 200;
     display: flex;
     align-items: center;
     justify-content: center;

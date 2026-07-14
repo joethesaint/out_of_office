@@ -15,7 +15,7 @@
 <section class="playlist">
   <p class="eyebrow"><MorphText text="The mood" boost={1.15} /></p>
   <h2 class="heading">Out of Office, the mixtape</h2>
-  <p class="body">Five tracks for disconnecting. Press play, put the phone face down.</p>
+  <p class="body">Five tracks for disconnecting. Put the phone face down.</p>
 
   <ol class="tracks">
     {#each TRACKS as t, i}
@@ -110,12 +110,12 @@
   .artist {
     font-family: var(--sans);
     font-size: 0.8rem;
-    color: #8a8a8a;
+    color: #6b6b6b;
   }
   .length {
     font-family: var(--sans);
     font-size: 0.8rem;
-    color: #8a8a8a;
+    color: #6b6b6b;
     flex: none;
   }
 </style>
