@@ -395,7 +395,7 @@
     font-weight: 700;
     font-size: 0.95rem;
     color: #fff;
-    background: linear-gradient(135deg, var(--blue, #00bfff), var(--pink-deep, #fc9ce0));
+    background: var(--blue, #00bfff);
     padding: 0.9rem 1rem;
     border-radius: 999px;
     text-decoration: none;
