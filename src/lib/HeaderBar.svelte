@@ -86,20 +86,23 @@
   }
 
   .block-theme {
-    background: var(--ink);
-    color: var(--bg);
-    border: none;
+    background: var(--blue, #00bfff);
+    color: #fff;
+    border-left: 2px solid var(--bg);
+    border-right: 2px solid var(--bg);
+    border-top: none;
+    border-bottom: none;
     cursor: pointer;
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: 0.15em;
-    padding: 0 clamp(0.6rem, 2.2vw, 1.2rem);
+    gap: 0.25em;
+    padding: 0 clamp(0.7rem, 2.5vw, 1.4rem);
     transition: background 0.3s ease, color 0.3s ease, transform 0.15s ease;
   }
   .block-theme:hover {
-    background: var(--blue);
-    color: #fff;
+    background: var(--pink, #fc9ce0);
+    color: var(--ink, #181818);
   }
   .block-theme:active {
     transform: scale(0.95);

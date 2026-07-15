@@ -6,6 +6,7 @@
   import HeaderBar from "./lib/HeaderBar.svelte";
   import FooterBar from "./lib/FooterBar.svelte";
   import BootSequence from "./lib/BootSequence.svelte";
+  import FloatingThemeToggle from "./lib/FloatingThemeToggle.svelte";
   import Postcard from "./lib/Postcard.svelte";
   import EscapeMetrics from "./lib/EscapeMetrics.svelte";
   import Community from "./lib/Community.svelte";
@@ -180,6 +181,7 @@
 </script>
 
 <BootSequence />
+<FloatingThemeToggle />
 
 <div class="scroll-track" bind:this={scrollTrack}>
   <div class="pinned">
