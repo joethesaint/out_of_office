@@ -35,6 +35,13 @@
   font-display: swap;
   src: url("/fonts/fraunces.woff2") format("woff2");
 }
+@font-face {
+  font-family: "Back Wild";
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url("/fonts/back-wild.otf") format("opentype");
+}
 
 :root {
   --bg: #f6f4f1;
@@ -69,6 +76,7 @@
   --bungee: "Bungee", system-ui, sans-serif;
   --marker: "Permanent Marker", cursive;
   --serif: "Fraunces", georgia, serif;
+  --wild: "Back Wild", cursive, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);

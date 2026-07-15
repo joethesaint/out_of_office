@@ -451,11 +451,12 @@
     line-height: 0.95;
   }
   .stack .word {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(2.6rem, 12vw, 4.2rem);
+    font-family: var(--wild);
+    font-weight: normal;
+    font-size: clamp(3.2rem, 14vw, 5.4rem);
     color: var(--blue);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.02em;
+    line-height: 0.92;
   }
 
   .subhead {
