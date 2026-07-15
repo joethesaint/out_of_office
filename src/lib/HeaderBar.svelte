@@ -29,7 +29,6 @@
       <span class="icon-wrap">
         <span class="theme-icon" aria-hidden="true">{$isDark ? '🌙' : '☀️'}</span>
       </span>
-      <span class="theme-label">{$isDark ? 'NIGHT' : 'DAY'}</span>
     </button>
   </div>
 
@@ -139,7 +138,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 clamp(0.5rem, 1.8vw, 1.1rem);
+    padding: 0 clamp(0.6rem, 2vw, 1.2rem);
     background: transparent;
     border-right: 1px solid rgba(255, 255, 255, 0.15);
     flex: 0 0 auto;
@@ -148,17 +147,15 @@
   .island-switch-pill {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    justify-content: center;
+    width: clamp(38px, 6vw, 44px);
+    height: clamp(38px, 6vw, 44px);
     background: rgba(0, 191, 255, 0.22);
     color: #fff;
     border: 1px solid rgba(0, 191, 255, 0.65);
-    border-radius: 999px;
-    padding: 0.42rem 1.15rem;
+    border-radius: 50%;
+    padding: 0;
     cursor: pointer;
-    font-family: var(--sans);
-    font-weight: 700;
-    font-size: clamp(0.7rem, 1.3vw, 0.85rem);
-    letter-spacing: 0.1em;
     box-shadow: 0 4px 14px rgba(0, 191, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
   }
@@ -167,23 +164,19 @@
     background: var(--blue, #00bfff);
     border-color: #fff;
     color: #fff;
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 8px 24px rgba(0, 191, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: 0 8px 24px rgba(0, 191, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   .island-switch-pill:active {
-    transform: translateY(0) scale(0.94);
+    transform: translateY(0) scale(0.92);
   }
 
   .icon-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.15em;
-    line-height: 1;
-  }
-
-  .theme-label {
+    font-size: clamp(1.15rem, 2.5vw, 1.35rem);
     line-height: 1;
   }
 
