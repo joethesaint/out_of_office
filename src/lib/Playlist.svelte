@@ -57,7 +57,7 @@
   .body {
     margin: 0 0 2.5rem;
     font-family: var(--sans);
-    color: #6b6b6b;
+    color: var(--muted);
   }
 
   .tracks {
@@ -66,7 +66,7 @@
     padding: 0;
     text-align: left;
     border-radius: 16px;
-    background: #fff;
+    background: var(--card-surface);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
     overflow: hidden;
   }
@@ -75,7 +75,7 @@
     align-items: center;
     gap: 1rem;
     padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid #f0ece5;
+    border-bottom: 1px solid var(--border-soft);
     opacity: 0;
     transform: translateY(14px);
     transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
@@ -110,12 +110,12 @@
   .artist {
     font-family: var(--sans);
     font-size: 0.8rem;
-    color: #6b6b6b;
+    color: var(--muted);
   }
   .length {
     font-family: var(--sans);
     font-size: 0.8rem;
-    color: #6b6b6b;
+    color: var(--muted);
     flex: none;
   }
 </style>

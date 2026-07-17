@@ -61,7 +61,7 @@
   .polaroid {
     margin: 0;
     width: clamp(160px, 22vw, 220px);
-    background: #fff;
+    background: var(--card-surface);
     padding: 0.6rem 0.6rem 1.1rem;
     border-radius: 4px;
     box-shadow: 0 16px 30px rgba(0, 0, 0, 0.14);

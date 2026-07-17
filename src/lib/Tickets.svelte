@@ -1,5 +1,6 @@
 <script>
   import MorphText from './MorphText.svelte';
+  import { muted, toggleMute } from './ambientSound.js';
 
   export let visible = false;
   const TICKET_URL = 'https://tix.africa/discover/outofofficeng';
@@ -33,6 +34,16 @@
         <div class="route-point">
           <span class="code blue">OOO</span>
           <span class="city">Blue Lagos (Tarkwa Bay)</span>
+          <button
+            type="button"
+            class="sound-toggle"
+            aria-pressed={!$muted}
+            aria-label={$muted ? 'Unmute ambient sound' : 'Mute ambient sound'}
+            on:click={toggleMute}
+          >
+            <span aria-hidden="true">{$muted ? '🔇' : '🔊'}</span>
+            <span class="sound-toggle-label">{$muted ? 'Sound off' : 'Sound on'}</span>
+          </button>
         </div>
       </div>
 
@@ -134,7 +145,7 @@
 
   /* Boarding Pass Layout */
   .boarding-pass {
-    background: #ffffff;
+    background: var(--card-surface);
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
     border: 2px solid #181818;
@@ -164,7 +175,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.6rem;
-    background: linear-gradient(135deg, #ffffff 0%, #faf8f5 100%);
+    background: linear-gradient(135deg, var(--card-surface) 0%, #faf8f5 100%);
   }
 
   .pass-header {
@@ -216,6 +227,35 @@
     text-transform: uppercase;
   }
 
+  .sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    border: 1.5px solid var(--blue, #00bfff);
+    border-radius: 999px;
+    background: rgba(0, 191, 255, 0.06);
+    color: var(--blue, #00bfff);
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .sound-toggle:hover {
+    background: rgba(0, 191, 255, 0.14);
+    transform: translateY(-1px);
+  }
+  .sound-toggle:active {
+    transform: translateY(0);
+  }
+  .sound-toggle:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+    outline-offset: 2px;
+  }
+
   .route-arrow {
     flex: 1;
     max-width: 180px;
@@ -258,7 +298,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.1rem 1.5rem;
-    background: #f4f1eb;
+    background: var(--card-surface);
     padding: 1.2rem 1.4rem;
     border-radius: 12px;
     border: 1px solid rgba(24, 24, 24, 0.12);
@@ -277,7 +317,7 @@
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #6b6b6b;
+    color: var(--muted);
   }
   .detail-item .value {
     font-size: 0.88rem;
@@ -295,11 +335,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #ffffff;
+    background: var(--card-surface);
   }
   .dash-line {
     height: 100%;
-    border-left: 2px dashed #bbb;
+    border-left: 2px dashed var(--border-dashed);
   }
   .notch {
     position: absolute;
@@ -341,7 +381,7 @@
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: #6b6b6b;
+    color: var(--muted);
   }
   .seat-badge {
     background: #181818;
@@ -406,9 +446,13 @@
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(0, 191, 255, 0.4);
   }
+  .cta-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+    outline-offset: 3px;
+  }
   .fine-print {
     font-size: 0.68rem;
-    color: #6b6b6b;
+    color: var(--muted);
   }
 
   @keyframes boatBob {
@@ -429,7 +473,7 @@
       width: 100%;
       height: 0;
       border-left: none;
-      border-top: 2px dashed #bbb;
+      border-top: 2px dashed var(--border-dashed);
     }
     .notch.top {
       top: 0;

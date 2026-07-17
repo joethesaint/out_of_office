@@ -91,7 +91,7 @@
     gap: 0.25rem;
     padding: 1.5rem 1rem;
     border-radius: 16px;
-    background: #ffffff;
+    background: var(--card-surface);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
   }
   .value {

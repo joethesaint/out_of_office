@@ -82,7 +82,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    border-left: 2px solid #e4dfd8;
+    border-left: 2px solid var(--border-soft);
   }
 
   .entry {
@@ -103,7 +103,7 @@
     transform: translateX(0);
   }
   .entry.pending {
-    border-left-color: #d8d2c8;
+    border-left-color: var(--border-soft-deep);
   }
 
   /* Passport-stamp treatment: circular ink-stamp look (double ring, rotated,
@@ -161,7 +161,7 @@
   .note {
     font-family: var(--sans);
     font-size: 0.9rem;
-    color: #6b6b6b;
+    color: var(--muted);
     margin-top: 0.15rem;
   }
 </style>

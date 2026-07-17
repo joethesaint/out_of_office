@@ -71,6 +71,15 @@
   --sunset-orange: #ff7b4d;
   --warm-sand: #e8c9a0;
   --muted-green: #7c9473;
+
+  /* Neutral UI tokens — recurring secondary-text/card/border values that
+     were previously repeated as one-off hex across component styles */
+  --muted: #6b6b6b;
+  --card-surface: #fbf9f6;
+  --border-soft: #e4dfd8;
+  --border-soft-deep: #d8d2c8;
+  --border-dashed: #bbb;
+  --island-divider: rgba(255, 255, 255, 0.15);
   --display: "Fredoka", system-ui, sans-serif;
   --sans: "Space Grotesk", system-ui, sans-serif;
   --bungee: "Bungee", system-ui, sans-serif;
@@ -89,6 +98,11 @@
   --bg: #0f1115;
   --ink: #f0ede6;
   --cream: #181a20;
+  --muted: #9a9a9a;
+  --card-surface: #1d2027;
+  --border-soft: #2a2e37;
+  --border-soft-deep: #363c47;
+  --border-dashed: #4a4f59;
 }
 
 * {

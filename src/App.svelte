@@ -17,6 +17,8 @@
   import ScrollReveal from "./lib/ScrollReveal.svelte";
   import Boat from "./lib/Boat.svelte";
   import ChaosLayer from "./lib/ChaosLayer.svelte";
+  import StressMeter from "./lib/StressMeter.svelte";
+  import AmbientSound from "./lib/AmbientSound.svelte";
   import { pageProgress } from "./lib/scrollProgress.js";
 
   let scrollTrack;
@@ -269,6 +271,9 @@
   </div>
 {/if}
 
+<StressMeter progress={smoothedProgress} {activated} />
+<AmbientSound />
+
 <section class="activated" class:visible={activated}>
   <p class="activated-eyebrow">Status update</p>
   <h2 class="activated-title">Out of Office Activated</h2>
@@ -454,7 +459,12 @@
     font-size: clamp(3.2rem, 14vw, 5.4rem);
     color: var(--blue);
     letter-spacing: 0.02em;
-    line-height: 0.92;
+    /* Hallmark typography.md: all-caps display heads need line-height >= 1.0
+       (recommended 1.02-1.08) — below that, cap-tops on the wrapped second
+       line collide with the line above since there are no descenders to
+       cushion the gap. "OUT OF" / "OFFICE" is exactly that pattern; 0.92
+       was letting the two words crowd each other. */
+    line-height: 1.04;
   }
 
   .subhead {
@@ -527,6 +537,9 @@
     font-family: var(--display);
     font-weight: 700;
     color: var(--chaos-red);
+    /* Digit widths vary per-glyph in Fredoka; without tabular-nums the
+       counter's own width jitters on every tick as it counts 999 -> 0. */
+    font-variant-numeric: tabular-nums;
     transition: color var(--dur-base) var(--ease-standard);
   }
   .notification-pill[data-stage="mid"] .notif-count {

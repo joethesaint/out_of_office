@@ -699,8 +699,17 @@
           const breath = 1 + Math.sin(now * 0.002) * 0.04;
           cubeGroup.scale.set(breath, breath, breath);
         } else {
-          velX += (0.004 - velX) * 0.02;
-          velY += (0.007 - velY) * 0.02;
+          // Concept 3 (concept.txt): "Stress Level ... cube spins rapidly
+          // ... as user scrolls ... cube slows." Idle tumble speed eases
+          // toward a target scaled by chaosT (0 = solved/calm, 1 =
+          // scrambled/stressed) instead of a fixed constant, so the cube
+          // itself visibly calms as the site's own stress meter drains —
+          // not just its sticker colors (repaintStickers already does that).
+          const stressT = scrollMode ? currentChaosT() : 1;
+          const targetVelX = 0.004 * (0.4 + 0.6 * stressT);
+          const targetVelY = 0.007 * (0.4 + 0.6 * stressT);
+          velX += (targetVelX - velX) * 0.02;
+          velY += (targetVelY - velY) * 0.02;
           cubeGroup.scale.set(1, 1, 1);
         }
       } else {
@@ -892,7 +901,7 @@
   }
   .modal-content {
     position: relative;
-    background: #fff;
+    background: var(--card-surface);
     border-radius: 16px;
     padding: 1.5rem;
     width: min(90%, 340px);
@@ -916,6 +925,10 @@
   }
   .close-btn:hover {
     color: #181818;
+  }
+  .close-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+    outline-offset: 2px;
   }
   .modal-eyebrow {
     margin: 0;
@@ -965,6 +978,10 @@
   }
   .action-btn:hover {
     transform: translateY(-1px);
+  }
+  .action-btn:focus-visible {
+    outline: 2px solid var(--blue, #00bfff);
+    outline-offset: 2px;
   }
   .action-btn.primary {
     background: var(--blue, #00bfff);

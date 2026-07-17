@@ -72,7 +72,7 @@
 
   .block-brand {
     background: transparent;
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-right: 1px solid var(--island-divider);
     color: #ffffff;
     flex: 0 0 auto;
     line-height: 1;
@@ -108,7 +108,7 @@
 
   .block-trend {
     background: transparent;
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-right: 1px solid var(--island-divider);
     color: #ffffff;
     flex: 1 1 auto;
     align-items: center;
@@ -140,7 +140,7 @@
     justify-content: center;
     padding: 0 clamp(0.6rem, 2vw, 1.2rem);
     background: transparent;
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-right: 1px solid var(--island-divider);
     flex: 0 0 auto;
   }
 
@@ -170,6 +170,11 @@
 
   .island-switch-pill:active {
     transform: translateY(0) scale(0.92);
+  }
+
+  .island-switch-pill:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
   }
 
   .icon-wrap {
