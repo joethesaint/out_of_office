@@ -62,18 +62,14 @@
     z-index: 10;
     display: flex;
     align-items: stretch;
-    width: auto;
-    margin: clamp(0.6rem, 1.8vh, 1.2rem) clamp(0.6rem, 2vw, 1.2rem) clamp(0.8rem, 2vh, 1.4rem);
+    width: 100%;
+    margin: 0;
     min-height: clamp(58px, 9.5vh, 76px);
     font-family: var(--display);
-    color: #fff;
-    background: rgba(15, 17, 21, 0.9);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 16px;
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42);
-    overflow: hidden;
+    color: var(--ink);
+    background: transparent;
+    border-bottom: 2px solid var(--ink);
+    border-radius: 0;
   }
 
   .block {
@@ -81,14 +77,12 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    padding: 0 clamp(0.6rem, 2.2vw, 1.2rem);
+    padding: 0 clamp(1rem, 2.5vw, 1.5rem);
     white-space: nowrap;
   }
 
   .block-brand {
-    background: transparent;
-    border-right: 1px solid var(--island-divider);
-    color: #ffffff;
+    border-right: 2px solid var(--ink);
     flex: 0 0 auto;
     line-height: 1;
     gap: 0.2em;
@@ -102,8 +96,8 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #08cabd;
-    box-shadow: 0 0 8px #08cabd, 0 0 14px rgba(8, 202, 189, 0.6);
+    background: var(--blue, #00bfff);
+    box-shadow: 0 0 8px var(--blue, #00bfff);
     animation: dotPulse 2s infinite ease-in-out;
   }
   @keyframes dotPulse {
@@ -111,20 +105,20 @@
     50% { transform: scale(1.4); opacity: 0.6; }
   }
   .block-brand .line {
-    font-size: clamp(0.6rem, 1.6vw, 0.85rem);
-    letter-spacing: 0.04em;
-    color: #e2e8f0;
+    font-size: clamp(0.65rem, 1.6vw, 0.85rem);
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-weight: 700;
   }
   .block-brand .status-val {
-    font-size: clamp(0.85rem, 2.2vw, 1.15rem);
+    font-size: clamp(0.9rem, 2.2vw, 1.25rem);
     font-weight: 700;
-    color: var(--blue, #00bfff);
+    color: var(--ink);
   }
 
   .block-trend {
-    background: transparent;
-    border-right: 1px solid var(--island-divider);
-    color: #ffffff;
+    border-right: 2px solid var(--ink);
     flex: 1 1 auto;
     align-items: center;
     text-align: center;
@@ -134,28 +128,28 @@
     font-family: var(--sans);
     font-weight: 700;
     font-size: clamp(0.45rem, 1.1vw, 0.6rem);
-    color: var(--blue, #00bfff);
-    letter-spacing: 0.08em;
+    color: var(--pink-deep);
+    letter-spacing: 0.15em;
   }
   .block-trend .word {
-    font-size: clamp(0.85rem, 2.4vw, 1.3rem);
-    color: #ffffff;
+    font-size: clamp(0.9rem, 2.4vw, 1.4rem);
+    color: var(--ink);
+    font-weight: 700;
   }
   .block-trend .sub {
     font-family: var(--sans);
     font-weight: 600;
     font-size: clamp(0.4rem, 1vw, 0.55rem);
     letter-spacing: 0.12em;
-    color: #cfcfcf;
+    color: var(--muted);
   }
 
   .theme-control-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 clamp(0.6rem, 2vw, 1.2rem);
-    background: transparent;
-    border-right: 1px solid var(--island-divider);
+    padding: 0 clamp(0.8rem, 2vw, 1.2rem);
+    border-right: 2px solid var(--ink);
     flex: 0 0 auto;
   }
 
@@ -163,24 +157,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: clamp(38px, 6vw, 44px);
-    height: clamp(38px, 6vw, 44px);
-    background: rgba(0, 191, 255, 0.22);
-    color: #fff;
-    border: 1px solid rgba(0, 191, 255, 0.65);
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    width: clamp(28px, 4.5vw, 36px);
+    height: clamp(28px, 4.5vw, 36px);
     border-radius: 50%;
     padding: 0;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 191, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    box-shadow: none;
+    transition: background 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .island-switch-pill:hover {
-    background: var(--blue, #00bfff);
-    border-color: #fff;
-    color: #fff;
-    transform: translateY(-2px) scale(1.08);
-    box-shadow: 0 8px 24px rgba(0, 191, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    background: var(--ink);
+    color: var(--bg);
+    transform: translateY(-2px);
   }
 
   .island-switch-pill:active {
@@ -188,7 +180,7 @@
   }
 
   .island-switch-pill:focus-visible {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
   }
 
@@ -197,8 +189,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: clamp(1.15rem, 2.5vw, 1.35rem);
-    height: clamp(1.15rem, 2.5vw, 1.35rem);
+    width: clamp(0.9rem, 1.8vw, 1.1rem);
+    height: clamp(0.9rem, 1.8vw, 1.1rem);
   }
   .theme-icon {
     position: absolute;
@@ -209,7 +201,7 @@
                 transform var(--dur-base) var(--ease-out-expo);
   }
   /* Sun reads danfo-warm, moon reads sea-calm — the same chaos->calm color
-     arc as the notification pill, just carried into the theme switch. */
+     arc as the notification pill, carried into the theme switch. */
   .sun-icon {
     color: var(--chaos-yellow);
   }
@@ -234,17 +226,17 @@
   }
 
   .block-logo {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     flex: 0 0 auto;
     flex-direction: row;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.6rem;
   }
   .status-dot {
-    width: clamp(7px, 1.4vw, 9px);
-    height: clamp(7px, 1.4vw, 9px);
+    width: clamp(8px, 1.6vw, 10px);
+    height: clamp(8px, 1.6vw, 10px);
     border-radius: 50%;
-    background: var(--blue);
+    background: var(--pink-deep);
   }
   .wordmark-col {
     display: flex;
@@ -253,34 +245,26 @@
   }
   .wordmark {
     font-family: var(--display);
-    font-size: clamp(1.1rem, 3vw, 1.6rem);
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
     font-weight: 700;
-    color: #ffffff;
+    color: var(--ink);
     letter-spacing: -0.04em;
   }
   .meta {
     font-family: var(--sans);
-    font-size: clamp(0.4rem, 0.9vw, 0.55rem);
-    font-weight: 600;
-    color: #b0b0b0;
-    letter-spacing: 0.06em;
+    font-size: clamp(0.45rem, 1vw, 0.6rem);
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   @media (max-width: 650px) {
-    .bar {
-      margin: 0.4rem;
-      border-radius: 12px;
-    }
     .block {
-      padding: 0 0.45rem;
+      padding: 0 0.8rem;
     }
     .theme-control-wrap {
-      padding: 0 0.4rem;
-    }
-    .island-switch-pill {
-      padding: 0.32rem 0.75rem;
-      gap: 0.3rem;
+      padding: 0 0.6rem;
     }
   }
 </style>
