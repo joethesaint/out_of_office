@@ -26,8 +26,23 @@
       aria-label={$isDark ? 'Switch to DAY theme' : 'Switch to NIGHT theme'}
       title="Switch between Light and Dark mode"
     >
-      <span class="icon-wrap">
-        <span class="theme-icon" aria-hidden="true">{$isDark ? '🌙' : '☀️'}</span>
+      <span class="icon-wrap" data-theme={$isDark ? 'dark' : 'light'}>
+        <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.5" />
+          <line x1="12" y1="2" x2="12" y2="4.6" />
+          <line x1="12" y1="19.4" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="4.6" y2="12" />
+          <line x1="19.4" y1="12" x2="22" y2="12" />
+          <line x1="4.93" y1="4.93" x2="6.75" y2="6.75" />
+          <line x1="17.25" y1="17.25" x2="19.07" y2="19.07" />
+          <line x1="4.93" y1="19.07" x2="6.75" y2="17.25" />
+          <line x1="17.25" y1="6.75" x2="19.07" y2="4.93" />
+        </svg>
+        <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20.2 14.7A8.6 8.6 0 1 1 9.3 3.8a7 7 0 0 0 10.9 10.9z" />
+          <circle cx="18.2" cy="6.1" r="0.9" />
+          <circle cx="15" cy="3.4" r="0.55" />
+        </svg>
       </span>
     </button>
   </div>
@@ -170,11 +185,44 @@
   }
 
   .icon-wrap {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
-    line-height: 1;
+    width: clamp(0.9rem, 1.8vw, 1.1rem);
+    height: clamp(0.9rem, 1.8vw, 1.1rem);
+  }
+  .theme-icon {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity var(--dur-base) var(--ease-out-expo),
+                transform var(--dur-base) var(--ease-out-expo);
+  }
+  /* Sun reads danfo-warm, moon reads sea-calm — the same chaos->calm color
+     arc as the notification pill, carried into the theme switch. */
+  .sun-icon {
+    color: var(--chaos-yellow);
+  }
+  .moon-icon {
+    color: var(--blue, #00bfff);
+  }
+  .icon-wrap[data-theme="light"] .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  .icon-wrap[data-theme="light"] .moon-icon {
+    opacity: 0;
+    transform: rotate(45deg) scale(0.5);
+  }
+  .icon-wrap[data-theme="dark"] .sun-icon {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.5);
+  }
+  .icon-wrap[data-theme="dark"] .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
   }
 
   .block-logo {
