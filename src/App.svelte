@@ -48,12 +48,32 @@
     }
   }
 
+  let lastSmoothTime = 0;
+  function smoothTick(now) {
+    const dt = lastSmoothTime ? now - lastSmoothTime : 16;
+    lastSmoothTime = now;
+    const delta = progress - smoothedProgress;
+    const factor = 1 - Math.exp(-dt / SMOOTH_TAU_MS);
+    if (Math.abs(delta) < 0.0005) {
+      smoothedProgress = progress;
+      smoothRafId = null;
+      return;
+    }
+    smoothedProgress += delta * factor;
+    smoothRafId = requestAnimationFrame(smoothTick);
+  }
+
   function readProgress() {
     if (!scrollTrack) return;
     const rect = scrollTrack.getBoundingClientRect();
     const total = rect.height - window.innerHeight;
     progress = total <= 0 ? 1 : Math.max(0, Math.min(1, -rect.top / total));
-    if (prefersReducedMotion) smoothedProgress = progress;
+    if (prefersReducedMotion) {
+      smoothedProgress = progress;
+    } else if (!smoothRafId) {
+      lastSmoothTime = 0;
+      smoothRafId = requestAnimationFrame(smoothTick);
+    }
 
     // Whole-document scroll fraction, for the corporate->handwritten
     // typography morph (concept.txt) — separate from the hero-only
@@ -70,29 +90,7 @@
     requestAnimationFrame(readProgress);
   }
 
-  // Lerped copy of `progress`, fed to the decorative scroll-tied elements
-  // (chaos layer, notification counter, boat/danfo) so fast/flicked
-  // scrolling doesn't snap them frame-to-frame. The cube is deliberately
-  // NOT fed this value — it has its own twist-queue easing and would
-  // double-lag if chained behind another smoothing layer.
-  //
-  // Uses delta-time-corrected exponential smoothing (not a fixed
-  // per-frame multiplier) so convergence speed stays consistent
-  // regardless of actual frame rate — a fixed 0.15-per-frame factor
-  // converges in ~200ms at 60fps but takes 4-6x longer on a throttled
-  // or heavily-loaded tab (e.g. competing with the Three.js cube's own
-  // render loop), which would make the "smoothing" feel laggy exactly
-  // when the page is already struggling.
-  const SMOOTH_TAU_MS = 90; // time constant: ~63% of the way there per tau
-  let lastSmoothTime = 0;
-  function smoothTick(now) {
-    const dt = lastSmoothTime ? now - lastSmoothTime : 16;
-    lastSmoothTime = now;
-    const delta = progress - smoothedProgress;
-    const factor = 1 - Math.exp(-dt / SMOOTH_TAU_MS);
-    smoothedProgress = Math.abs(delta) < 0.0005 ? progress : smoothedProgress + delta * factor;
-    smoothRafId = requestAnimationFrame(smoothTick);
-  }
+  const SMOOTH_TAU_MS = 90;
 
   onMount(() => {
     prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

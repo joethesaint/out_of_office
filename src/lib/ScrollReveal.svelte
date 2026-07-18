@@ -34,7 +34,6 @@
     transform: translateY(40px);
     transition: opacity var(--dur-slow) var(--ease-out-expo),
                 transform var(--dur-slow) var(--ease-out-expo);
-    will-change: opacity, transform;
   }
   .reveal-wrapper.visible {
     opacity: 1;

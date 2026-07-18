@@ -732,19 +732,37 @@
 
       renderer.render(scene, camera);
     }
-    function handleVisibility() {
-      if (document.hidden) {
+
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[0].isIntersecting;
+      if (isVisible && !document.hidden && !frameId) {
+        lastActivityTime = performance.now(); // avoid waking up in sleep
+        animate();
+      } else if (!isVisible && frameId) {
         cancelAnimationFrame(frameId);
-      } else {
+        frameId = null;
+      }
+    });
+    observer.observe(container);
+
+    function handleVisibility() {
+      if (document.hidden || !isVisible) {
+        if (frameId) {
+          cancelAnimationFrame(frameId);
+          frameId = null;
+        }
+      } else if (!frameId) {
+        lastActivityTime = performance.now();
         animate();
       }
     }
     document.addEventListener('visibilitychange', handleVisibility);
-    animate();
 
     onDestroy(() => {
-      cancelAnimationFrame(frameId);
+      if (frameId) cancelAnimationFrame(frameId);
       document.removeEventListener('visibilitychange', handleVisibility);
+      observer.disconnect();
       clearTimeout(easterEggTimer);
       clearTimeout(sleepTimer);
       clearTimeout(nudgeTimer);
@@ -842,6 +860,15 @@
     pointer-events: none;
     animation: fadeIn 0.4s ease;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    /* Fixed-size flex row + border-radius:999px only reads as a pill when
+       its content stays on one line — on narrow cube-slot widths the two
+       spans used to wrap internally, ballooning the pill into a tall blob
+       that covered most of the cube. width:max-content lets the pill size
+       to its (now single-line) content and overflow the cube's bounds
+       instead of growing to fill them. */
+    width: max-content;
+    max-width: none;
+    white-space: nowrap;
   }
   .zzz {
     font-family: var(--display);
@@ -851,7 +878,7 @@
   }
   .sleep-text {
     font-family: var(--sans);
-    font-size: 0.68rem;
+    font-size: clamp(0.56rem, 2vw, 0.68rem);
     color: #f6f4f1;
     letter-spacing: 0.04em;
   }
