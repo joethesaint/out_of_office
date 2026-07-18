@@ -338,9 +338,8 @@
 
   .frame {
     position: relative;
-    width: min(100%, 480px);
-    aspect-ratio: 9 / 16;
-    max-height: 100vh;
+    width: min(92vw, 1400px);
+    height: min(90vh, 850px);
     background: var(--bg);
     display: flex;
     flex-direction: column;
@@ -380,11 +379,20 @@
     position: relative;
     z-index: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 4rem;
     width: 100%;
+    padding: 0 2rem;
+  }
+
+  @media (max-width: 700px) {
+    .hero-row {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0;
+    }
   }
 
   .icon-btn {
