@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @font-face { font-family:"Fredoka"; src:url("public/fonts/fredoka.woff2") format("woff2"); font-weight:600 700; font-style:normal; font-display:swap; }
+    @font-face { font-family:"Space Grotesk"; src:url("public/fonts/space-grotesk.woff2") format("woff2"); font-weight:400 500; font-style:normal; font-display:swap; }
+    @font-face { font-family:"Bungee"; src:url("public/fonts/bungee.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:swap; }
+    @font-face { font-family:"Permanent Marker"; src:url("public/fonts/permanent-marker.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:swap; }
+    @font-face { font-family:"Fraunces"; src:url("public/fonts/fraunces.woff2") format("woff2"); font-weight:700 900; font-style:normal; font-display:swap; }
+    :root {
+      --bg:#f6f4f1; --ink:#181818; --blue:#00bfff; --pink:#fc9ce0; --pink-deep:#e0568f; --accent:#08cabd; --cream:#f6f4f1;
+      --chaos-yellow:#ffc72c; --chaos-red:#e5383b;
+      --sunset-orange:#ff7b4d; --warm-sand:#e8c9a0; --muted-green:#7c9473;
+      --display:"Fredoka", system-ui, sans-serif; --sans:"Space Grotesk", system-ui, sans-serif;
+      --bungee:"Bungee", system-ui, sans-serif; --marker:"Permanent Marker", cursive; --serif:"Fraunces", Georgia, serif;
+      --ease-out-expo: cubic-bezier(0.16,1,0.3,1); --ease-standard: cubic-bezier(0.4,0,0.2,1);
+    }
+    html, body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+    a { color: var(--blue); }
+    a:hover { color: var(--pink-deep); }
+    @keyframes floatAssistant { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+    @keyframes floatChaos { 0%{transform:translateY(0);} 100%{transform:translateY(-6px);} }
+    @keyframes busBounce {
+      0%,55%{transform:translateY(0) rotate(0deg);}
+      62%{transform:translateY(-6px) rotate(-3deg);}
+      68%{transform:translateY(0) rotate(2deg);}
+      74%{transform:translateY(-6px) rotate(-3deg);}
+      80%{transform:translateY(0) rotate(2deg);}
+      88%{transform:translateY(-4px) rotate(1deg);}
+      93%,100%{transform:translateY(0) rotate(0deg);}
+    }
+    @keyframes boatBobIdle {
+      0%,10%{transform:translateY(0) rotate(0deg);}
+      15%{transform:translateY(4px) rotate(2deg);}
+      22%{transform:translateY(-3px) rotate(-1.5deg);}
+      29%{transform:translateY(4px) rotate(2deg);}
+      36%{transform:translateY(-3px) rotate(-1deg);}
+      44%{transform:translateY(3px) rotate(1.5deg);}
+      50%,100%{transform:translateY(0) rotate(0deg);}
+    }
+    @keyframes boatBobCta {0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-4px) rotate(6deg);}}
+    @keyframes riseLine { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+    }
+  </style>
+</helmet>
+
+<div style="position:relative; background:var(--bg); overflow-x:hidden; min-height:100vh; font-family:var(--sans); color:var(--ink);">
+
+  <sc-if value="{{ bootRemoved }}" hint-placeholder-val="{{ false }}">
+    <div></div>
+  </sc-if>
+  <sc-if value="{{ notBootRemoved }}" hint-placeholder-val="{{ true }}">
+    <div style="{{ bootWrapStyle }}">
+      <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-start;">
+        <sc-for list="{{ bootLines }}" as="ln" hint-placeholder-count="0">
+          <p style="{{ ln.style }}">{{ ln.text }}</p>
+        </sc-for>
+      </div>
+      <svg viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true" style="{{ bootWaveStyle }}">
+        <path d="M0 30 Q 50 5 100 30 T 200 30 T 300 30 T 400 30 V60 H0 Z" fill="#00bfff"></path>
+      </svg>
+    </div>
+  </sc-if>
+
+  <div ref="{{ trackRef }}" style="position:relative; height:150vh;">
+    <div style="position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+      <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; overflow:hidden;">
+
+        <div style="position:absolute; inset:0; pointer-events:none; opacity:0.05; mix-blend-mode:multiply; background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);"></div>
+
+        <sc-if value="{{ chaosVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ chaosLayerStyle }}" aria-hidden="true">
+            <div style="position:absolute; top:calc(clamp(52px, 9vh, 72px) + 5.5rem); left:1%; transform:rotate(-8deg); z-index:3; width:clamp(210px, 26vw, 290px); background:rgba(255,255,255,0.94); backdrop-filter:blur(10px); border-radius:14px; padding:0.75rem 0.9rem; box-shadow:0 12px 32px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08); border:1px solid rgba(255,255,255,0.8); border-left:4px solid #25d366; font-family:var(--sans); animation:floatChaos 4s ease-in-out infinite alternate;">
+              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; font-size:0.7rem; color:#666; font-weight:600;">
+                <span style="font-size:0.85rem;">💬</span>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#222;">WhatsApp · Boss (Urgent!)</span>
+                <span style="font-size:0.65rem; color:#888; font-weight:400;">now</span>
+              </div>
+              <p style="margin:0; font-size:0.76rem; color:#333; line-height:1.35;">Where is the updated Q2 budget deck??? We are waiting in the boardroom right now!</p>
+            </div>
+
+            <div style="position:absolute; top:calc(clamp(52px, 9vh, 72px) + 11.5rem); left:9%; transform:rotate(7deg) scale(0.96); z-index:4; width:clamp(210px, 26vw, 290px); background:rgba(255,255,255,0.94); backdrop-filter:blur(10px); border-radius:14px; padding:0.75rem 0.9rem; box-shadow:0 12px 32px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08); border:1px solid rgba(255,255,255,0.8); border-left:4px solid #4a154b; font-family:var(--sans); animation:floatChaos 4s ease-in-out infinite alternate; animation-delay:-1.2s;">
+              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; font-size:0.7rem; color:#666; font-weight:600;">
+                <span style="font-size:0.85rem;">⚡</span>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#222;">Slack · #production-incident</span>
+                <span style="font-size:0.65rem; color:#888; font-weight:400;">2m ago</span>
+              </div>
+              <p style="margin:0; font-size:0.76rem; color:#333; line-height:1.35;"><strong style="color:#111;">@here</strong> Server CPU spiking to 99% across 4 instances in af-south-1. Can someone check logs immediately?</p>
+            </div>
+
+            <div style="position:absolute; top:calc(clamp(52px, 9vh, 72px) + 5.5rem); right:1%; transform:rotate(9deg); z-index:3; width:clamp(210px, 26vw, 290px); background:rgba(255,255,255,0.94); backdrop-filter:blur(10px); border-radius:14px; padding:0.75rem 0.9rem; box-shadow:0 12px 32px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08); border:1px solid rgba(255,255,255,0.8); border-left:4px solid #0078d4; font-family:var(--sans); animation:floatChaos 4s ease-in-out infinite alternate; animation-delay:-2.4s;">
+              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; font-size:0.7rem; color:#666; font-weight:600;">
+                <span style="font-size:0.85rem;">✉️</span>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#222;">Mail · 14 Unread</span>
+                <span style="font-size:0.65rem; color:#888; font-weight:400;">5m ago</span>
+              </div>
+              <p style="margin:0; font-size:0.76rem; color:#333; line-height:1.35;"><strong style="color:#111;">ACTION REQUIRED:</strong> Mandatory compliance training overdue. Your access will be restricted by 5 PM.</p>
+            </div>
+
+            <div style="position:absolute; top:calc(clamp(52px, 9vh, 72px) + 11.5rem); right:8%; transform:rotate(-7deg) scale(0.96); z-index:4; width:clamp(210px, 26vw, 290px); background:rgba(255,255,255,0.94); backdrop-filter:blur(10px); border-radius:14px; padding:0.75rem 0.9rem; box-shadow:0 12px 32px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08); border:1px solid rgba(255,255,255,0.8); border-left:4px solid #ea4335; font-family:var(--sans); animation:floatChaos 4s ease-in-out infinite alternate; animation-delay:-0.7s;">
+              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; font-size:0.7rem; color:#666; font-weight:600;">
+                <span style="font-size:0.85rem;">📅</span>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#222;">Calendar Reminder</span>
+                <span style="font-size:0.65rem; color:#888; font-weight:400;">in 3 min</span>
+              </div>
+              <p style="margin:0; font-size:0.76rem; color:#333; line-height:1.35;"><strong style="color:#111;">Quick 15-min Sync</strong> w/ Legal &amp; Finance (Google Meet link inside)</p>
+            </div>
+
+            <div style="position:absolute; bottom:4%; left:40%; transform:rotate(-3deg) scale(0.94); z-index:2; width:clamp(210px, 26vw, 290px); background:rgba(255,255,255,0.94); backdrop-filter:blur(10px); border-radius:14px; padding:0.75rem 0.9rem; box-shadow:0 12px 32px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08); border:1px solid rgba(255,255,255,0.8); border-left:4px solid #ff9900; font-family:var(--sans); animation:floatChaos 4s ease-in-out infinite alternate; animation-delay:-3.1s;">
+              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.35rem; font-size:0.7rem; color:#666; font-weight:600;">
+                <span style="font-size:0.85rem;">🔋</span>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#222;">System Notification</span>
+              </div>
+              <p style="margin:0; font-size:0.76rem; color:#333; line-height:1.35;"><strong style="color:#111;">Battery Low (9%)</strong> — Connect your Mac to a power adapter soon or it will sleep.</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <main style="position:relative; width:100%; height:100%; background:var(--bg); display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;">
+
+          <header style="display:flex; width:100%; height:clamp(52px, 9vh, 72px); font-family:var(--display); color:#fff; overflow:hidden;">
+            <div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:0 clamp(0.5rem, 2vw, 1rem); white-space:nowrap; background:var(--ink); flex:0 0 auto; line-height:1; gap:0.15em;">
+              <span style="font-size:clamp(0.6rem, 1.6vw, 0.85rem); letter-spacing:0.01em;">STATUS:</span>
+              <span style="font-size:clamp(0.6rem, 1.6vw, 0.85rem); letter-spacing:0.01em;">AWAY</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 clamp(0.5rem, 2vw, 1rem); white-space:nowrap; background:var(--ink); flex:1 1 auto; text-align:center; gap:0.1em;">
+              <span style="font-family:var(--sans); font-weight:700; font-size:clamp(0.45rem, 1.1vw, 0.6rem); color:var(--blue); letter-spacing:0.08em;">AUTO-REPLY</span>
+              <span style="font-size:clamp(0.85rem, 2.4vw, 1.3rem);">ENABLED</span>
+              <span style="font-family:var(--sans); font-weight:600; font-size:clamp(0.4rem, 1vw, 0.55rem); letter-spacing:0.12em; color:#cfcfcf;">MAINLAND → ISLAND</span>
+            </div>
+            <div style="display:flex; flex-direction:row; align-items:center; justify-content:center; padding:0 clamp(0.5rem, 2vw, 1rem); white-space:nowrap; background:var(--bg); flex:0 0 auto; gap:0.5rem;">
+              <span aria-hidden="true" style="width:clamp(7px, 1.4vw, 9px); height:clamp(7px, 1.4vw, 9px); border-radius:50%; background:#d9a441; flex:none;"></span>
+              <div style="display:flex; flex-direction:column; line-height:1; gap:0.15em;">
+                <span style="color:var(--ink); font-size:clamp(0.9rem, 2.2vw, 1.2rem); text-transform:lowercase;">ooo</span>
+                <span style="font-family:var(--sans); font-size:clamp(0.4rem, 0.9vw, 0.5rem); color:#6b6b6b; letter-spacing:0.05em;">Lagos</span>
+              </div>
+            </div>
+          </header>
+
+          <div style="position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden;" aria-hidden="true">
+            <div style="position:absolute; left:clamp(0.5rem, 1.5vw, 1.25rem); top:50%; transform:translateY(-50%) rotate(-90deg); transform-origin:center; white-space:nowrap; font-family:var(--sans); font-size:clamp(0.4rem, 1vw, 0.55rem); letter-spacing:0.15em; color:#a0a0a0; text-transform:uppercase;">
+              <span>ADMITTANCE STRICTLY FOR OUT OF OFFICE PERSONNEL · TERMS AND CONDITIONS APPLY</span>
+            </div>
+            <div style="position:absolute; bottom:clamp(4.5rem, 9vh, 6.5rem); right:clamp(1rem, 3vw, 2rem); display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--ink); opacity:0.7;">
+              <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width:clamp(40px, 8vw, 60px); height:clamp(15px, 3vh, 25px);">
+                <path d="M0,0 h4 v30 h-4 Z M6,0 h2 v30 h-2 Z M10,0 h6 v30 h-6 Z M18,0 h2 v30 h-2 Z M22,0 h4 v30 h-4 Z M28,0 h8 v30 h-8 Z M38,0 h2 v30 h-2 Z M42,0 h6 v30 h-6 Z M50,0 h4 v30 h-4 Z M56,0 h2 v30 h-2 Z M60,0 h6 v30 h-6 Z M68,0 h2 v30 h-2 Z M72,0 h8 v30 h-8 Z M82,0 h4 v30 h-4 Z M88,0 h2 v30 h-2 Z M92,0 h4 v30 h-4 Z M98,0 h2 v30 h-2 Z" fill="currentColor"></path>
+              </svg>
+              <span style="font-family:var(--bungee); font-size:clamp(0.35rem, 0.8vw, 0.5rem); letter-spacing:0.05em;">OOO-001-002</span>
+            </div>
+            <div style="position:absolute; bottom:clamp(5rem, 10vh, 7rem); left:clamp(2.5rem, 5vw, 4rem); display:flex; gap:0.5rem; color:var(--ink); opacity:0.5;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:clamp(14px, 2.5vw, 20px); height:clamp(14px, 2.5vw, 20px);"><path d="M4 8l2 12h12l2-12H4z"></path><path d="M4 8c0-2 8-2 16 0"></path><path d="M8 12c2 1 4-1 6 0"></path></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:clamp(14px, 2.5vw, 20px); height:clamp(14px, 2.5vw, 20px);"><path d="M5 16h14l-1-7H6l-1 7zM14 9V6h-4v3"></path><line x1="4" y1="4" x2="20" y2="20"></line></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:clamp(14px, 2.5vw, 20px); height:clamp(14px, 2.5vw, 20px);"><circle cx="12" cy="12" r="4"></circle><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.34 6.34l1.42 1.42M16.24 16.24l1.42 1.42M6.34 17.66l1.42-1.42M16.24 7.76l1.42-1.42"></path></svg>
+            </div>
+            <svg viewBox="0 0 60 50" style="position:absolute; top:20%; left:12%; width:clamp(20px, 4vw, 30px); transform:rotate(-25deg);"><path fill="var(--accent)" opacity="0.6" d="M30 4c4 0 5 6 9 5s8-3 10 1-3 6-1 10 6 6 2 10-8 1-10 5-4 8-9 6-4-7-9-7-9 4-12-1 2-7-1-11-8-4-5-9 7-3 9-7 2-2 4-4 3-1 5-2z"></path></svg>
+            <svg viewBox="0 0 60 50" style="position:absolute; bottom:25%; right:30%; width:clamp(15px, 3vw, 25px); transform:rotate(40deg);"><path fill="var(--pink-deep)" opacity="0.4" d="M20 10c6 2 12-4 15 2s4 12 0 15-10 2-15-1-8-12-5-15 4-5 5-1z"></path></svg>
+          </div>
+
+          <div style="position:relative; flex:1 1 auto; display:flex; align-items:center; padding:0 clamp(1.25rem, 5vw, 3rem); overflow:hidden;">
+
+            <div style="position:absolute; left:0; bottom:16%; width:100%; height:65px; pointer-events:none; z-index:0; overflow:visible;" aria-hidden="true">
+              <div style="{{ boatWrapStyle }}">
+                <div style="width:100%; height:100%; animation:boatBobIdle 12s ease-in-out infinite;">
+                  <svg viewBox="0 0 160 90" style="width:100%; height:100%; overflow:visible;">
+                    <path d="M5 75 Q 30 82, 60 75 T 120 75" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" opacity="0.6"></path>
+                    <path d="M15 82 Q 45 88, 85 82 T 145 82" fill="none" stroke="var(--pink-deep)" stroke-width="2" stroke-linecap="round" opacity="0.4"></path>
+                    <path d="M15 52 L135 52 L120 72 L30 72 Z" fill="#f6f4f1" stroke="#181818" stroke-width="3.5" stroke-linejoin="round"></path>
+                    <path d="M22 62 L127 62 L122 68 L28 68 Z" fill="var(--blue)"></path>
+                    <path d="M45 52 L55 30 L105 30 L115 52 Z" fill="var(--pink-deep)" stroke="#181818" stroke-width="3" stroke-linejoin="round"></path>
+                    <rect x="58" y="36" width="12" height="10" rx="2" fill="#181818"></rect>
+                    <rect x="74" y="36" width="12" height="10" rx="2" fill="#181818"></rect>
+                    <rect x="90" y="36" width="12" height="10" rx="2" fill="#181818"></rect>
+                    <rect x="6" y="46" width="12" height="24" rx="3" fill="#333" stroke="#181818" stroke-width="2.5" transform="rotate(-8, 12, 58)"></rect>
+                    <path d="M2,66 C0,72 8,76 14,70" fill="none" stroke="#fff" stroke-width="2" opacity="0.8"></path>
+                    <line x1="108" y1="30" x2="108" y2="16" stroke="#181818" stroke-width="2.5" stroke-linecap="round"></line>
+                    <path d="M108 16 L126 21 L108 26 Z" fill="var(--blue)" stroke="#181818" stroke-width="2" stroke-linejoin="round"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div style="position:absolute; left:0; bottom:8%; width:100%; height:60px; pointer-events:none; z-index:0; overflow:visible;" aria-hidden="true">
+              <div style="{{ busWrapStyle }}">
+                <div style="width:100%; height:100%; animation:busBounce 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;">
+                  <svg viewBox="0 0 150 90" style="width:100%; height:100%; overflow:visible;">
+                    <rect x="8" y="20" width="134" height="45" rx="10" fill="#ffcc00" stroke="#181818" stroke-width="4"></rect>
+                    <rect x="55" y="8" width="40" height="14" rx="3" fill="#181818"></rect>
+                    <rect x="55" y="8" width="40" height="5" rx="2" fill="#f6f4f1"></rect>
+                    <rect x="20" y="26" width="100" height="22" rx="4" fill="#181818"></rect>
+                    <rect x="24" y="30" width="27" height="15" rx="2" fill="#55606b"></rect>
+                    <rect x="58" y="30" width="27" height="15" rx="2" fill="#55606b"></rect>
+                    <rect x="92" y="30" width="24" height="15" rx="2" fill="#55606b"></rect>
+                    <rect x="8" y="50" width="134" height="4" fill="#181818"></rect>
+                    <rect x="8" y="57" width="134" height="4" fill="#181818"></rect>
+                    <rect x="132" y="27" width="10" height="2" fill="#181818"></rect>
+                    <rect x="132" y="31" width="10" height="2" fill="#181818"></rect>
+                    <rect x="132" y="35" width="10" height="2" fill="#181818"></rect>
+                    <rect x="132" y="39" width="10" height="2" fill="#181818"></rect>
+                    <rect x="14" y="59" width="5" height="10" rx="1" fill="var(--pink-deep)"></rect>
+                    <rect x="129" y="59" width="5" height="10" rx="1" fill="var(--pink-deep)"></rect>
+                    <circle cx="35" cy="68" r="13" fill="#181818" stroke="#f6f4f1" stroke-width="2"></circle>
+                    <path d="M35,68 m-6,0 a6,6 0 0 1 12,0 z" fill="#d8d8d8"></path>
+                    <circle cx="115" cy="68" r="13" fill="#181818" stroke="#f6f4f1" stroke-width="2"></circle>
+                    <path d="M115,68 m-6,0 a6,6 0 0 1 12,0 z" fill="#d8d8d8"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <button aria-label="Share this page" onclick="{{ handleShare }}" style="position:absolute; top:clamp(0.75rem, 2.5vh, 1.5rem); right:clamp(0.75rem, 4vw, 1.5rem); background:none; border:none; padding:0; cursor:pointer; width:clamp(26px, 6vw, 34px); height:clamp(26px, 6vw, 34px); border-radius:50%; z-index:2;">
+              <svg viewBox="0 0 24 24" style="width:100%; height:100%;"><path fill="none" stroke="#181818" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 15c0-5 3-8 8-8m0 0V3l6 5-6 5V9"></path></svg>
+            </button>
+            <sc-if value="{{ shareConfirmed }}" hint-placeholder-val="{{ false }}">
+              <span role="status" style="position:absolute; top:clamp(3.2rem, 6.5vh, 4rem); right:clamp(0.75rem, 4vw, 1.5rem); background:var(--ink); color:#fff; font-family:var(--sans); font-size:0.7rem; font-weight:600; padding:0.35rem 0.7rem; border-radius:999px; z-index:3;">Link copied</span>
+            </sc-if>
+
+            <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:center; gap:clamp(0.5rem, 2vw, 1.5rem); width:100%;">
+              <div style="display:flex; flex-direction:column; gap:clamp(0.5rem, 1.5vh, 0.9rem);">
+
+                <div style="display:inline-flex; align-items:center; gap:0.45rem; padding:0.35rem 0.75rem; border-radius:999px; font-family:var(--sans); font-size:clamp(0.65rem, 1.8vw, 0.75rem); width:fit-content; pointer-events:none; {{ notifPillStyle }}">
+                  <span>🔔</span>
+                  <span style="color:var(--ink); font-weight:500;">Pending Notifications:</span>
+                  <span style="font-family:var(--display); font-weight:700; {{ notifCountStyle }}">{{ notificationLabel }}</span>
+                </div>
+
+                <span style="position:relative; font-family:var(--sans); font-weight:600; font-size:clamp(0.6rem, 1.8vw, 0.8rem); letter-spacing:0.1em; text-transform:uppercase; color:var(--accent);">
+                  <svg viewBox="0 0 60 50" aria-hidden="true" style="position:absolute; top:-0.9em; left:-1.8em; width:clamp(16px, 4vw, 22px); height:auto; z-index:-1; opacity:0.9;">
+                    <defs>
+                      <linearGradient id="splatGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="var(--pink)"></stop>
+                        <stop offset="1" stop-color="var(--pink-deep)"></stop>
+                      </linearGradient>
+                    </defs>
+                    <path fill="url(#splatGrad)" d="M30 4c4 0 5 6 9 5s8-3 10 1-3 6-1 10 6 6 2 10-8 1-10 5-4 8-9 6-4-7-9-7-9 4-12-1 2-7-1-11-8-4-5-9 7-3 9-7 2-2 4-4 3-1 5-2z"></path>
+                  </svg>
+                  Auto-reply for real life
+                </span>
+
+                <div style="position:relative; display:flex; flex-direction:column; line-height:0.95;">
+                  <span style="font-family:var(--display); font-weight:700; font-size:clamp(2.6rem, 12vw, 4.2rem); color:var(--blue); letter-spacing:-0.01em;">OUT OF</span>
+                  <span style="font-family:var(--display); font-weight:700; font-size:clamp(2.6rem, 12vw, 4.2rem); color:var(--blue); letter-spacing:-0.01em;">OFFICE</span>
+                </div>
+
+                <div style="display:flex; align-items:baseline; gap:0.6rem;">
+                  <span style="font-family:var(--display); font-weight:700; font-size:clamp(1rem, 4vw, 1.4rem); color:var(--ink);">OOO 002</span>
+                  <span style="font-family:var(--sans); font-weight:500; font-size:clamp(0.75rem, 3vw, 1rem); color:#5a5a5a;">Tarkwa Bay · Apr 11</span>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem; font-family:var(--sans); font-size:clamp(0.7rem, 2vw, 0.9rem); color:var(--ink);">
+                  <span>Release. Unwind. Reconnect.</span>
+                  <span style="text-transform:uppercase; letter-spacing:0.06em; font-size:clamp(0.5rem, 1.6vw, 0.65rem); font-weight:600; color:#6b6b6b;">Auto replies enabled. Stress disabled.</span>
+                </div>
+
+                <div style="margin-top:clamp(0.4rem, 1.2vh, 0.8rem);">
+                  <button onclick="{{ onActivateClick }}" style="font-family:var(--display); font-weight:700; font-size:clamp(0.85rem, 2.4vw, 1.05rem); background:var(--blue); color:#fff; border:none; padding:clamp(0.65rem, 2vh, 0.85rem) clamp(1.2rem, 4vw, 1.8rem); border-radius:999px; cursor:pointer; box-shadow:0 6px 20px rgba(0, 191, 255, 0.32);" style-hover="transform:translateY(-2px); box-shadow:0 8px 24px rgba(0, 191, 255, 0.45); background:#00aceb;">Activate Auto Reply →</button>
+                </div>
+              </div>
+
+              <div style="position:relative; z-index:2; flex:none; pointer-events:auto; width:clamp(200px, 27vw, 340px); height:clamp(200px, 27vw, 340px); margin-left:clamp(-1.5rem, -3vw, -0.5rem);">
+                <div style="position:absolute; inset:-20%; z-index:-1; border-radius:50%; background:radial-gradient(circle, rgba(0, 191, 255, 0.22), rgba(252, 156, 224, 0.14) 45%, transparent 72%); filter:blur(28px);"></div>
+                <div style="{{ cubeWrapStyle }}">
+                  <sc-if value="{{ activated }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; inset:-18%; border-radius:50%; background:rgba(255,255,255,0.32); backdrop-filter:blur(14px) saturate(160%); border:1px solid rgba(255,255,255,0.55); box-shadow:0 8px 28px rgba(0,0,0,0.1); z-index:-1;"></div>
+                  </sc-if>
+                  <div ref="{{ cubeStageRef }}" onPointerDown="{{ onCubePointerDown }}" onPointerMove="{{ onCubePointerMove }}" onPointerUp="{{ onCubePointerUp }}" style="{{ cubeStageStyle }}">
+                    <div style="{{ cubeInnerStyle }}">
+                      <div style="{{ cubeFaceFrontStyle }}"></div>
+                      <div style="{{ cubeFaceBackStyle }}"></div>
+                      <div style="{{ cubeFaceRightStyle }}"></div>
+                      <div style="{{ cubeFaceLeftStyle }}"></div>
+                      <div style="{{ cubeFaceTopStyle }}"></div>
+                      <div style="{{ cubeFaceBottomStyle }}"></div>
+                    </div>
+                  </div>
+                  <sc-if value="{{ cubeSleeping }}" hint-placeholder-val="{{ false }}">
+                    <span aria-hidden="true" style="position:absolute; top:6%; right:8%; font-family:var(--display); font-weight:700; font-size:0.8rem; color:var(--blue); opacity:0.75; pointer-events:none;">zZz</span>
+                  </sc-if>
+                  <sc-if value="{{ showAutoReplyModal }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; inset:0; overflow:visible; z-index:20;">
+                      <div role="dialog" aria-label="Auto-Reply Generator" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:240px; background:#fff; border-radius:16px; padding:1.1rem 1.2rem 1.3rem; box-shadow:0 24px 50px rgba(0,0,0,0.25); border:2px solid var(--ink); display:flex; flex-direction:column; gap:0.75rem; text-align:left;">
+                        <button aria-label="Close" onclick="{{ closeAutoReplyModal }}" style="position:absolute; top:0.5rem; right:0.6rem; background:none; border:none; cursor:pointer; font-family:var(--sans); font-size:1rem; color:#888; line-height:1; padding:0.2rem;">✕</button>
+                        <span style="font-family:var(--sans); font-weight:700; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--pink-deep);">Auto-Reply Generator</span>
+                        <p style="margin:0; font-family:var(--marker); font-size:1rem; line-height:1.4; color:var(--ink);">{{ autoReplyText }}</p>
+                        <div style="display:flex; gap:0.5rem;">
+                          <button onclick="{{ shuffleAutoReply }}" style="flex:1; font-family:var(--display); font-weight:700; font-size:0.75rem; background:var(--bg); color:var(--ink); border:1.5px solid var(--ink); padding:0.5rem 0.6rem; border-radius:999px; cursor:pointer;">Shuffle Reply</button>
+                          <button onclick="{{ copyAutoReply }}" style="flex:1; font-family:var(--display); font-weight:700; font-size:0.75rem; background:var(--blue); color:#fff; border:none; padding:0.5rem 0.6rem; border-radius:999px; cursor:pointer;">{{ copyLabel }}</button>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer style="width:100%; padding:clamp(0.6rem, 2vh, 1.1rem) clamp(0.75rem, 3vw, 1.5rem); display:flex; flex-direction:column; gap:clamp(0.4rem, 1.2vh, 0.7rem); color:var(--ink);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width:clamp(16px, 3vw, 20px); height:auto; flex:none;">
+                  <path d="M18 6 6 18M6 18h9M6 18V9" fill="none" stroke="#00bfff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <div style="display:flex; flex-direction:column; font-family:var(--display); font-weight:600; line-height:1.05;">
+                  <span style="font-size:clamp(0.55rem, 1.4vw, 0.75rem);">AUTO REPLY</span>
+                  <span style="font-size:clamp(0.55rem, 1.4vw, 0.75rem);">ENABLED</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.1;">
+                  <span style="color:var(--accent); font-family:var(--display); font-weight:600; font-size:clamp(0.6rem, 1.5vw, 0.8rem);">LAGOS</span>
+                  <span style="font-family:var(--sans); font-weight:500; font-size:clamp(0.45rem, 1.1vw, 0.6rem); letter-spacing:0.08em; color:#6b6b6b;">NIGERIA</span>
+                </div>
+                <svg viewBox="0 0 20 20" aria-hidden="true" style="width:clamp(14px, 2.6vw, 18px); height:auto; flex:none;">
+                  <path d="M10 1 18 7l-8 12L2 7z" fill="none" stroke="#08cabd" stroke-width="1.3"></path>
+                  <path d="M10 1 18 7H2z" fill="none" stroke="#08cabd" stroke-width="1"></path>
+                  <path d="M6.5 7 10 19M13.5 7 10 19" fill="none" stroke="#08cabd" stroke-width="0.8"></path>
+                </svg>
+              </div>
+            </div>
+            <p style="margin:0; text-align:center; font-family:var(--sans); font-size:clamp(0.35rem, 0.9vw, 0.5rem); letter-spacing:0.15em; text-transform:uppercase; color:#8a8a8a;">LEAVING YELLOW LAGOS. ENTERING BLUE LAGOS.</p>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <section style="{{ activatedStyle }}">
+    <p style="margin:0; font-family:var(--sans); font-weight:600; font-size:0.85rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent);">Status update</p>
+    <h2 style="margin:0; font-family:var(--display); font-weight:700; font-size:clamp(2rem, 7vw, 3.2rem); color:var(--blue);">Out of Office Activated</h2>
+    <p style="margin:0; font-family:var(--sans); color:var(--ink);">You've found a little order and peace.</p>
+    <p style="margin:0.75rem 0 0; max-width:32ch; font-family:var(--marker); font-size:clamp(0.95rem, 2.4vw, 1.15rem); line-height:1.4; color:var(--pink-deep); transform:rotate(-1deg);">Life is messy. Like a scrambled cube. Out of Office is where we stop trying to solve everything for a moment.</p>
+  </section>
+
+  <div ref="{{ refPostcard }}" style="{{ revealStyle.postcard }}">
+    <section style="max-width:720px; margin:0 auto; padding:clamp(3rem, 10vh, 6rem) 1.5rem; text-align:center;">
+      <p style="margin:0 0 1.5rem; font-family:var(--marker); font-size:clamp(1.1rem, 3vw, 1.5rem); color:var(--pink-deep);">Wish you were here</p>
+      <figure style="position:relative; margin:0; display:inline-block; max-width:100%; border-radius:6px; overflow:hidden; box-shadow:0 24px 50px rgba(0,0,0,0.18); transform:rotate(-1.5deg);">
+        <img src="docs/brand-reference/postcard-greetings-from-out-of-office.jpg" alt="Greetings from Out of Office" loading="lazy" style="display:block; width:100%; max-width:520px; height:auto;"></img>
+        <span style="position:absolute; top:0.9rem; right:0.9rem; width:clamp(44px, 8vw, 56px); height:clamp(44px, 8vw, 56px); opacity:0.85;">
+          <svg viewBox="0 0 40 40" aria-hidden="true" style="width:100%; height:100%;">
+            <circle cx="20" cy="20" r="18" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 2"></circle>
+            <text x="20" y="17" text-anchor="middle" font-size="7" fill="#fff">OOO</text>
+            <text x="20" y="27" text-anchor="middle" font-size="6" fill="#fff">LAGOS</text>
+          </svg>
+        </span>
+      </figure>
+      <p style="margin:1.5rem 0 0; font-family:var(--sans); font-size:0.85rem; color:#6b6b6b;">A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
+    </section>
+  </div>
+
+  <div ref="{{ refMetrics }}" style="{{ revealStyle.metrics }}">
+    <section style="max-width:640px; margin:0 auto; padding:clamp(3rem, 10vh, 6rem) 1.5rem; text-align:center;">
+      <p style="margin:0 0 0.5rem; font-family:var(--sans); font-weight:600; font-size:0.8rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent);">The auto reply</p>
+      <h2 style="margin:0 0 0.75rem; font-family:var(--display); font-weight:700; font-size:clamp(1.8rem, 5vw, 2.6rem); color:var(--ink);">I am currently unavailable.</h2>
+      <p style="margin:0 auto 2.5rem; max-width:34ch; font-family:var(--sans); font-size:1rem; color:#5a5a5a; line-height:1.6;">I'm painting. Playing board games. Watching sunsets. Making memories. I will return when my soul battery is charged.</p>
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem;">
+        <div style="display:flex; flex-direction:column; gap:0.25rem; padding:1.5rem 1rem; border-radius:16px; background:#ffffff; box-shadow:0 12px 30px rgba(0,0,0,0.06);">
+          <span style="font-family:var(--display); font-weight:700; font-size:clamp(1.8rem, 6vw, 2.4rem); color:var(--blue);">87</span>
+          <span style="font-family:var(--sans); font-size:0.8rem; letter-spacing:0.04em; text-transform:uppercase; color:#6b6b6b;">Emails ignored</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem; padding:1.5rem 1rem; border-radius:16px; background:#ffffff; box-shadow:0 12px 30px rgba(0,0,0,0.06);">
+          <span style="font-family:var(--display); font-weight:700; font-size:clamp(1.8rem, 6vw, 2.4rem); color:var(--sunset-orange);">62%</span>
+          <span style="font-family:var(--sans); font-size:0.8rem; letter-spacing:0.04em; text-transform:uppercase; color:#6b6b6b;">Stress reduced</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem; padding:1.5rem 1rem; border-radius:16px; background:#ffffff; box-shadow:0 12px 30px rgba(0,0,0,0.06);">
+          <span style="font-family:var(--display); font-weight:700; font-size:clamp(1.8rem, 6vw, 2.4rem); color:var(--muted-green);">∞</span>
+          <span style="font-family:var(--sans); font-size:0.8rem; letter-spacing:0.04em; text-transform:uppercase; color:#6b6b6b;">New friendships</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.25rem; padding:1.5rem 1rem; border-radius:16px; background:#ffffff; box-shadow:0 12px 30px rgba(0,0,0,0.06);">
+          <span style="font-family:var(--display); font-weight:700; font-size:clamp(1.8rem, 6vw, 2.4rem); color:var(--pink-deep);">100%</span>
+          <span style="font-family:var(--sans); font-size:0.8rem; letter-spacing:0.04em; text-transform:uppercase; color:#6b6b6b;">Battery recharged</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div ref="{{ refCommunity }}" style="{{ revealStyle.community }}">
+    <section style="max-width:900px; margin:0 auto; padding:clamp(3rem, 10vh, 6rem) 1.5rem; text-align:center;">
+      <p style="margin:0 0 0.5rem; font-family:var(--sans); font-weight:600; font-size:0.8rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--pink-deep);">Community</p>
+      <h2 style="margin:0 0 3rem; font-family:var(--display); font-weight:700; font-size:clamp(1.6rem, 4.5vw, 2.4rem); color:var(--ink);">Leaving yellow Lagos, entering blue Lagos.</h2>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(1.25rem, 4vw, 2.5rem);">
+        <figure style="margin:0; width:clamp(160px, 22vw, 220px); background:#fff; padding:0.6rem 0.6rem 1.1rem; border-radius:4px; box-shadow:0 16px 30px rgba(0,0,0,0.14); transform:rotate(-4deg);">
+          <img src="docs/brand-reference/flyer-post-nysc-hangout-tarkwa-bay.png" alt="Tarkwa Bay" loading="lazy" style="display:block; width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:2px;"></img>
+          <figcaption style="margin-top:0.6rem; font-family:var(--marker); font-size:1rem; color:var(--ink);">Tarkwa Bay 🌊</figcaption>
+        </figure>
+        <figure style="margin:0; width:clamp(160px, 22vw, 220px); background:#fff; padding:0.6rem 0.6rem 1.1rem; border-radius:4px; box-shadow:0 16px 30px rgba(0,0,0,0.14); transform:rotate(3deg);">
+          <img src="docs/brand-reference/flyer-open-canvas-jaekel-house.png" alt="Open Canvas" loading="lazy" style="display:block; width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:2px;"></img>
+          <figcaption style="margin-top:0.6rem; font-family:var(--marker); font-size:1rem; color:var(--ink);">Open Canvas 🎨</figcaption>
+        </figure>
+        <figure style="margin:0; width:clamp(160px, 22vw, 220px); background:#fff; padding:0.6rem 0.6rem 1.1rem; border-radius:4px; box-shadow:0 16px 30px rgba(0,0,0,0.14); transform:rotate(-2deg);">
+          <img src="docs/brand-reference/flyer-save-the-date-painting.png" alt="Save the date" loading="lazy" style="display:block; width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:2px;"></img>
+          <figcaption style="margin-top:0.6rem; font-family:var(--marker); font-size:1rem; color:var(--ink);">Save the date</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
+
+  <div ref="{{ refTimeline }}" style="{{ revealStyle.timeline }}">
+    <section style="max-width:640px; margin:0 auto; padding:clamp(3rem, 10vh, 6rem) 1.5rem;">
+      <p style="margin:0 0 0.5rem; font-family:var(--sans); font-weight:600; font-size:0.8rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); text-align:center;">Memory timeline</p>
+      <h2 style="margin:0 0 3rem; font-family:var(--display); font-weight:700; font-size:clamp(1.6rem, 4.5vw, 2.4rem); color:var(--ink); text-align:center;">Every escape gets a stamp.</h2>
+      <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1.5rem; border-left:2px solid #e4dfd8;">
+        <li style="display:flex; align-items:flex-start; gap:1.25rem; padding:0 0 0 1.5rem; margin-left:-2px; border-left:2px solid var(--blue); position:relative;">
+          <span style="flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center; width:3.6rem; height:3.6rem; border-radius:50%; border:2px solid var(--blue); outline:1px dashed var(--blue); outline-offset:3px; color:var(--blue); text-align:center; transform:rotate(-7deg);">
+            <span style="font-family:var(--bungee); font-size:0.42rem; letter-spacing:0.08em;">OOO</span>
+            <span style="font-family:var(--bungee); font-size:0.7rem; line-height:1.2;">001</span>
+          </span>
+          <div style="display:flex; flex-direction:column; gap:0.15rem; padding-bottom:0.5rem;">
+            <span style="font-family:var(--serif); font-weight:700; font-size:clamp(1.2rem, 3.5vw, 1.5rem); color:var(--ink);">Open Canvas</span>
+            <span style="font-family:var(--sans); font-size:0.85rem; color:var(--pink-deep); font-weight:500;">Jaekel House Garden · May 30</span>
+            <span style="font-family:var(--sans); font-size:0.9rem; color:#6b6b6b; margin-top:0.15rem;">You don't need to know how to paint. Just come with an open mind to create.</span>
+          </div>
+        </li>
+        <li style="display:flex; align-items:flex-start; gap:1.25rem; padding:0 0 0 1.5rem; margin-left:-2px; border-left:2px solid var(--sunset-orange); position:relative;">
+          <span style="flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center; width:3.6rem; height:3.6rem; border-radius:50%; border:2px solid var(--sunset-orange); outline:1px dashed var(--sunset-orange); outline-offset:3px; color:var(--sunset-orange); text-align:center; transform:rotate(6deg);">
+            <span style="font-family:var(--bungee); font-size:0.42rem; letter-spacing:0.08em;">OOO</span>
+            <span style="font-family:var(--bungee); font-size:0.7rem; line-height:1.2;">002</span>
+          </span>
+          <div style="display:flex; flex-direction:column; gap:0.15rem; padding-bottom:0.5rem;">
+            <span style="font-family:var(--serif); font-weight:700; font-size:clamp(1.2rem, 3.5vw, 1.5rem); color:var(--ink);">The Post-NYSC Hangout</span>
+            <span style="font-family:var(--sans); font-size:0.85rem; color:var(--pink-deep); font-weight:500;">Tarkwa Bay Beach · Apr 11 · 12pm till daybreak</span>
+            <span style="font-family:var(--sans); font-size:0.9rem; color:#6b6b6b; margin-top:0.15rem;">The calming embrace of ocean waves. The soothing breeze. The tranquility of nature.</span>
+          </div>
+        </li>
+        <li style="display:flex; align-items:flex-start; gap:1.25rem; padding:0 0 0 1.5rem; margin-left:-2px; border-left:2px solid #d8d2c8; position:relative; opacity:0.85;">
+          <span style="flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center; width:3.6rem; height:3.6rem; border-radius:50%; border:2px solid #b8b2a8; outline:1px dashed #b8b2a8; outline-offset:3px; color:#b8b2a8; text-align:center; transform:rotate(-7deg); opacity:0.7;">
+            <span style="font-family:var(--bungee); font-size:0.42rem; letter-spacing:0.08em;">OOO</span>
+            <span style="font-family:var(--bungee); font-size:0.7rem; line-height:1.2;">003</span>
+          </span>
+          <div style="display:flex; flex-direction:column; gap:0.15rem; padding-bottom:0.5rem;">
+            <span style="font-family:var(--serif); font-weight:700; font-size:clamp(1.2rem, 3.5vw, 1.5rem); color:var(--ink);">???</span>
+            <span style="font-family:var(--sans); font-size:0.85rem; color:var(--pink-deep); font-weight:500;">Coming soon</span>
+            <span style="font-family:var(--sans); font-size:0.9rem; color:#6b6b6b; margin-top:0.15rem;">Stay tuned.</span>
+          </div>
+        </li>
+      </ol>
+    </section>
+  </div>
+
+  <div ref="{{ refPlaylist }}" style="{{ revealStyle.playlist }}">
+    <section style="max-width:560px; margin:0 auto; padding:clamp(3rem, 10vh, 6rem) 1.5rem; text-align:center;">
+      <p style="margin:0 0 0.5rem; font-family:var(--sans); font-weight:600; font-size:0.8rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--blue);">The mood</p>
+      <h2 style="margin:0 0 0.5rem; font-family:var(--display); font-weight:700; font-size:clamp(1.6rem, 4.5vw, 2.2rem); color:var(--ink);">Out of Office, the mixtape</h2>
+      <p style="margin:0 0 2.5rem; font-family:var(--sans); color:#6b6b6b;">Five tracks for disconnecting. Press play, put the phone face down.</p>
+      <ol style="list-style:none; margin:0; padding:0; text-align:left; border-radius:16px; background:#fff; box-shadow:0 12px 30px rgba(0,0,0,0.06); overflow:hidden;">
+        <li style="display:flex; align-items:center; gap:1rem; padding:0.9rem 1.25rem; border-bottom:1px solid #f0ece5;">
+          <span style="font-family:var(--bungee); font-size:0.7rem; color:var(--pink-deep); flex:none; width:1.6rem;">01</span>
+          <span style="flex:1 1 auto; display:flex; flex-direction:column; min-width:0;"><span style="font-family:var(--sans); font-weight:500; font-size:0.95rem; color:var(--ink);">Salt Air</span><span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a;">Late Bloom</span></span>
+          <span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a; flex:none;">3:12</span>
+        </li>
+        <li style="display:flex; align-items:center; gap:1rem; padding:0.9rem 1.25rem; border-bottom:1px solid #f0ece5;">
+          <span style="font-family:var(--bungee); font-size:0.7rem; color:var(--pink-deep); flex:none; width:1.6rem;">02</span>
+          <span style="flex:1 1 auto; display:flex; flex-direction:column; min-width:0;"><span style="font-family:var(--sans); font-weight:500; font-size:0.95rem; color:var(--ink);">Slow Tide</span><span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a;">Nightswim</span></span>
+          <span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a; flex:none;">4:01</span>
+        </li>
+        <li style="display:flex; align-items:center; gap:1rem; padding:0.9rem 1.25rem; border-bottom:1px solid #f0ece5;">
+          <span style="font-family:var(--bungee); font-size:0.7rem; color:var(--pink-deep); flex:none; width:1.6rem;">03</span>
+          <span style="flex:1 1 auto; display:flex; flex-direction:column; min-width:0;"><span style="font-family:var(--sans); font-weight:500; font-size:0.95rem; color:var(--ink);">Soft Static</span><span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a;">Coastline Radio</span></span>
+          <span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a; flex:none;">2:47</span>
+        </li>
+        <li style="display:flex; align-items:center; gap:1rem; padding:0.9rem 1.25rem; border-bottom:1px solid #f0ece5;">
+          <span style="font-family:var(--bungee); font-size:0.7rem; color:var(--pink-deep); flex:none; width:1.6rem;">04</span>
+          <span style="flex:1 1 auto; display:flex; flex-direction:column; min-width:0;"><span style="font-family:var(--sans); font-weight:500; font-size:0.95rem; color:var(--ink);">No Signal</span><span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a;">Harmattan</span></span>
+          <span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a; flex:none;">3:35</span>
+        </li>
+        <li style="display:flex; align-items:center; gap:1rem; padding:0.9rem 1.25rem;">
+          <span style="font-family:var(--bungee); font-size:0.7rem; color:var(--pink-deep); flex:none; width:1.6rem;">05</span>
+          <span style="flex:1 1 auto; display:flex; flex-direction:column; min-width:0;"><span style="font-family:var(--sans); font-weight:500; font-size:0.95rem; color:var(--ink);">Soul Battery</span><span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a;">Blue Lagos</span></span>
+          <span style="font-family:var(--sans); font-size:0.8rem; color:#8a8a8a; flex:none;">3:58</span>
+        </li>
+      </ol>
+    </section>
+  </div>
+
+  <div ref="{{ refTickets }}" style="{{ revealStyle.tickets }}">
+    <section style="max-width:920px; margin:0 auto; padding:clamp(3rem, 10vh, 7rem) 1.5rem clamp(4rem, 12vh, 8rem); font-family:var(--sans); background:radial-gradient(ellipse at 50% 100%, rgba(232, 201, 160, 0.4), transparent 70%); border-radius:32px;">
+      <div style="text-align:center; margin-bottom:2.5rem;">
+        <p style="margin:0 0 0.4rem; font-weight:600; font-size:0.8rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--pink-deep);">Boarding pass</p>
+        <h2 style="margin:0 0 0.5rem; font-family:var(--display); font-weight:700; font-size:clamp(2rem, 5vw, 2.8rem); color:var(--blue);">Your ticket out of yellow Lagos.</h2>
+        <p style="margin:0; color:#666; font-size:1rem;">Destination: Out of Office. Permission to disconnect, granted.</p>
+      </div>
+
+      <div style="background:#ffffff; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05); border:2px solid #181818; display:flex; overflow:hidden; position:relative;">
+        <div style="flex:1 1 auto; padding:1.8rem 2.2rem; display:flex; flex-direction:column; gap:1.6rem; background:linear-gradient(135deg, #ffffff 0%, #faf8f5 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #181818; padding-bottom:0.8rem; font-size:0.75rem; font-weight:700; letter-spacing:0.08em; color:#555;">
+            <div style="color:#181818;">OUT OF OFFICE AIR &amp; MARINE · ONE WAY ESCAPE</div>
+            <div>FLIGHT: <strong style="color:var(--blue); font-family:var(--display); font-size:0.95rem;">OOO-2026</strong></div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:0.5rem 0;">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+              <span style="font-family:var(--display); font-weight:700; font-size:clamp(2.2rem, 5vw, 3.2rem); line-height:1; letter-spacing:-0.02em; color:#e6b800;">LOS</span>
+              <span style="font-size:0.78rem; font-weight:600; color:#666; text-transform:uppercase;">Yellow Lagos</span>
+            </div>
+            <div style="flex:1; max-width:180px; display:flex; flex-direction:column; align-items:center; gap:0.3rem; padding:0 1rem;">
+              <span style="font-size:1.4rem; animation:boatBobCta 3s ease-in-out infinite; display:inline-block;">⛵</span>
+              <div style="width:100%; height:2px; background:#181818; position:relative;"></div>
+              <span style="font-size:0.65rem; font-weight:700; letter-spacing:0.1em; color:var(--pink-deep);">NON-STOP ESCAPE</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+              <span style="font-family:var(--display); font-weight:700; font-size:clamp(2.2rem, 5vw, 3.2rem); line-height:1; letter-spacing:-0.02em; color:var(--blue);">OOO</span>
+              <span style="font-size:0.78rem; font-weight:600; color:#666; text-transform:uppercase;">Blue Lagos (Tarkwa Bay)</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:1.1rem 1.5rem; background:#f4f1eb; padding:1.2rem 1.4rem; border-radius:12px; border:1px solid rgba(24,24,24,0.12);">
+            <div style="display:flex; flex-direction:column; gap:0.2rem;"><span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; color:#777;">PASSENGER</span><span style="font-size:0.88rem; font-weight:700; color:#181818;">LAGOS ESCAPER</span></div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;"><span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; color:#777;">DATE</span><span style="font-size:0.88rem; font-weight:700; color:#181818;">ANYTIME</span></div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;"><span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; color:#777;">GATE</span><span style="font-size:0.88rem; font-weight:700; color:#181818;">TB-01</span></div>
+            <div style="display:flex; flex-direction:column; gap:0.2rem;"><span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; color:#777;">BOARDING TIME</span><span style="font-size:0.88rem; font-weight:700; color:#181818;">IMMEDIATELY</span></div>
+            <div style="grid-column:span 2; border-top:1px dashed rgba(24,24,24,0.2); padding-top:0.8rem; display:flex; flex-direction:column; gap:0.2rem;"><span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; color:#777;">SPECIAL INSTRUCTIONS</span><span style="font-size:0.88rem; font-weight:700; color:var(--pink-deep);">Mute work Slack · Leave problems at Marina jetty</span></div>
+          </div>
+        </div>
+
+        <div style="position:relative; width:28px; display:flex; flex-direction:column; align-items:center; background:#ffffff;">
+          <div style="height:100%; border-left:2px dashed #bbb;"></div>
+          <div style="position:absolute; width:24px; height:24px; background:var(--bg); border:2px solid #181818; border-radius:50%; z-index:2; top:-14px; border-top-color:transparent;"></div>
+          <div style="position:absolute; width:24px; height:24px; background:var(--bg); border:2px solid #181818; border-radius:50%; z-index:2; bottom:-14px; border-bottom-color:transparent;"></div>
+        </div>
+
+        <div style="width:clamp(230px, 28vw, 290px); padding:1.8rem 1.6rem; background:#fbf9f6; display:flex; flex-direction:column; justify-content:space-between; align-items:center; text-align:center; gap:1.4rem;">
+          <div style="width:100%; display:flex; flex-direction:column; gap:0.3rem;">
+            <span style="font-size:0.68rem; font-weight:700; letter-spacing:0.15em; color:#888;">STUB COPY</span>
+            <span style="background:#181818; color:#fff; font-size:0.72rem; font-weight:700; padding:0.35rem 0.6rem; border-radius:6px; letter-spacing:0.05em;">SEAT: 1A (SURFSIDE)</span>
+          </div>
+          <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+            <div style="width:100%; height:48px; background:repeating-linear-gradient(90deg, #181818 0px, #181818 3px, transparent 3px, transparent 5px, #181818 5px, #181818 9px, transparent 9px, transparent 11px, #181818 11px, #181818 13px, transparent 13px, transparent 18px, #181818 18px, #181818 20px);"></div>
+            <span style="font-family:monospace; font-size:0.72rem; letter-spacing:0.12em; color:#444;">4 829104 772019 OOO-BNG</span>
+          </div>
+          <a href="https://tix.africa/discover/outofofficeng" target="_blank" rel="noopener noreferrer" style="display:inline-block; width:100%; font-family:var(--display); font-weight:700; font-size:0.95rem; color:#fff; background:linear-gradient(135deg, var(--blue), var(--pink-deep)); padding:0.9rem 1rem; border-radius:999px; text-decoration:none; box-shadow:0 10px 24px rgba(0,191,255,0.28); box-sizing:border-box;">Claim Boarding Pass →</a>
+          <span style="font-size:0.68rem; color:#888;">Powered by tix.africa</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div style="{{ statsToastStyle }}" role="status">
+    <p style="margin:0 0 0.75rem; font-family:var(--display); font-weight:700; font-size:1.1rem; color:var(--blue);">Lagos Survival Stats</p>
+    <ul style="list-style:none; padding:0; margin:0; font-family:var(--sans); font-size:0.85rem; color:var(--ink);">
+      <li style="margin-bottom:0.4rem; display:flex; justify-content:space-between; gap:1.5rem;">Traffic avoided: <strong style="color:var(--accent);">3 hours</strong></li>
+      <li style="margin-bottom:0.4rem; display:flex; justify-content:space-between; gap:1.5rem;">Emails ignored: <strong style="color:var(--accent);">17</strong></li>
+      <li style="margin-bottom:0.4rem; display:flex; justify-content:space-between; gap:1.5rem;">Stress reduced: <strong style="color:var(--accent);">68%</strong></li>
+    </ul>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    progress: 0,
+    smoothedProgress: 0,
+    pageProgress: 0,
+    bootShownCount: 0,
+    bootLeaving: false,
+    bootRemoved: false,
+    shareConfirmed: false,
+    showStats: false,
+    reveal: { postcard: false, metrics: false, community: false, timeline: false, playlist: false, tickets: false },
+    tumbleT: 0,
+    cubeClickCount: 0,
+    showAutoReplyModal: false,
+    autoReplyIndex: 0,
+    autoReplyCopied: false,
+    cubeSleeping: false,
+    dragging: false,
+    dragOffsetX: 0,
+    dragOffsetY: 0,
+    pointerNX: 0,
+    pointerNY: 0,
+  };
+
+  AUTO_REPLIES = [
+    "I'm currently unavailable. I'm at the beach pretending my problems don't exist.",
+    "Auto-reply active: gone to touch grass. Back soon.",
+    "Currently out of office and out of Wi-Fi range. Emotionally, too.",
+    "Status: away. Soul battery charging. Do not disturb.",
+    "I have left the group chat of adult responsibilities. Temporarily.",
+  ];
+
+  cubeStageRef = React.createRef();
+
+  BOOT_LINES = [
+    'Sending auto-reply…',
+    '✓ Emails muted',
+    '✓ Notifications paused',
+    '✓ Lagos stress suspended',
+    'Redirecting to Out of Office…',
+  ];
+
+  trackRef = React.createRef();
+  refPostcard = (el) => { this._postcard = el; this._observe(el, 'postcard'); };
+  refMetrics = (el) => { this._metrics = el; this._observe(el, 'metrics'); };
+  refCommunity = (el) => { this._community = el; this._observe(el, 'community'); };
+  refTimeline = (el) => { this._timeline = el; this._observe(el, 'timeline'); };
+  refPlaylist = (el) => { this._playlist = el; this._observe(el, 'playlist'); };
+  refTickets = (el) => { this._tickets = el; this._observe(el, 'tickets'); };
+
+  _observers = {};
+  _observe(el, key) {
+    if (!el || this._observers[key]) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        this.setState(s => ({ reveal: { ...s.reveal, [key]: true } }));
+        obs.disconnect();
+      }
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+    obs.observe(el);
+    this._observers[key] = obs;
+  }
+
+  componentDidMount() {
+    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (sessionStorage.getItem('ooo-booted')) {
+      this.setState({ bootRemoved: true });
+    } else {
+      sessionStorage.setItem('ooo-booted', '1');
+      const LINE_DELAY = 380, HOLD_AFTER = 500;
+      this._bootTimers = this.BOOT_LINES.map((_, i) =>
+        setTimeout(() => this.setState({ bootShownCount: i + 1 }), i * LINE_DELAY)
+      );
+      const leaveAt = this.BOOT_LINES.length * LINE_DELAY + HOLD_AFTER;
+      this._bootTimers.push(setTimeout(() => this.setState({ bootLeaving: true }), leaveAt));
+      this._bootTimers.push(setTimeout(() => this.setState({ bootRemoved: true }), leaveAt + 900));
+    }
+
+    this._ticking = false;
+    this._readProgress = () => {
+      const el = this.trackRef.current;
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const total = rect.height - window.innerHeight;
+        const progress = total <= 0 ? 1 : Math.max(0, Math.min(1, -rect.top / total));
+        const docTotal = document.documentElement.scrollHeight - window.innerHeight;
+        const pageProgress = docTotal <= 0 ? 0 : Math.max(0, Math.min(1, window.scrollY / docTotal));
+        this.setState(s => ({ progress, pageProgress, smoothedProgress: this.prefersReducedMotion ? progress : s.smoothedProgress }));
+      }
+      this._ticking = false;
+    };
+    this._updateProgress = () => {
+      if (this._ticking) return;
+      this._ticking = true;
+      requestAnimationFrame(this._readProgress);
+    };
+    window.addEventListener('scroll', this._updateProgress, { passive: true });
+    window.addEventListener('resize', this._updateProgress);
+    this._updateProgress();
+
+    this._lastSmooth = 0;
+    const TAU = 90;
+    this._smoothTick = (now) => {
+      const dt = this._lastSmooth ? now - this._lastSmooth : 16;
+      this._lastSmooth = now;
+      this.setState(s => {
+        const delta = s.progress - s.smoothedProgress;
+        const factor = 1 - Math.exp(-dt / TAU);
+        const smoothedProgress = Math.abs(delta) < 0.0005 ? s.progress : s.smoothedProgress + delta * factor;
+        return { smoothedProgress };
+      });
+      this._tumbleRaf = requestAnimationFrame(this._smoothTick);
+    };
+    if (!this.prefersReducedMotion) this._tumbleRaf = requestAnimationFrame(this._smoothTick);
+
+    this._tumbleStart = performance.now();
+    this._tumbleTick = (now) => {
+      const t = (now - this._tumbleStart) / 1000;
+      this.setState({ tumbleT: t });
+      this._tumbleRaf2 = requestAnimationFrame(this._tumbleTick);
+    };
+    this._tumbleRaf2 = requestAnimationFrame(this._tumbleTick);
+
+    this._konamiIdx = 0;
+    this._onKeyDown = (e) => {
+      if (e.key === 'o') {
+        this._konamiIdx++;
+        if (this._konamiIdx === 2) {
+          this.setState({ showStats: true });
+          this._konamiIdx = 0;
+          clearTimeout(this._statsTimer);
+          this._statsTimer = setTimeout(() => this.setState({ showStats: false }), 6000);
+        }
+      } else {
+        this._konamiIdx = 0;
+      }
+    };
+    window.addEventListener('keydown', this._onKeyDown);
+
+    // Cube idle/sleep mode — 5s of no pointer/keyboard/scroll activity dims
+    // the cube and gives it a slow "breathing" scale until activity resumes.
+    this._resetIdle = () => {
+      clearTimeout(this._idleTimer);
+      if (this.state.cubeSleeping) this.setState({ cubeSleeping: false });
+      this._idleTimer = setTimeout(() => this.setState({ cubeSleeping: true }), 5000);
+    };
+    window.addEventListener('mousemove', this._resetIdle);
+    window.addEventListener('touchstart', this._resetIdle, { passive: true });
+    window.addEventListener('scroll', this._resetIdle, { passive: true });
+    window.addEventListener('keydown', this._resetIdle);
+    this._resetIdle();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._updateProgress);
+    window.removeEventListener('resize', this._updateProgress);
+    window.removeEventListener('keydown', this._onKeyDown);
+    window.removeEventListener('mousemove', this._resetIdle);
+    window.removeEventListener('touchstart', this._resetIdle);
+    window.removeEventListener('scroll', this._resetIdle);
+    window.removeEventListener('keydown', this._resetIdle);
+    if (this._tumbleRaf) cancelAnimationFrame(this._tumbleRaf);
+    if (this._tumbleRaf2) cancelAnimationFrame(this._tumbleRaf2);
+    (this._bootTimers || []).forEach(clearTimeout);
+    clearTimeout(this._statsTimer);
+    clearTimeout(this._shareTimer);
+    clearTimeout(this._idleTimer);
+    clearTimeout(this._copyTimer);
+    Object.values(this._observers).forEach(o => o.disconnect());
+  }
+
+  // --- Cube drag-to-spin / click / parallax ---
+  onCubePointerDown = (e) => {
+    if (e.target.setPointerCapture) { try { e.target.setPointerCapture(e.pointerId); } catch (err) {} }
+    this._dragStartX = e.clientX;
+    this._dragStartY = e.clientY;
+    this._dragStartOffX = this.state.dragOffsetX;
+    this._dragStartOffY = this.state.dragOffsetY;
+    this._dragMoved = false;
+    this.setState({ dragging: true });
+    this._resetIdle();
+  };
+
+  onCubePointerMove = (e) => {
+    this._resetIdle();
+    if (this.state.dragging) {
+      const dx = e.clientX - this._dragStartX;
+      const dy = e.clientY - this._dragStartY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) this._dragMoved = true;
+      this.setState({ dragOffsetX: this._dragStartOffX + dx * 0.4, dragOffsetY: this._dragStartOffY - dy * 0.4 });
+    } else {
+      const el = this.cubeStageRef.current;
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+        this.setState({ pointerNX: nx, pointerNY: ny });
+      }
+    }
+  };
+
+  onCubePointerUp = () => {
+    this.setState({ dragging: false });
+    if (!this._dragMoved) this._onCubeClick();
+  };
+
+  _onCubeClick = () => {
+    const count = this.state.cubeClickCount + 1;
+    if (count >= 10) {
+      this.setState({
+        cubeClickCount: 0,
+        showAutoReplyModal: true,
+        autoReplyIndex: Math.floor(Math.random() * this.AUTO_REPLIES.length),
+        autoReplyCopied: false,
+      });
+    } else {
+      this.setState({ cubeClickCount: count });
+    }
+  };
+
+  shuffleAutoReply = () => {
+    this.setState(s => ({ autoReplyIndex: (s.autoReplyIndex + 1) % this.AUTO_REPLIES.length, autoReplyCopied: false }));
+  };
+
+  copyAutoReply = async () => {
+    try {
+      await navigator.clipboard.writeText(this.AUTO_REPLIES[this.state.autoReplyIndex]);
+      this.setState({ autoReplyCopied: true });
+      clearTimeout(this._copyTimer);
+      this._copyTimer = setTimeout(() => this.setState({ autoReplyCopied: false }), 1800);
+    } catch (err) {}
+  };
+
+  closeAutoReplyModal = () => this.setState({ showAutoReplyModal: false });
+
+  easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  easedScrollTo = (targetY, duration = 1400) => {
+    if (this.prefersReducedMotion) { window.scrollTo(0, targetY); return; }
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    const startTime = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      window.scrollTo(0, startY + distance * this.easeInOutCubic(t));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  onActivateClick = () => {
+    const el = this.trackRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    this.easedScrollTo(window.scrollY + rect.top + window.innerHeight * 1.5);
+  };
+
+  handleShare = async () => {
+    const shareData = {
+      title: 'Out of Office',
+      text: 'Auto-reply for real life. Leaving yellow Lagos, entering blue Lagos.',
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (e) {}
+      return;
+    }
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareData.url);
+      this.setState({ shareConfirmed: true });
+      clearTimeout(this._shareTimer);
+      this._shareTimer = setTimeout(() => this.setState({ shareConfirmed: false }), 2000);
+    }
+  };
+
+  renderVals() {
+    const { progress, smoothedProgress, bootShownCount, bootLeaving, bootRemoved, shareConfirmed, showStats, reveal, tumbleT,
+      showAutoReplyModal, autoReplyIndex, autoReplyCopied, cubeSleeping, dragging, dragOffsetX, dragOffsetY, pointerNX, pointerNY } = this.state;
+    const activated = progress >= 0.995;
+
+    const bootLines = this.BOOT_LINES.slice(0, bootShownCount).map((text, i) => ({
+      text,
+      style: `margin:0; font-family:var(--sans); font-size:clamp(0.85rem, 3vw, 1.15rem); color:${i === 0 ? 'var(--pink)' : '#f6f4f1'}; ${i === 0 ? 'font-weight:500;' : ''} letter-spacing:0.02em; animation:riseLine 0.4s ease both;`,
+    }));
+
+    const bootWrapStyle = `position:fixed; inset:0; z-index:50; background:#181818; display:flex; align-items:center; justify-content:center; overflow:hidden; opacity:${bootLeaving ? 0 : 1}; pointer-events:${bootLeaving ? 'none' : 'auto'}; transition:opacity 0.9s ease;`;
+    const bootWaveStyle = `position:absolute; left:0; right:0; bottom:-2px; width:100%; height:30vh; transform:translateY(${bootLeaving ? '0%' : '100%'}); transition:transform 1s cubic-bezier(0.22,1,0.36,1);`;
+
+    // Chaos layer (mainland clutter) fades out by progress 0.58
+    const chaosVisible = smoothedProgress < 0.58;
+    const chaosOpacity = Math.max(0, 1 - smoothedProgress * 1.85);
+    const chaosBlur = Math.min(12, smoothedProgress * 24);
+    const chaosScale = Math.max(0.75, 1 - smoothedProgress * 0.4);
+    const chaosTY = smoothedProgress * -80;
+    const chaosLayerStyle = `position:fixed; inset:0; pointer-events:none; z-index:100; overflow:visible; opacity:${chaosOpacity}; filter:blur(${chaosBlur}px); transform:translateY(${chaosTY}px) scale(${chaosScale});`;
+
+    // Boat crosses right->left during first half of scroll
+    const bStart = 0.08, bEnd = 0.45, bFade = 0.12;
+    const bt = Math.max(0, Math.min(1, (smoothedProgress - bStart) / (bEnd - bStart)));
+    const boatLeft = smoothedProgress <= bStart ? 115 : smoothedProgress >= bEnd ? -40 : 115 + (-30 - 115) * bt;
+    const boatOpacity = (smoothedProgress <= bStart || smoothedProgress >= bEnd) ? 0 : Math.min(1, bt / bFade, (1 - bt) / bFade);
+    const boatWrapStyle = `position:absolute; top:0; width:140px; height:100%; left:${boatLeft}%; opacity:${boatOpacity}; transition:opacity 0.4s var(--ease-standard);`;
+
+    // Danfo bus crosses left->right during second half
+    const dStart = 0.58, dEnd = 0.88, dFade = 0.1;
+    const dt = Math.max(0, Math.min(1, (smoothedProgress - dStart) / (dEnd - dStart)));
+    const busLeft = smoothedProgress <= dStart ? -25 : smoothedProgress >= dEnd ? 132 : -25 + (108 - -25) * dt;
+    const busOpacity = (smoothedProgress <= dStart || smoothedProgress >= dEnd) ? 0 : Math.min(1, dt / dFade, (1 - dt) / dFade);
+    const busWrapStyle = `position:absolute; top:0; width:130px; height:100%; left:${busLeft}%; opacity:${busOpacity}; transition:opacity 0.4s var(--ease-standard);`;
+
+    // Notification counter
+    let notificationCount;
+    if (smoothedProgress < 0.05) notificationCount = '999+';
+    else if (smoothedProgress < 0.25) notificationCount = Math.floor(840 * (1 - smoothedProgress));
+    else if (smoothedProgress < 0.65) notificationCount = Math.floor(420 * (1 - smoothedProgress));
+    else if (smoothedProgress < 0.95) notificationCount = Math.max(1, Math.floor(60 * (1 - smoothedProgress)));
+    else notificationCount = 0;
+    const notifStage = notificationCount === 0 ? 'zero' : smoothedProgress < 0.25 ? 'high' : 'mid';
+    const notificationLabel = notificationCount === 0 ? '0 (Muted ✓)' : String(notificationCount);
+    const pillColors = {
+      high: { bg: 'rgba(229, 56, 58, 0.12)', border: 'rgba(229, 56, 58, 0.28)', count: 'var(--chaos-red)' },
+      mid: { bg: 'rgba(255, 199, 44, 0.16)', border: 'rgba(255, 199, 44, 0.4)', count: '#b8860b' },
+      zero: { bg: 'rgba(0, 191, 255, 0.12)', border: 'rgba(0, 191, 255, 0.35)', count: 'var(--blue)' },
+    }[notifStage];
+    const notifPillStyle = `background:${pillColors.bg}; border:1px solid ${pillColors.border}; transition:background 0.4s var(--ease-standard), border-color 0.4s var(--ease-standard);`;
+    const notifCountStyle = `color:${pillColors.count}; transition:color 0.4s var(--ease-standard);`;
+
+    // Cube: tumble settles into a resting orientation as progress -> 1;
+    // dims and slows into a "sleep" breathing state after 5s idle; drag and
+    // cursor-parallax both nudge it, per the brief's "never static, responds
+    // to cursor / drag" idle-behavior spec.
+    const settle = progress;
+    const calm = cubeSleeping ? 0.15 : 1;
+    const wobbleAmp = ((1 - settle) * 50 + 6) * calm;
+    const parallaxAmt = (dragging || cubeSleeping) ? 0 : 6;
+    const rotX = -20 + Math.sin(tumbleT * 0.6) * wobbleAmp * 0.5 + dragOffsetY + (-pointerNY * parallaxAmt);
+    const rotY = 35 + tumbleT * 22 * (1 - settle * 0.85) * calm + Math.cos(tumbleT * 0.4) * wobbleAmp + dragOffsetX + (pointerNX * parallaxAmt);
+    const sleepScale = cubeSleeping ? 0.94 + Math.sin(tumbleT * 1.5) * 0.03 : 1;
+    const cubeInnerStyle = `width:140px; height:140px; position:relative; transform-style:preserve-3d; transform:rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${sleepScale}); transition:transform 0.05s linear;`;
+    const cubeStageStyle = `width:100%; height:100%; display:flex; align-items:center; justify-content:center; perspective:900px; cursor:${dragging ? 'grabbing' : 'grab'}; opacity:${cubeSleeping ? 0.55 : 1}; transition:opacity 0.6s var(--ease-standard); touch-action:none;`;
+    const autoReplyText = this.AUTO_REPLIES[autoReplyIndex];
+    const copyLabel = autoReplyCopied ? 'Copied ✓' : 'Copy';
+    const faceBase = 'position:absolute; width:140px; height:140px; border:2px solid rgba(255,255,255,0.65); border-radius:16px; box-shadow: inset 0 0 26px rgba(0,0,0,0.18);';
+    const cubeFaceFrontStyle = `${faceBase} background:var(--blue); transform:rotateY(0deg) translateZ(70px);`;
+    const cubeFaceBackStyle = `${faceBase} background:var(--pink-deep); transform:rotateY(180deg) translateZ(70px);`;
+    const cubeFaceRightStyle = `${faceBase} background:var(--accent); transform:rotateY(90deg) translateZ(70px);`;
+    const cubeFaceLeftStyle = `${faceBase} background:var(--warm-sand); transform:rotateY(-90deg) translateZ(70px);`;
+    const cubeFaceTopStyle = `${faceBase} background:var(--sunset-orange); transform:rotateX(90deg) translateZ(70px);`;
+    const cubeFaceBottomStyle = `${faceBase} background:var(--muted-green); transform:rotateX(-90deg) translateZ(70px);`;
+
+    const cubeWrapStyle = activated
+      ? `position:fixed; bottom:clamp(1.5rem, 5vh, 3rem); right:clamp(1.5rem, 5vw, 3rem); width:clamp(70px, 10vw, 100px); height:clamp(70px, 10vw, 100px); z-index:100; pointer-events:auto; animation:floatAssistant 4s ease-in-out infinite; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.15)); transition:transform 0.6s var(--ease-out-expo), width 0.6s var(--ease-out-expo), height 0.6s var(--ease-out-expo);`
+      : `width:100%; height:100%; transition:transform 0.6s var(--ease-out-expo), width 0.6s var(--ease-out-expo), height 0.6s var(--ease-out-expo);`;
+
+    const activatedStyle = `min-height:50vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; text-align:center; padding:2rem; opacity:${activated ? 1 : 0}; transform:translateY(${activated ? 0 : 24}px); transition:opacity 0.6s var(--ease-standard), transform 0.6s var(--ease-standard);`;
+
+    const mkReveal = (v) => `opacity:${v ? 1 : 0}; transform:translateY(${v ? 0 : 40}px); transition:opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);`;
+    const revealStyle = {
+      postcard: mkReveal(reveal.postcard),
+      metrics: mkReveal(reveal.metrics),
+      community: mkReveal(reveal.community),
+      timeline: mkReveal(reveal.timeline),
+      playlist: mkReveal(reveal.playlist),
+      tickets: mkReveal(reveal.tickets),
+    };
+
+    const statsToastStyle = `position:fixed; top:2rem; left:50%; background:rgba(246,244,241,0.95); backdrop-filter:blur(8px); border:2px solid var(--blue); padding:1.25rem 1.75rem; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.15); z-index:1000; pointer-events:none; opacity:${showStats ? 1 : 0}; transform:translate(-50%, ${showStats ? '0px' : '-20px'}); transition:opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);`;
+
+    return {
+      trackRef: this.trackRef,
+      bootRemoved,
+      notBootRemoved: !bootRemoved,
+      bootWrapStyle, bootWaveStyle, bootLines,
+      chaosVisible, chaosLayerStyle,
+      boatWrapStyle, busWrapStyle,
+      shareConfirmed,
+      handleShare: this.handleShare,
+      onActivateClick: this.onActivateClick,
+      notifPillStyle, notifCountStyle, notificationLabel,
+      cubeWrapStyle, cubeInnerStyle, cubeStageStyle,
+      cubeStageRef: this.cubeStageRef,
+      onCubePointerDown: this.onCubePointerDown,
+      onCubePointerMove: this.onCubePointerMove,
+      onCubePointerUp: this.onCubePointerUp,
+      cubeFaceFrontStyle, cubeFaceBackStyle, cubeFaceRightStyle, cubeFaceLeftStyle, cubeFaceTopStyle, cubeFaceBottomStyle,
+      cubeSleeping,
+      showAutoReplyModal, autoReplyText, copyLabel,
+      shuffleAutoReply: this.shuffleAutoReply,
+      copyAutoReply: this.copyAutoReply,
+      closeAutoReplyModal: this.closeAutoReplyModal,
+      activated,
+      activatedStyle,
+      refPostcard: this.refPostcard,
+      refMetrics: this.refMetrics,
+      refCommunity: this.refCommunity,
+      refTimeline: this.refTimeline,
+      refPlaylist: this.refPlaylist,
+      refTickets: this.refTickets,
+      revealStyle,
+      statsToastStyle,
+    };
+  }
+}
+</script>
+</body>
+</html>

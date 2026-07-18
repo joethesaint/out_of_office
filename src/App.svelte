@@ -177,16 +177,7 @@
   // still slammed, danfo yellow through the mid-range taper, brand blue once
   // muted. Mirrors the mainland (red/yellow) -> island (blue) journey.
   $: notifStage = notificationCount === 0 ? "zero" : smoothedProgress < 0.25 ? "high" : "mid";
-
-  let stackEl;
-  function handlePointerMove(e) {
-    if (!stackEl) return;
-    stackEl.style.setProperty('--cx', `${e.clientX}px`);
-    stackEl.style.setProperty('--cy', `${e.clientY}px`);
-  }
 </script>
-
-<svelte:window on:pointermove={handlePointerMove} />
 
 <BootSequence />
 
@@ -246,7 +237,7 @@
                 </svg>
                 Auto-reply for real life</span
               >
-              <div class="stack" bind:this={stackEl}>
+              <div class="stack">
                 <span class="word">OUT</span>
                 <span class="of">of</span>
                 <span class="word">OFFICE</span>
@@ -344,9 +335,9 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.05;
-    mix-blend-mode: multiply;
+    opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    will-change: transform;
   }
 
   .frame {
@@ -478,36 +469,13 @@
     font-family: var(--wild);
     font-weight: normal;
     font-size: clamp(3.2rem, 14vw, 5.4rem);
+    color: var(--blue);
     letter-spacing: 0.02em;
     /* Hallmark typography.md: all-caps display heads need line-height >= 1.0
        (recommended 1.02-1.08) — below that, cap-tops on the wrapped second
        line collide with the line above since there are no descenders to
        cushion the gap. */
     line-height: 1.04;
-
-    /* Glossy glass text with masked mouse spotlight */
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.7);
-
-    /* Layer 1: The mouse spotlight (fixed to viewport, masked by text)
-       Layer 2: A sharp diagonal shiny gloss reflection
-       Layer 3: The base tinted glass color */
-    background: 
-      radial-gradient(circle 120px at var(--cx, -500px) var(--cy, -500px), rgba(0, 191, 255, 0.95), transparent),
-      linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.4) 28%, rgba(255, 255, 255, 0.8) 32%, transparent 40%),
-      rgba(0, 191, 255, 0.1);
-    background-attachment: fixed, scroll, scroll;
-    -webkit-background-clip: text;
-    background-clip: text;
-
-    /* Extrusion depth */
-    text-shadow: 
-      1px 1px 0px rgba(0, 191, 255, 0.25),
-      2px 2px 0px rgba(0, 191, 255, 0.25),
-      3px 3px 0px rgba(0, 191, 255, 0.2),
-      4px 4px 0px rgba(0, 191, 255, 0.1),
-      5px 5px 12px rgba(0, 191, 255, 0.4);
   }
   /* "of" breaks from the wordmark's Back Wild/blue pairing into Permanent
      Marker on a danfo-yellow highlight — a hand-scrawled connector taped

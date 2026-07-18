@@ -6,7 +6,11 @@
 </script>
 
 <section class="postcard-section">
-  <p class="eyebrow" class:visible><MorphText text="Wish you were here" /></p>
+  <div class="text-content">
+    <p class="eyebrow" class:visible><MorphText text="Wish you were here" /></p>
+    <p class="caption" class:visible>A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
+  </div>
+
   <figure class="postcard" class:visible>
     <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
     <span class="stamp">
@@ -17,16 +21,34 @@
       </svg>
     </span>
   </figure>
-  <p class="caption" class:visible>A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
 </section>
 
 <style>
   .postcard-section {
-    max-width: 720px;
+    max-width: 900px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
   }
+  
+  @media (min-width: 768px) {
+    .postcard-section {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 4rem;
+    }
+    .text-content {
+      flex: 1 1 40%;
+    }
+    .postcard {
+      flex: 1 1 60%;
+      margin: 0;
+    }
+  }
+
   .eyebrow,
   .postcard,
   .caption {
@@ -42,9 +64,9 @@
   .caption.visible { transition-delay: 220ms; }
 
   .eyebrow {
-    margin: 0 0 1.5rem;
+    margin: 0 0 1rem;
     font-family: var(--marker);
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-size: clamp(1.4rem, 3.5vw, 1.8rem);
     color: var(--pink-deep);
     transform: translateY(16px);
   }
@@ -86,9 +108,10 @@
   }
 
   .caption {
-    margin: 1.5rem 0 0;
+    margin: 0;
     font-family: var(--sans);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
     color: #6b6b6b;
     transform: translateY(16px);
   }

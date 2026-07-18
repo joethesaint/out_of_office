@@ -3,41 +3,46 @@
 
   export let visible = false;
 
-  const TRACKS = [
-    { title: 'Salt Air', artist: 'Late Bloom', length: '3:12' },
-    { title: 'Slow Tide', artist: 'Nightswim', length: '4:01' },
-    { title: 'Soft Static', artist: 'Coastline Radio', length: '2:47' },
-    { title: 'No Signal', artist: 'Harmattan', length: '3:35' },
-    { title: 'Soul Battery', artist: 'Blue Lagos', length: '3:58' },
-  ];
 </script>
 
 <section class="playlist">
-  <p class="eyebrow"><MorphText text="The mood" boost={1.15} /></p>
-  <h2 class="heading">Out of Office, the mixtape</h2>
-  <p class="body">Five tracks for disconnecting. Put the phone face down.</p>
+  <div class="text-content">
+    <p class="eyebrow"><MorphText text="The mood" boost={1.15} /></p>
+    <h2 class="heading">Out of Office, the mixtape</h2>
+    <p class="body">Five tracks for disconnecting. Put the phone face down.</p>
+  </div>
 
-  <ol class="tracks">
-    {#each TRACKS as t, i}
-      <li class="track" class:visible style="--i: {i};">
-        <span class="index">{String(i + 1).padStart(2, '0')}</span>
-        <span class="names">
-          <span class="title">{t.title}</span>
-          <span class="artist">{t.artist}</span>
-        </span>
-        <span class="length">{t.length}</span>
-      </li>
-    {/each}
-  </ol>
+  <div class="embed-wrapper" class:visible>
+    <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5uJnnaFGzzaBcunJz6HA0h?utm_source=generator&theme=0&si=bcca622a34564cf1" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  </div>
 </section>
 
 <style>
   .playlist {
-    max-width: 560px;
+    max-width: 960px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
   }
+  
+  @media (min-width: 768px) {
+    .playlist {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4rem;
+    }
+    .text-content {
+      flex: 1 1 40%;
+    }
+    .embed-wrapper {
+      flex: 1 1 60%;
+      width: 100%;
+    }
+  }
+
   .eyebrow {
     margin: 0 0 0.5rem;
     font-family: var(--sans);
@@ -48,74 +53,30 @@
     color: var(--blue);
   }
   .heading {
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.75rem;
     font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.2rem);
     color: var(--ink);
+    line-height: 1.15;
   }
   .body {
-    margin: 0 0 2.5rem;
+    margin: 0;
     font-family: var(--sans);
     color: var(--muted);
+    line-height: 1.6;
   }
 
-  .tracks {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    text-align: left;
-    border-radius: 16px;
-    background: var(--card-surface);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-  }
-  .track {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid var(--border-soft);
+  .embed-wrapper {
     opacity: 0;
     transform: translateY(14px);
-    transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
-    transition-delay: calc(var(--i, 0) * 70ms);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+    transition-delay: 200ms;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
   }
-  .track.visible {
+  .embed-wrapper.visible {
     opacity: 1;
     transform: translateY(0);
-  }
-  .track:last-child {
-    border-bottom: none;
-  }
-  .index {
-    font-family: var(--bungee);
-    font-size: 0.7rem;
-    color: var(--pink-deep);
-    flex: none;
-    width: 1.6rem;
-  }
-  .names {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-  .title {
-    font-family: var(--sans);
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: var(--ink);
-  }
-  .artist {
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-  .length {
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    color: var(--muted);
-    flex: none;
   }
 </style>

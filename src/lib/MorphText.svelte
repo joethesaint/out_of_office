@@ -10,15 +10,15 @@
   $: p = Math.max(0, Math.min(1, $pageProgress * boost));
 </script>
 
-<span class="morph-text" style="--p: {p}">
-  <span class="mt-corporate" aria-hidden="true">{text}</span>
-  <span class="mt-hand" aria-hidden="true">{text}</span>
+<span class="morph-text">
+  <span class="mt-corporate" aria-hidden="true" style="clip-path: polygon({p * 100}% 0, 100% 0, 100% 100%, {p * 100}% 100%);">{text}</span>
+  <span class="mt-hand" aria-hidden="true" style="clip-path: polygon(0 0, {p * 100}% 0, {p * 100}% 100%, 0 100%);">{text}</span>
   <span class="mt-sr-only">{text}</span>
 </span>
 
 <style>
   /* Corporate (grotesk, tracked-out caps) crossfades into handwritten
-     (marker script) as --p climbs from 0 to 1 — a continuous scroll-tied
+     (marker script) as p climbs from 0 to 1 — a continuous scroll-tied
      morph rather than a fixed per-element font assignment. Both states
      occupy the same grid cell so there's no layout jump mid-fade. */
   .morph-text {
@@ -28,15 +28,13 @@
   .mt-corporate,
   .mt-hand {
     grid-area: 1 / 1;
-    transition: opacity 0.25s linear;
+    will-change: clip-path;
     white-space: nowrap;
   }
   .mt-corporate {
-    opacity: calc(1 - var(--p));
     text-transform: uppercase;
   }
   .mt-hand {
-    opacity: var(--p);
     font-family: var(--marker);
     text-transform: none;
     letter-spacing: 0.02em;

@@ -14,18 +14,20 @@
 </script>
 
 <section class="community">
-  <p class="eyebrow"><MorphText text="Community" /></p>
-  <h2 class="heading">Leaving yellow Lagos, entering blue Lagos.</h2>
+  <div class="text-content">
+    <p class="eyebrow"><MorphText text="Community" /></p>
+    <h2 class="heading">Leaving yellow Lagos, entering blue Lagos.</h2>
 
-  <div class="manifesto" class:visible>
-    <p>For the young and the working, the ones done with NYSC and starting life. This is a breath away from the Lagos palava and wahala.</p>
-    <p>For the transplants seeing Lagos for the beauty that it is: the arts and paintings on the beach, the creators, the DJs, the engineers. The free people. The Lagos spirits.</p>
-    <p>We gather for the silent reading and quiet musings. The serenity, the blue, the ocean. The yogi, the bonfire, the peaceful.</p>
-  </div>
+    <div class="manifesto" class:visible>
+      <p>For the young and the working, the ones done with NYSC and starting life. It is also for those who want to take a break from the Lagos palava and wahala.</p>
+      <p>For the ones who came to Lagos from other states, seeing Lagos for the beauty that it is: the arts and the paintings on the beach, the artists, the creators, the DJs, the engineers. The free people, the Lagos spirits.</p>
+      <p>We gather for the silent reading and quiet musings, the serenity, the blue and the ocean. The yogi, the bonfire, the peaceful.</p>
+    </div>
 
-  <div class="cta-row" class:visible>
-    <button class="btn-join">Join the community</button>
-    <button class="btn-volunteer">Volunteer & Sponsor</button>
+    <div class="cta-row" class:visible>
+      <button class="btn-join">Join the community</button>
+      <button class="btn-volunteer">Volunteer & Sponsor</button>
+    </div>
   </div>
 
   <div class="wall">
@@ -40,11 +42,30 @@
 
 <style>
   .community {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
   }
+  
+  @media (min-width: 900px) {
+    .community {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6rem;
+    }
+    .text-content {
+      flex: 1 1 50%;
+    }
+    .wall {
+      flex: 1 1 50%;
+      justify-content: flex-end;
+    }
+  }
+
   .eyebrow {
     margin: 0 0 0.5rem;
     font-family: var(--sans);
@@ -55,23 +76,24 @@
     color: var(--pink-deep);
   }
   .heading {
-    margin: 0 0 3rem;
+    margin: 0 0 2.5rem;
     font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.4rem);
     color: var(--ink);
+    line-height: 1.15;
   }
 
   .wall {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: clamp(1.25rem, 4vw, 2.5rem);
+    gap: clamp(1rem, 3vw, 2rem);
   }
 
   .polaroid {
     margin: 0;
-    width: clamp(160px, 22vw, 220px);
+    width: clamp(150px, 20vw, 220px);
     background: var(--card-surface);
     padding: 0.6rem 0.6rem 1.1rem;
     border-radius: 4px;
@@ -88,6 +110,7 @@
   .polaroid.visible:hover {
     transition-delay: 0s;
     transform: rotate(0deg) scale(1.03);
+    z-index: 10;
   }
   .polaroid img {
     display: block;
@@ -101,13 +124,13 @@
     font-family: var(--marker);
     font-size: 1rem;
     color: var(--ink);
+    text-align: center;
   }
 
   .manifesto {
-    max-width: 600px;
-    margin: 0 auto 2.5rem;
+    margin: 0 0 2.5rem;
     font-family: var(--sans);
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
     line-height: 1.6;
     color: var(--ink);
     opacity: 0;
@@ -124,9 +147,8 @@
 
   .cta-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    justify-content: center;
-    margin-bottom: 4rem;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.8s var(--ease-out-expo) 200ms, transform 0.8s var(--ease-out-expo) 200ms;

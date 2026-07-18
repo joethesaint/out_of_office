@@ -30,8 +30,10 @@
 </script>
 
 <section class="timeline">
-  <p class="eyebrow"><MorphText text="Memory timeline" /></p>
-  <h2 class="heading">Every escape gets a stamp.</h2>
+  <div class="text-content">
+    <p class="eyebrow"><MorphText text="Memory timeline" /></p>
+    <h2 class="heading">Every escape gets a stamp.</h2>
+  </div>
 
   <ol class="list">
     {#each MEMORIES as m, i}
@@ -52,10 +54,31 @@
 
 <style>
   .timeline {
-    max-width: 640px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
   }
+  
+  @media (min-width: 768px) {
+    .timeline {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 5rem;
+    }
+    .text-content {
+      flex: 1 1 40%;
+      position: sticky;
+      top: 8rem;
+    }
+    .list {
+      flex: 1 1 60%;
+    }
+  }
+
   .eyebrow {
     margin: 0 0 0.5rem;
     font-family: var(--sans);
@@ -64,15 +87,14 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--accent);
-    text-align: center;
   }
   .heading {
-    margin: 0 0 3rem;
+    margin: 0 0 1rem;
     font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.4rem);
     color: var(--ink);
-    text-align: center;
+    line-height: 1.15;
   }
 
   .list {

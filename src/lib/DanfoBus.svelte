@@ -17,7 +17,7 @@
 </script>
 
 <div class="bus-track" aria-hidden="true">
-  <div class="bus-travel" style="left: {left}%; opacity: {opacity};">
+  <div class="bus-travel" style="transform: translateX({left}vw); opacity: {opacity};">
     <div class="bus-rig">
       <svg viewBox="0 0 150 90" class="bus-svg">
         <!-- danfo: Lagos yellow minibus, VW-van silhouette with roof

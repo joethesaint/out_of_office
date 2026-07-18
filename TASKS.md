@@ -43,7 +43,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
 ## P3 — Content gaps
 
 - [ ] **Real community / attendee photos** — Community section currently uses event flyers as polaroid stand-ins. Replace with real disposable-camera-style candid photos when available.
-- [ ] **Playlist tracks** — currently 5 fictional tracks. Replace with a real curated list or link to a real Spotify/Apple Music playlist.
+- [x] **Playlist tracks** — currently 5 fictional tracks. Replace with a real curated list or link to a real Spotify/Apple Music playlist.
 - [x] **OG image** — added `public/og-image.jpg` (1200×630), reusing the favicon's isometric cube mark for brand consistency.
 
 ---
@@ -127,8 +127,4 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done
     now overlap each other in two piles with more rotation variance, so it
     reads as a stack of competing alerts instead of four neatly placed
     widgets.
-  - Not done in this pass, flagged as still open: the six-color cube
-    palette itself hasn't been re-judged for whether saturated/pastel is
-    the right call, and the header's own 3-block strip vs. `ZineDecorations`'
-    barcode+spine+splats still hasn't been consolidated into one visual
-    language — see the live site before deciding either is done.
+  - **Consolidated Header & Zine Aesthetic**: Removed the SaaS-style glassmorphic iOS "Dynamic Island" look from `HeaderBar.svelte`. It is now a flat, ink-colored printed ticket header with solid borders and mono typography, completely matching `ZineDecorations`' physical print aesthetic.

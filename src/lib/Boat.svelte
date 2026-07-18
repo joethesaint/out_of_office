@@ -18,7 +18,7 @@
 </script>
 
 <div class="boat-track" aria-hidden="true">
-  <div class="boat-travel" style="left: {left}%; opacity: {opacity};">
+  <div class="boat-travel" style="transform: translateX({left}vw); opacity: {opacity};">
     <div class="boat-rig">
       <svg viewBox="0 0 160 90" class="boat-svg">
         <!-- Water wake / ripples -->

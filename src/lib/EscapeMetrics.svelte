@@ -12,12 +12,14 @@
 </script>
 
 <section class="metrics">
-  <p class="eyebrow" class:visible><MorphText text="The auto reply" /></p>
-  <h2 class="heading" class:visible>I am currently unavailable.</h2>
-  <p class="body" class:visible>
-    I'm painting. Playing board games. Watching sunsets. Making memories.
-    I will return when my soul battery is charged.
-  </p>
+  <div class="text-content">
+    <p class="eyebrow" class:visible><MorphText text="The auto reply" /></p>
+    <h2 class="heading" class:visible>I am currently unavailable.</h2>
+    <p class="body" class:visible>
+      I'm painting. Playing board games. Watching sunsets. Making memories.
+      I will return when my soul battery is charged.
+    </p>
+  </div>
 
   <div class="grid">
     {#each STATS as stat, i}
@@ -31,11 +33,29 @@
 
 <style>
   .metrics {
-    max-width: 640px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 6rem) 1.5rem;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
   }
+  
+  @media (min-width: 800px) {
+    .metrics {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 5rem;
+    }
+    .text-content {
+      flex: 1 1 45%;
+    }
+    .grid {
+      flex: 1 1 55%;
+    }
+  }
+
   .eyebrow,
   .heading,
   .body,
@@ -70,12 +90,13 @@
     font-weight: 700;
     font-size: clamp(1.8rem, 5vw, 2.6rem);
     color: var(--ink);
+    line-height: 1.1;
   }
   .body {
-    margin: 0 auto 2.5rem;
+    margin: 0;
     max-width: 34ch;
     font-family: var(--sans);
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #5a5a5a;
     line-height: 1.6;
   }
@@ -84,12 +105,13 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+    width: 100%;
   }
   .tile {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 1.25rem;
     border-radius: 16px;
     background: var(--card-surface);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
@@ -97,7 +119,8 @@
   .value {
     font-family: var(--display);
     font-weight: 700;
-    font-size: clamp(1.8rem, 6vw, 2.4rem);
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    line-height: 1;
   }
   .label {
     font-family: var(--sans);

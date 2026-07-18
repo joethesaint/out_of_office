@@ -147,6 +147,7 @@
     inset: 0;
     pointer-events: none;
     z-index: 100;
+    will-change: opacity, filter, transform;
     transition: opacity 0.1s var(--ease-standard), transform 0.1s var(--ease-standard), filter 0.1s var(--ease-standard);
     overflow: visible;
   }
