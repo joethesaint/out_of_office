@@ -223,8 +223,13 @@
                 <svg class="paint-splat" viewBox="0 0 60 50" aria-hidden="true">
                   <path
                     fill="url(#splatGrad)"
-                    d="M30 4c4 0 5 6 9 5s8-3 10 1-3 6-1 10 6 6 2 10-8 1-10 5-4 8-9 6-4-7-9-7-9 4-12-1 2-7-1-11-8-4-5-9 7-3 9-7 2-2 4-4 3-1 5-2z"
+                    d="M18 6c9 0 15 5 19 5s9-4 12 0-2 8 1 12 8 5 5 10-9 3-12 7-6 8-13 5-3-9-9-9-11 3-14-3 3-8 0-12-7-5-3-10 9-2 11-5 1-1 3-0z"
                   />
+                  <path
+                    fill="url(#splatGrad)"
+                    d="M14 24q4 11-1 17q-5 6-9 0q-3-6 2-15q3-5 8-2z"
+                  />
+                  <circle cx="46" cy="10" r="3.5" fill="var(--pink-deep)" />
                   <defs>
                     <linearGradient id="splatGrad" x1="0" y1="0" x2="1" y2="1">
                       <stop offset="0" stop-color="var(--pink)" />
@@ -235,7 +240,8 @@
                 Auto-reply for real life</span
               >
               <div class="stack">
-                <span class="word">OUT OF</span>
+                <span class="word">OUT</span>
+                <span class="of">of</span>
                 <span class="word">OFFICE</span>
               </div>
               <div class="subhead">
@@ -466,6 +472,33 @@
        was letting the two words crowd each other. */
     line-height: 1.04;
   }
+  /* "of" breaks from the wordmark's Back Wild/blue pairing into Permanent
+     Marker on a danfo-yellow highlight — a hand-scrawled connector taped
+     between two big painted words, the way a route detail gets marker'd
+     onto a danfo alongside the painted destination name. */
+  .stack .of {
+    align-self: flex-start;
+    font-family: var(--marker);
+    font-weight: normal;
+    font-size: clamp(1.3rem, 4.2vw, 1.9rem);
+    color: var(--ink);
+    margin: 0.15em 0 0.05em 0.12em;
+    transform: rotate(-6deg);
+    position: relative;
+    z-index: 1;
+  }
+  .stack .of::after {
+    content: "";
+    position: absolute;
+    left: -8%;
+    right: -8%;
+    bottom: 0.08em;
+    height: 0.34em;
+    background: var(--chaos-yellow);
+    border-radius: 2px;
+    z-index: -1;
+    opacity: 0.9;
+  }
 
   .subhead {
     display: flex;
@@ -502,6 +535,7 @@
   }
 
   .notification-pill {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -513,15 +547,30 @@
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid rgba(229, 56, 58, 0.32);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    padding: 0.35rem 0.75rem;
+    padding: 0.35rem 0.75rem 0.35rem 0.9rem;
     border-radius: 999px;
     font-family: var(--sans);
     font-size: clamp(0.65rem, 1.8vw, 0.75rem);
     width: fit-content;
+    overflow: hidden;
     transition: background var(--dur-base) var(--ease-standard),
                 border-color var(--dur-base) var(--ease-standard),
                 transform var(--dur-base) var(--ease-standard);
     pointer-events: none;
+  }
+  /* Danfo zone: while the cube is still scrambled (stage "high"), the pill
+     carries a yellow/black hazard-stripe edge instead of a flat red tint —
+     the one moment on the page that's allowed to look like mainland chaos. */
+  .notification-pill[data-stage="high"]::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 6px;
+    background: repeating-linear-gradient(
+      135deg,
+      var(--ink) 0 4px,
+      var(--chaos-yellow) 4px 8px
+    );
   }
   .notification-pill[data-stage="mid"] {
     border-color: rgba(255, 199, 44, 0.45);
@@ -641,6 +690,7 @@
   }
 
   .activated {
+    position: relative;
     min-height: 50vh;
     display: flex;
     flex-direction: column;
@@ -649,9 +699,33 @@
     gap: 0.75rem;
     text-align: center;
     padding: 2rem;
+    overflow: hidden;
     opacity: 0;
     transform: translateY(24px);
     transition: opacity 0.6s var(--ease-standard), transform 0.6s var(--ease-standard);
+    /* Sea zone: this is the "you've found calm" moment, so blue gets to read
+       as water here instead of as a flat UI accent — a soft foam wash from
+       the top and a horizon line, not a saturated block, so the existing
+       ink/blue/pink-deep text on top stays readable. */
+    background:
+      radial-gradient(140% 65% at 50% -10%, rgba(0, 191, 255, 0.16), transparent 60%),
+      linear-gradient(180deg, transparent 0%, rgba(0, 191, 255, 0.05) 60%, rgba(0, 191, 255, 0.12) 100%);
+  }
+  .activated::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 28%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 191, 255, 0.5), transparent);
+    box-shadow: 0 22px 0 -1px rgba(0, 191, 255, 0.22),
+                0 46px 0 -1px rgba(0, 191, 255, 0.12);
+    pointer-events: none;
+  }
+  .activated > * {
+    position: relative;
+    z-index: 1;
   }
   .activated.visible {
     opacity: 1;
