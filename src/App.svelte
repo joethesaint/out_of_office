@@ -19,7 +19,13 @@
   import ChaosLayer from "./lib/ChaosLayer.svelte";
   import StressMeter from "./lib/StressMeter.svelte";
   import AmbientSound from "./lib/AmbientSound.svelte";
+  import AboutEvent from "./lib/AboutEvent.svelte";
   import { pageProgress } from "./lib/scrollProgress.js";
+
+  let currentRoute = typeof window !== 'undefined' ? window.location.hash || '#/' : '#/';
+  function onHashChange() {
+    currentRoute = window.location.hash || '#/';
+  }
 
   let scrollTrack;
   let progress = 0;
@@ -178,6 +184,12 @@
   // muted. Mirrors the mainland (red/yellow) -> island (blue) journey.
   $: notifStage = notificationCount === 0 ? "zero" : smoothedProgress < 0.25 ? "high" : "mid";
 </script>
+
+<svelte:window on:hashchange={onHashChange} />
+
+{#if currentRoute === '#/about'}
+  <AboutEvent />
+{/if}
 
 <BootSequence />
 

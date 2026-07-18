@@ -47,13 +47,13 @@
     </button>
   </div>
 
-  <div class="block block-logo">
+  <a href="#/about" class="block block-logo" title="What We Are">
     <span class="status-dot" aria-hidden="true"></span>
     <div class="wordmark-col">
       <span class="wordmark">ooo</span>
       <span class="meta">Lagos</span>
     </div>
-  </div>
+  </a>
 </header>
 
 <style>
@@ -227,10 +227,16 @@
 
   .block-logo {
     background: transparent;
-    flex: 0 0 auto;
     flex-direction: row;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.6em;
+    flex: 0 0 auto;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .block-logo:hover {
+    opacity: 0.7;
   }
   .status-dot {
     width: clamp(8px, 1.6vw, 10px);
