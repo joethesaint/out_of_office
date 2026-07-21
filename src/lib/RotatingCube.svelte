@@ -8,6 +8,14 @@
   // (null) for the autonomous scramble/rest/solve/rest demo loop instead.
   export let progress = null;
 
+  // When true, independent of `progress`/scroll: every so often, at a
+  // random interval, the cube gives itself a quick scramble then solves
+  // it back on its own — a little ambient "it's alive" flourish. Meant
+  // for a cube that just sits there otherwise (e.g. the docked companion),
+  // not the scroll-pinned hero cube, whose scrambled/solved state is
+  // supposed to map directly to scroll position.
+  export let randomSolve = false;
+
   let canvas;
   let container;
 
@@ -513,16 +521,26 @@
     const PAUSE_MS = 320;
     const REST_MS = 1400; // pause once fully scrambled / fully solved (autonomous mode only)
     const SCRAMBLE_COUNT = 14;
+    const RANDOM_SHOW_MOVES = 8; // shorter flourish than a full autonomous-mode cycle
 
     // autonomous-mode-only state: scramble for SCRAMBLE_COUNT twists, then
-    // replay them inverted to solve, on a timer, forever
+    // replay them inverted to solve, on a timer, forever. Also reused by
+    // randomSolve's scramble-then-solve show (see queueNextTwist) — the two
+    // never run at once, since randomSolve only fires on cubes that are
+    // otherwise sitting still (progress fixed, or autonomous mode itself).
     let phase = 'scramble';
     let history = [];
+
+    // randomSolve-only state: true for the duration of one scramble+solve
+    // flourish, independent of scrollMode/progress.
+    let randomShowActive = false;
+    let randomSolveTimer;
 
     // 0 = solved (fully calm brand colors), 1 = fully scrambled (fully
     // chaos-tinted) — shared by both modes, since appliedCount/history.length
     // already carry the same 0..SCRAMBLE_COUNT meaning in each.
     function currentChaosT() {
+      if (randomShowActive) return history.length / RANDOM_SHOW_MOVES;
       return (scrollMode ? appliedCount : history.length) / SCRAMBLE_COUNT;
     }
     function repaintStickers() {
@@ -590,6 +608,30 @@
     }
 
     function queueNextTwist(now) {
+      if (randomShowActive) {
+        if (phase === 'scramble') {
+          if (history.length >= RANDOM_SHOW_MOVES) {
+            phase = 'solve';
+            nextTwistAt = now + REST_MS;
+            return;
+          }
+          const axis = AXES[(Math.random() * 3) | 0];
+          const layer = ((Math.random() * 3) | 0) - 1;
+          const dir = Math.random() < 0.5 ? 1 : -1;
+          history.push({ axis, layer, dir });
+          beginTwist(now, axis, layer, dir);
+        } else {
+          if (history.length === 0) {
+            randomShowActive = false;
+            phase = 'scramble';
+            scheduleRandomSolve();
+            return;
+          }
+          const move = history.pop();
+          beginTwist(now, move.axis, move.layer, -move.dir);
+        }
+        return;
+      }
       if (scrollMode) {
         const target = Math.max(0, Math.min(SCRAMBLE_COUNT, Math.round((1 - liveProgress) * SCRAMBLE_COUNT)));
         if (target === appliedCount) return;
@@ -668,7 +710,10 @@
           c.mesh.quaternion.normalize();
           c.trail.forEach((ghost) => { ghost.mesh.visible = false; });
         }
-        if (scrollMode) {
+        if (randomShowActive) {
+          twist = null;
+          nextTwistAt = now + PAUSE_MS;
+        } else if (scrollMode) {
           appliedCount += twist.appliedDelta;
           twist = null;
           nextTwistAt = now; // no rest pause — chain straight into the next catch-up move
@@ -678,6 +723,25 @@
         }
         repaintStickers();
       }
+    }
+
+    // randomSolve: fire a scramble-then-solve show at a random interval
+    // (15-45s), skipping the wait entirely if the cube is mid-interaction
+    // (dragging or already twisting) and just trying again shortly after.
+    function scheduleRandomSolve() {
+      if (!randomSolve) return;
+      clearTimeout(randomSolveTimer);
+      const delay = 15000 + Math.random() * 30000;
+      randomSolveTimer = setTimeout(() => {
+        if (dragging || twist || randomShowActive) {
+          randomSolveTimer = setTimeout(() => scheduleRandomSolve(), 2000);
+          return;
+        }
+        randomShowActive = true;
+        phase = 'scramble';
+        history = [];
+        nextTwistAt = performance.now();
+      }, delay);
     }
 
     let frameId;
@@ -759,6 +823,8 @@
     }
     document.addEventListener('visibilitychange', handleVisibility);
 
+    scheduleRandomSolve();
+
     onDestroy(() => {
       if (frameId) cancelAnimationFrame(frameId);
       document.removeEventListener('visibilitychange', handleVisibility);
@@ -766,6 +832,7 @@
       clearTimeout(easterEggTimer);
       clearTimeout(sleepTimer);
       clearTimeout(nudgeTimer);
+      clearTimeout(randomSolveTimer);
       ro.disconnect();
       container.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerdown', onPointerDown);

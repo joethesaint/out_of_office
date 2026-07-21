@@ -283,7 +283,7 @@
 
 {#if activated}
   <div class="cube-companion" in:scale={{ duration: 550, start: 0.4, opacity: 0, easing: cubicOut }}>
-    <RotatingCube progress={1} />
+    <RotatingCube progress={1} randomSolve={true} />
   </div>
 {/if}
 
