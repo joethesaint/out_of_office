@@ -53,7 +53,6 @@
     padding: 0.6rem 1.2rem;
     border-radius: 20px;
     cursor: pointer;
-    font-family: var(--sans);
     font-size: 0.9rem;
     transition: background 0.2s ease, transform 0.2s ease;
   }
@@ -90,21 +89,18 @@
     }
   }
   .title {
-    font-family: var(--display);
     font-size: clamp(2.5rem, 6vw, 4rem);
     color: var(--chaos-yellow, #d9a441);
     margin-top: 0;
     margin-bottom: 2rem;
   }
   .manifesto {
-    font-family: var(--sans);
     font-size: 1.2rem;
     line-height: 1.6;
     margin-bottom: 1.5rem;
     color: rgba(230, 230, 220, 0.85);
   }
   .signature {
-    font-family: var(--marker, cursive);
     color: var(--pink-deep, #fc9ce0);
     font-size: 1.5rem;
     margin-top: 2rem;

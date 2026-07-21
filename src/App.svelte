@@ -437,7 +437,6 @@
     right: clamp(0.75rem, 4vw, 1.5rem);
     background: var(--ink);
     color: #fff;
-    font-family: var(--sans);
     font-size: 0.7rem;
     font-weight: 600;
     padding: 0.35rem 0.7rem;
@@ -453,7 +452,6 @@
 
   .eyebrow {
     position: relative;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: clamp(0.6rem, 1.8vw, 0.8rem);
     letter-spacing: 0.1em;
@@ -478,7 +476,6 @@
     line-height: 0.95;
   }
   .stack .word {
-    font-family: var(--wild);
     font-weight: normal;
     font-size: clamp(3.2rem, 14vw, 5.4rem);
     color: var(--blue);
@@ -495,7 +492,6 @@
      onto a danfo alongside the painted destination name. */
   .stack .of {
     align-self: flex-start;
-    font-family: var(--marker);
     font-weight: normal;
     font-size: clamp(1.3rem, 4.2vw, 1.9rem);
     color: var(--ink);
@@ -523,13 +519,11 @@
     gap: 0.6rem;
   }
   .subhead .stamp {
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1rem, 4vw, 1.4rem);
     color: var(--ink);
   }
   .subhead .venue {
-    font-family: var(--sans);
     font-weight: 500;
     font-size: clamp(0.75rem, 3vw, 1rem);
     color: #5a5a5a;
@@ -539,7 +533,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    font-family: var(--sans);
     font-size: clamp(0.7rem, 2vw, 0.9rem);
     color: var(--ink);
   }
@@ -566,7 +559,6 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
     padding: 0.35rem 0.75rem 0.35rem 0.9rem;
     border-radius: 999px;
-    font-family: var(--sans);
     font-size: clamp(0.65rem, 1.8vw, 0.75rem);
     width: fit-content;
     overflow: hidden;
@@ -600,7 +592,6 @@
     font-weight: 500;
   }
   .notif-count {
-    font-family: var(--display);
     font-weight: 700;
     color: var(--chaos-red);
     /* Digit widths vary per-glyph in Fredoka; without tabular-nums the
@@ -619,7 +610,6 @@
     margin-top: clamp(0.4rem, 1.2vh, 0.8rem);
   }
   .activate-cta {
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(0.85rem, 2.4vw, 1.05rem);
     background: var(--blue, #00bfff);
@@ -750,7 +740,6 @@
   }
   .activated-eyebrow {
     margin: 0;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.85rem;
     letter-spacing: 0.18em;
@@ -759,20 +748,17 @@
   }
   .activated-title {
     margin: 0;
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(2rem, 7vw, 3.2rem);
     color: var(--blue);
   }
   .activated-sub {
     margin: 0;
-    font-family: var(--sans);
     color: var(--ink);
   }
   .activated-note {
     margin: 0.75rem 0 0;
     max-width: 32ch;
-    font-family: var(--marker);
     font-size: clamp(0.95rem, 2.4vw, 1.15rem);
     line-height: 1.4;
     color: var(--pink-deep);
@@ -801,7 +787,6 @@
   }
   .stats-title {
     margin: 0 0 0.75rem;
-    font-family: var(--display);
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--blue);
@@ -810,7 +795,6 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    font-family: var(--sans);
     font-size: 0.85rem;
     color: var(--ink);
   }

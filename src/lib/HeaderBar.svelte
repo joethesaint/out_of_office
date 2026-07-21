@@ -65,7 +65,6 @@
     width: 100%;
     margin: 0;
     min-height: clamp(58px, 9.5vh, 76px);
-    font-family: var(--display);
     color: var(--ink);
     background: transparent;
     border-bottom: 2px solid var(--ink);
@@ -108,7 +107,6 @@
     font-size: clamp(0.65rem, 1.6vw, 0.85rem);
     letter-spacing: 0.08em;
     color: var(--muted);
-    font-family: var(--sans);
     font-weight: 700;
   }
   .block-brand .status-val {
@@ -125,7 +123,6 @@
     gap: 0.1em;
   }
   .block-trend .tag {
-    font-family: var(--sans);
     font-weight: 700;
     font-size: clamp(0.45rem, 1.1vw, 0.6rem);
     color: var(--pink-deep);
@@ -137,7 +134,6 @@
     font-weight: 700;
   }
   .block-trend .sub {
-    font-family: var(--sans);
     font-weight: 600;
     font-size: clamp(0.4rem, 1vw, 0.55rem);
     letter-spacing: 0.12em;
@@ -250,14 +246,12 @@
     line-height: 0.9;
   }
   .wordmark {
-    font-family: var(--display);
     font-size: clamp(1.2rem, 3.5vw, 1.8rem);
     font-weight: 700;
     color: var(--ink);
     letter-spacing: -0.04em;
   }
   .meta {
-    font-family: var(--sans);
     font-size: clamp(0.45rem, 1vw, 0.6rem);
     font-weight: 700;
     color: var(--muted);

@@ -45,7 +45,6 @@
 
   .eyebrow {
     margin: 0 0 0.5rem;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.8rem;
     letter-spacing: 0.18em;
@@ -54,7 +53,6 @@
   }
   .heading {
     margin: 0 0 0.75rem;
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.2rem);
     color: var(--ink);
@@ -62,7 +60,6 @@
   }
   .body {
     margin: 0;
-    font-family: var(--sans);
     color: var(--muted);
     line-height: 1.6;
   }

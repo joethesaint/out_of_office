@@ -56,7 +56,6 @@
     text-orientation: mixed;
     transform: translateY(-50%);
     white-space: nowrap;
-    font-family: var(--sans);
     font-size: clamp(0.45rem, 1vw, 0.6rem);
     letter-spacing: 0.15em;
     color: #6b6b6b;
@@ -79,7 +78,6 @@
     height: clamp(15px, 3vh, 25px);
   }
   .barcode .code {
-    font-family: var(--bungee);
     font-size: clamp(0.35rem, 0.8vw, 0.5rem);
     letter-spacing: 0.05em;
   }

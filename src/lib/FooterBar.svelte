@@ -58,7 +58,6 @@
   .lines {
     display: flex;
     flex-direction: column;
-    font-family: var(--display);
     font-weight: 600;
     line-height: 1.05;
   }
@@ -79,12 +78,10 @@
   }
   .meta-lines .place {
     color: var(--accent);
-    font-family: var(--display);
     font-weight: 600;
     font-size: clamp(0.6rem, 1.5vw, 0.8rem);
   }
   .meta-lines .en {
-    font-family: var(--sans);
     font-weight: 500;
     font-size: clamp(0.45rem, 1.1vw, 0.6rem);
     letter-spacing: 0.08em;
@@ -99,7 +96,6 @@
   .fine-print {
     margin: 0;
     text-align: center;
-    font-family: var(--sans);
     font-size: clamp(0.35rem, 0.9vw, 0.5rem);
     letter-spacing: 0.15em;
     text-transform: uppercase;

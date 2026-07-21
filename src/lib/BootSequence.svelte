@@ -80,7 +80,6 @@
   }
   .line {
     margin: 0;
-    font-family: var(--sans);
     font-size: clamp(0.85rem, 3vw, 1.15rem);
     color: #f6f4f1;
     letter-spacing: 0.02em;

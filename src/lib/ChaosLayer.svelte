@@ -161,7 +161,6 @@
     padding: 0.75rem 0.9rem;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.8);
-    font-family: var(--sans);
     animation: floatChaos 4s ease-in-out infinite alternate;
   }
 

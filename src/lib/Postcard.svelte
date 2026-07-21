@@ -11,7 +11,7 @@
     <p class="caption" class:visible>A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
   </div>
 
-  <figure class="postcard" class:visible>
+  <figure class="postcard gamified-float interactive-card" class:visible>
     <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
     <span class="stamp">
       <svg viewBox="0 0 40 40" aria-hidden="true">
@@ -65,7 +65,6 @@
 
   .eyebrow {
     margin: 0 0 1rem;
-    font-family: var(--marker);
     font-size: clamp(1.4rem, 3.5vw, 1.8rem);
     color: var(--pink-deep);
     transform: translateY(16px);
@@ -109,7 +108,6 @@
 
   .caption {
     margin: 0;
-    font-family: var(--sans);
     font-size: 0.95rem;
     line-height: 1.5;
     color: #6b6b6b;

@@ -77,7 +77,6 @@
 
   .eyebrow {
     margin: 0 0 0.5rem;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.8rem;
     letter-spacing: 0.18em;
@@ -86,7 +85,6 @@
   }
   .heading {
     margin: 0 0 0.75rem;
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.8rem, 5vw, 2.6rem);
     color: var(--ink);
@@ -95,7 +93,6 @@
   .body {
     margin: 0;
     max-width: 34ch;
-    font-family: var(--sans);
     font-size: 1.1rem;
     color: #5a5a5a;
     line-height: 1.6;
@@ -117,13 +114,11 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
   }
   .value {
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.8rem, 5vw, 2.4rem);
     line-height: 1;
   }
   .label {
-    font-family: var(--sans);
     font-size: 0.8rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;

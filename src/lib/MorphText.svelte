@@ -35,7 +35,6 @@
     text-transform: uppercase;
   }
   .mt-hand {
-    font-family: var(--marker);
     text-transform: none;
     letter-spacing: 0.02em;
     transform: rotate(-3deg);

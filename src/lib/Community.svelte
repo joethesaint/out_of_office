@@ -68,7 +68,6 @@
 
   .eyebrow {
     margin: 0 0 0.5rem;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.8rem;
     letter-spacing: 0.18em;
@@ -77,7 +76,6 @@
   }
   .heading {
     margin: 0 0 2.5rem;
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.4rem);
     color: var(--ink);
@@ -121,7 +119,6 @@
   }
   .polaroid figcaption {
     margin-top: 0.6rem;
-    font-family: var(--marker);
     font-size: 1rem;
     color: var(--ink);
     text-align: center;
@@ -129,7 +126,6 @@
 
   .manifesto {
     margin: 0 0 2.5rem;
-    font-family: var(--sans);
     font-size: clamp(1rem, 2.5vw, 1.1rem);
     line-height: 1.6;
     color: var(--ink);
@@ -159,7 +155,6 @@
   }
   
   .btn-join {
-    font-family: var(--display);
     font-weight: 700;
     font-size: 1rem;
     background: var(--blue);
@@ -178,7 +173,6 @@
   }
 
   .btn-volunteer {
-    font-family: var(--display);
     font-weight: 600;
     font-size: 1rem;
     background: transparent;

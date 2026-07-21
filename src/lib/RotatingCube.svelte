@@ -938,13 +938,11 @@
     white-space: nowrap;
   }
   .zzz {
-    font-family: var(--display);
     font-weight: 700;
     font-size: 0.75rem;
     color: var(--pink-deep, #fc9ce0);
   }
   .sleep-text {
-    font-family: var(--sans);
     font-size: clamp(0.56rem, 2vw, 0.68rem);
     color: #f6f4f1;
     letter-spacing: 0.04em;
@@ -957,7 +955,6 @@
     transform: translateX(-50%);
     background: var(--ink, #181818);
     color: #f6f4f1;
-    font-family: var(--sans);
     font-size: 0.72rem;
     font-weight: 500;
     white-space: nowrap;
@@ -1026,7 +1023,6 @@
   }
   .modal-eyebrow {
     margin: 0;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.68rem;
     letter-spacing: 0.15em;
@@ -1035,7 +1031,6 @@
   }
   .modal-title {
     margin: 0;
-    font-family: var(--display);
     font-weight: 700;
     font-size: 1.15rem;
     color: var(--blue, #00bfff);
@@ -1048,7 +1043,6 @@
   }
   .reply-text {
     margin: 0;
-    font-family: var(--sans);
     font-style: italic;
     font-size: 0.85rem;
     color: #333;
@@ -1061,7 +1055,6 @@
     margin-top: 0.25rem;
   }
   .action-btn {
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.75rem;
     padding: 0.55rem 0.9rem;

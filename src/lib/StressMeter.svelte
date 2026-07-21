@@ -57,7 +57,6 @@
 
   .meter-label {
     margin: 0;
-    font-family: var(--sans);
     font-weight: 700;
     font-size: 0.62rem;
     letter-spacing: 0.1em;
@@ -92,7 +91,6 @@
 
   .meter-pct {
     margin: 0;
-    font-family: var(--display);
     font-weight: 700;
     font-size: 0.7rem;
     font-variant-numeric: tabular-nums;

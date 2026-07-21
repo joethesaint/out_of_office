@@ -81,7 +81,6 @@
 
   .eyebrow {
     margin: 0 0 0.5rem;
-    font-family: var(--sans);
     font-weight: 600;
     font-size: 0.8rem;
     letter-spacing: 0.18em;
@@ -90,7 +89,6 @@
   }
   .heading {
     margin: 0 0 1rem;
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(1.6rem, 4.5vw, 2.4rem);
     color: var(--ink);
@@ -111,18 +109,25 @@
     display: flex;
     align-items: flex-start;
     gap: 1.25rem;
-    padding: 0 0 0 1.5rem;
+    padding: 0.5rem 1rem 0.5rem 1.5rem;
     margin-left: -2px;
     border-left: 2px solid var(--blue);
     position: relative;
     opacity: 0;
     transform: translateX(-16px);
-    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+    transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo), background 0.4s var(--ease-out-expo);
     transition-delay: calc(var(--i, 0) * 130ms);
+    cursor: pointer;
+    border-radius: 0 16px 16px 0;
   }
   .entry.visible {
     opacity: 1;
     transform: translateX(0);
+  }
+  .entry.visible:hover {
+    background: rgba(0, 191, 255, 0.05);
+    transform: translateX(8px);
+    transition-delay: 0s;
   }
   .entry.pending {
     border-left-color: var(--border-soft-deep);
@@ -147,14 +152,18 @@
     background: transparent;
     transform: rotate(var(--stamp-rotate, -6deg));
     text-align: center;
+    transition: transform 0.4s var(--ease-out-expo), background 0.4s var(--ease-out-expo), color 0.4s var(--ease-out-expo);
+  }
+  .entry.visible:hover .stamp {
+    transform: rotate(var(--stamp-rotate, -6deg)) scale(1.15);
+    background: var(--stamp-color, var(--blue));
+    color: var(--bg);
   }
   .stamp-brand {
-    font-family: var(--bungee);
     font-size: 0.42rem;
     letter-spacing: 0.08em;
   }
   .stamp-num {
-    font-family: var(--bungee);
     font-size: 0.7rem;
     line-height: 1.2;
   }
@@ -169,19 +178,16 @@
     padding-bottom: 0.5rem;
   }
   .title {
-    font-family: var(--serif);
     font-weight: 700;
     font-size: clamp(1.2rem, 3.5vw, 1.5rem);
     color: var(--ink);
   }
   .meta {
-    font-family: var(--sans);
     font-size: 0.85rem;
     color: var(--pink-deep);
     font-weight: 500;
   }
   .note {
-    font-family: var(--sans);
     font-size: 0.9rem;
     color: var(--muted);
     margin-top: 0.15rem;

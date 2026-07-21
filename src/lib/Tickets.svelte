@@ -13,7 +13,7 @@
     <p class="subheading">Destination: Out of Office. Permission to disconnect, granted.</p>
   </div>
 
-  <div class="boarding-pass" class:visible>
+  <div class="boarding-pass gamified-float interactive-card" class:visible>
     <!-- Main Pass Body -->
     <div class="pass-main">
       <div class="pass-header">
@@ -103,7 +103,6 @@
     max-width: 920px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 7rem) 1.5rem clamp(4rem, 12vh, 8rem);
-    font-family: var(--sans);
     /* warm-sand wash — the ticket is the last stop of the journey (Tarkwa Bay
        arrival), so a beach-sand tint under the boarding pass reads truer to
        concept.txt's escape palette than plain cream. */
@@ -132,7 +131,6 @@
   }
   .heading {
     margin: 0 0 0.5rem;
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(2rem, 5vw, 2.8rem);
     color: var(--blue, #00bfff);
@@ -194,7 +192,6 @@
   }
   .flight-num strong {
     color: var(--blue, #00bfff);
-    font-family: var(--display);
     font-size: 0.95rem;
   }
 
@@ -211,7 +208,6 @@
     gap: 0.2rem;
   }
   .route-point .code {
-    font-family: var(--display);
     font-weight: 700;
     font-size: clamp(2.2rem, 5vw, 3.2rem);
     line-height: 1;
@@ -237,7 +233,6 @@
     border-radius: 999px;
     background: rgba(0, 191, 255, 0.06);
     color: var(--blue, #00bfff);
-    font-family: var(--sans);
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -370,6 +365,11 @@
     align-items: center;
     text-align: center;
     gap: 1.4rem;
+    transition: transform 0.5s var(--ease-out-expo);
+    transform-origin: left center;
+  }
+  .boarding-pass.visible:hover .pass-stub {
+    transform: rotate(2deg) translateX(4px);
   }
   .stub-header {
     width: 100%;
@@ -431,7 +431,6 @@
   .cta-btn {
     display: inline-block;
     width: 100%;
-    font-family: var(--display);
     font-weight: 700;
     font-size: 0.95rem;
     color: #fff;
@@ -487,6 +486,10 @@
     }
     .pass-stub {
       width: 100%;
+    }
+    .boarding-pass.visible:hover .pass-stub {
+      transform: translateY(4px) rotate(1deg);
+      transform-origin: top center;
     }
     .details-grid {
       grid-template-columns: 1fr;

@@ -44,48 +44,37 @@
 }
 
 :root {
-  --bg: #f6f4f1;
-  --ink: #181818;
-  --blue: #00bfff;
-  /* sampled from the pink paint splat in the "C" of "Canvas" on
-     docs/brand-reference/flyer-open-canvas-jaekel-house.png */
-  --pink: #fc9ce0;
-  --pink-deep: #e0568f;
-  --accent: #08cabd;
-  --cream: #f6f4f1;
+  /* Hallmark Custom: "Escape" Palette (Ocean, Coral, Sand) */
+  --bg: oklch(97% 0.01 85);
+  --ink: oklch(22% 0.03 260);
+  --blue: oklch(65% 0.18 245);
+  --pink: oklch(75% 0.15 340);
+  --pink-deep: oklch(60% 0.22 340);
+  --accent: oklch(65% 0.18 245);
+  --cream: oklch(99% 0.005 85);
+  
+  --chaos-yellow: oklch(80% 0.18 90);
+  --chaos-red: oklch(55% 0.22 25);
+  
+  --sunset-orange: oklch(68% 0.21 40);
+  --warm-sand: oklch(90% 0.04 80);
+  --muted-green: oklch(65% 0.12 150);
 
-  /* Chaos (mainland/pre-activation) — Lagos traffic colors, from concept.txt's
-     "Color Direction": danfo yellow, brake-light red. Used only in the hero
-     while the cube is still scrambled (ChaosLayer, notification pill), never
-     in the post-activation sections — those stay on the real flyer-sampled
-     brand palette above. */
-  --chaos-yellow: #ffc72c;
-  --chaos-red: #e5383b;
-
-  /* Escape (post-activation) — concept.txt's second palette (ocean teal,
-     sunset orange, warm sand, muted green) never made it into the build; the
-     flyer-sampled blue/pink/teal became the whole site instead of just the
-     brand-identity layer. These three fill that gap as secondary accents
-     woven through the content sections below the hero, so the "colors
-     become calmer" arc has somewhere to land besides more blue. */
-  --sunset-orange: #ff7b4d;
-  --warm-sand: #e8c9a0;
-  --muted-green: #7c9473;
-
-  /* Neutral UI tokens — recurring secondary-text/card/border values that
-     were previously repeated as one-off hex across component styles */
-  --muted: #6b6b6b;
-  --card-surface: #fbf9f6;
-  --border-soft: #e4dfd8;
-  --border-soft-deep: #d8d2c8;
-  --border-dashed: #bbb;
+  /* UI Tokens */
+  --muted: oklch(55% 0.02 260);
+  --card-surface: oklch(99.5% 0.002 85);
+  --border-soft: oklch(90% 0.02 85);
+  --border-soft-deep: oklch(82% 0.03 85);
+  --border-dashed: oklch(75% 0.03 85);
   --island-divider: rgba(255, 255, 255, 0.15);
+
+  /* Unified Gamified Font */
   --display: "Fredoka", system-ui, sans-serif;
-  --sans: "Space Grotesk", system-ui, sans-serif;
-  --bungee: "Bungee", system-ui, sans-serif;
-  --marker: "Permanent Marker", cursive;
-  --serif: "Fraunces", georgia, serif;
-  --wild: "Back Wild", cursive, sans-serif;
+  --sans: "Fredoka", system-ui, sans-serif;
+  --bungee: "Fredoka", system-ui, sans-serif;
+  --marker: "Fredoka", system-ui, sans-serif;
+  --serif: "Fredoka", system-ui, sans-serif;
+  --wild: "Fredoka", system-ui, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,14 +84,15 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #0f1115;
-  --ink: #f0ede6;
-  --cream: #181a20;
-  --muted: #9a9a9a;
-  --card-surface: #1d2027;
-  --border-soft: #2a2e37;
-  --border-soft-deep: #363c47;
-  --border-dashed: #4a4f59;
+  --bg: oklch(18% 0.02 260);
+  --ink: oklch(95% 0.01 260);
+  --cream: oklch(22% 0.03 260);
+  --muted: oklch(70% 0.01 260);
+  --card-surface: oklch(24% 0.03 260);
+  --border-soft: oklch(30% 0.04 260);
+  --border-soft-deep: oklch(35% 0.04 260);
+  --border-dashed: oklch(40% 0.03 260);
+  --blue: oklch(70% 0.15 245);
 }
 
 * {
@@ -135,4 +125,36 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Gamified Interactivity */
+button, a {
+  transition: transform 0.2s var(--ease-out-expo), box-shadow 0.2s var(--ease-out-expo);
+}
+
+button:hover, a:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+button:active, a:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.interactive-card {
+  transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo);
+}
+
+.interactive-card:hover {
+  transform: translateY(-4px) rotate(1deg);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.gamified-float {
+  animation: float 4s ease-in-out infinite;
 }
