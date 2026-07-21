@@ -1,200 +1,114 @@
 <script>
   import { onMount } from 'svelte';
 
-  // Kept for API compatibility with existing callers, but now read as a
-  // low-res pixel grid (columns x rows) instead of a monospace character
-  // grid — chunky pixel-art blocks, not a Doom-fire text simulation.
-  export let width = 31;
-  export let height = 36;
+  // Exact pixel data extracted from the reference campfire image: the
+  // source photo was downsampled to a 52x57 grid (box filter), then every
+  // cell was classified as background / outline / one of 9 flame-and-log
+  // colors via k-means on the non-background, non-outline pixels. This is
+  // not a procedural approximation of a flame shape — it's the actual
+  // artwork, pixel for pixel, at its native low-res block size.
+  const COLS = 52;
+  const ROWS = 57;
+
+  // index 0 = outline; 1..9 = the k-means color clusters, sorted dark to
+  // light. Grid values below are -1 = transparent background.
+  const PALETTE_HEX = [
+    '#392826', '#6b3732', '#92534e', '#c36545', '#e4933f',
+    '#c2a084', '#f0b64b', '#dbc1a7', '#f6d05e', '#fae5a0',
+  ];
+  const PALETTE_RGB = PALETTE_HEX.map((hex) => [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ]);
+
+  const GRID = [
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,1,-1,-1,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,2,-1,-1,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,1,-1,0,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,1,0,3,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,1,2,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,3,3,3,3,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,-1,-1,0,3,3,3,4,3,2,-1,-1,-1,-1,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,0,-1,-1,-1,0,3,3,3,4,3,2,-1,-1,-1,-1,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,0,-1,-1,-1,0,3,3,4,4,3,2,-1,-1,-1,-1,0,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,0,-1,-1,0,3,3,3,4,4,3,2,-1,-1,-1,-1,0,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,2,0,-1,-1,0,3,3,4,4,4,3,2,-1,-1,-1,0,1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,1,-1,-1,0,3,4,4,4,4,3,2,-1,-1,-1,0,3,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,2,0,-1,0,3,4,4,4,4,3,2,-1,-1,-1,1,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,3,3,0,2,4,4,4,4,4,4,3,1,-1,-1,2,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,3,2,3,4,4,4,4,4,4,3,2,0,0,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,3,3,4,4,6,6,4,4,4,3,3,1,2,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,4,3,4,4,6,6,4,4,4,3,4,3,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,-1,-1,-1,-1,1,4,3,4,6,8,8,6,4,4,3,4,3,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,0,-1,-1,-1,1,4,4,4,6,8,8,6,4,4,4,4,4,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,0,-1,-1,-1,1,4,4,4,4,6,8,8,4,4,4,4,4,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,2,0,-1,2,2,4,4,4,4,6,8,8,6,4,4,4,6,6,3,0,-1,-1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,0,-1,1,3,4,4,6,4,6,8,8,8,6,4,6,8,6,3,1,-1,1,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,3,2,1,3,4,4,6,6,4,6,9,9,8,8,8,8,6,4,4,3,0,2,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,4,3,3,3,4,6,8,6,4,6,8,9,8,8,9,8,6,4,4,3,3,3,2,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,4,4,3,3,4,4,6,8,4,6,8,8,9,9,8,9,6,4,4,4,3,3,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,4,4,4,3,4,6,8,8,4,6,8,8,9,9,8,8,6,4,4,4,4,3,4,3,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,4,4,4,4,6,8,8,6,8,8,9,9,9,9,8,6,4,4,4,4,4,4,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,4,4,4,4,4,6,6,9,8,8,8,8,9,9,9,9,8,6,6,4,4,6,4,4,3,3,2,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,2,3,4,4,6,4,4,6,8,9,8,8,8,9,9,9,9,9,8,8,6,4,4,8,6,4,4,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,3,4,4,6,4,4,6,9,9,9,8,9,9,9,9,9,8,8,8,8,6,6,8,6,4,4,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,4,4,4,8,6,4,6,9,9,9,9,9,9,-1,9,9,8,9,9,8,6,6,8,6,4,4,3,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,4,4,4,8,6,4,6,8,9,-1,9,9,-1,-1,9,9,9,9,9,8,8,8,9,6,4,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,3,4,4,8,8,6,6,8,9,-1,-1,9,-1,-1,-1,9,9,9,8,8,8,9,9,6,4,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,3,4,4,6,8,8,8,8,9,9,-1,-1,-1,-1,-1,-1,9,9,8,8,9,9,8,6,4,3,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,3,4,4,8,9,9,8,9,9,9,-1,-1,-1,-1,9,9,9,9,9,9,8,8,4,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,3,4,4,8,8,9,9,9,9,-1,-1,-1,-1,-1,-1,9,-1,9,9,9,8,6,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,1,3,4,6,8,8,9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,9,8,6,4,3,1,0,0,0,0,0,0,0,0,0,0,0,-1,-1,-1],
+    [-1,-1,0,5,7,3,3,3,3,3,3,3,3,2,2,1,3,4,6,8,9,9,-1,-1,-1,-1,-1,-1,-1,-1,-1,9,9,8,4,3,1,2,2,3,3,3,3,3,3,3,3,7,5,0,-1,-1],
+    [-1,-1,-1,7,7,-1,5,3,3,2,2,2,2,1,0,0,1,2,4,6,8,9,9,-1,-1,-1,-1,-1,-1,-1,9,9,8,4,2,1,0,0,1,2,2,2,2,3,3,3,-1,7,7,-1,-1,-1],
+    [-1,-1,-1,7,7,7,7,2,2,2,1,0,0,0,0,2,3,2,2,4,6,8,5,1,1,2,2,2,1,5,9,8,4,2,2,3,2,0,0,0,0,1,2,2,2,5,7,7,7,-1,-1,-1],
+    [-1,-1,5,5,5,7,-1,2,2,0,1,1,2,3,3,3,3,2,2,2,4,3,1,2,2,3,3,3,2,1,3,4,2,2,2,3,3,3,3,2,1,1,0,2,2,5,7,5,5,5,-1,-1],
+    [-1,-1,2,5,5,7,-1,2,0,-1,-1,-1,5,3,3,3,2,2,2,2,1,1,2,2,3,3,3,3,2,2,1,1,2,2,2,2,3,3,3,5,-1,-1,-1,0,2,-1,7,5,5,2,-1,-1],
+    [-1,-1,0,5,7,-1,2,0,-1,7,7,7,7,5,2,2,2,2,2,1,0,1,2,2,3,3,3,3,2,2,1,0,1,2,2,2,2,2,5,-1,7,7,7,-1,0,2,-1,7,5,0,-1,-1],
+    [-1,-1,-1,0,0,0,0,0,-1,7,7,7,7,-1,5,2,2,2,1,-1,-1,1,2,2,3,3,3,3,2,2,1,-1,-1,1,2,2,2,5,7,7,7,7,7,-1,0,0,0,0,0,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,5,7,7,7,5,5,7,2,2,1,-1,-1,-1,1,2,-1,-1,-1,-1,-1,-1,2,1,-1,-1,-1,1,2,2,-1,5,5,7,7,7,5,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,2,7,7,5,5,5,-1,2,1,-1,-1,-1,-1,2,7,7,7,7,7,7,7,-1,2,-1,-1,-1,-1,1,2,-1,5,5,5,7,7,2,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,2,5,5,5,7,7,1,-1,-1,-1,-1,-1,-1,7,7,7,7,7,7,5,5,-1,-1,-1,-1,-1,-1,1,7,7,5,5,5,2,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,-1,-1,-1,-1,-1,-1,2,7,7,7,7,7,5,5,5,2,-1,-1,-1,-1,-1,-1,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,5,7,7,7,5,5,5,5,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,5,5,5,5,5,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+  ];
 
   let canvas;
 
-  const PEAK_ROWS = 7; // twin flame-tongue tips at the top
-  const LOG_ROWS = 8; // wood-log bed at the bottom
-
-  const PALETTE = {
-    outline: '#160b05',
-    band1: '#c33e18', // outer rim — deep red-orange
-    band2: '#f07c1c', // orange
-    band3: '#ffb63a', // amber
-    band4: '#ffe98a', // bright yellow
-    band5: '#fff5da', // white-hot core
-    logLight: '#8a4a2a', // log body, lit side
-    logDark: '#5c2f18', // log body, shadow side
-    logCap: '#d9b483',
-    logCapRing: '#a97a4a',
-  };
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-  // 0 at t=0 and t=1, 1 at t=0.5 — for tapering a shape in from both ends
-  function hump(t) {
-    return Math.max(0, Math.sin(Math.max(0, Math.min(1, t)) * Math.PI));
-  }
-
-  // Gentle, sparse irregularity along the body's silhouette (indexed by
-  // body row) — a couple of soft undulations, not a sawtooth. Values are
-  // added to the smooth base half-width.
-  const BODY_NOTCHES = [0, 0, 0.6, 0, -0.5, 0, 0.5, 0, 0, -0.6, 0, 0.5, 0, 0, -0.4, 0, 0, 0, 0, 0, 0];
-
-  // Builds one frame of the pixel grid. `time` (ms) drives a gentle,
-  // continuous flicker in the tip height, silhouette edges, and the
-  // white-hot core — instead of a full re-scramble every frame, which
-  // would read as noise rather than a flame breathing.
-  function buildFireGrid(cols, rows, time) {
-    const center = (cols - 1) / 2;
-    const flameRows = rows - LOG_ROWS;
-    const bodyRows = flameRows - PEAK_ROWS;
-    const grid = Array.from({ length: rows }, () => Array(cols).fill(null));
-
-    // --- twin peaks, each with an inward "hook" partway down its inner
-    // edge (a concave notch), not a plain triangle ---
-    for (let r = 0; r < PEAK_ROWS; r++) {
-      const t = r / (PEAK_ROWS - 1);
-      const outerHalf = lerp(0.6, 2.1, t);
-      const hookPinch = hump((t - 0.35) / 0.5) * 0.35; // subtle notch mid-way down
-      const innerHalf = Math.max(0.4, outerHalf - hookPinch);
-      const gapHalf = lerp(2.5, 0.15, t);
-      const wobble = Math.sin(time * 0.0026 + r) * 0.3;
-
-      const leftOuter = center - gapHalf - outerHalf + wobble;
-      const leftInner = center - gapHalf + innerHalf + wobble;
-      const rightInner = center + gapHalf - innerHalf - wobble;
-      const rightOuter = center + gapHalf + outerHalf - wobble;
-      const band = t < 0.4 ? 'band1' : 'band2';
-      for (let c = 0; c < cols; c++) {
-        if (c >= leftOuter && c <= leftInner) grid[r][c] = band;
-        if (c >= rightInner && c <= rightOuter) grid[r][c] = band;
-      }
-    }
-
-    // --- body ---
-    for (let i = 0; i < bodyRows; i++) {
-      const r = PEAK_ROWS + i;
-      const bt = i / (bodyRows - 1);
-      const eased = easeOutCubic(bt);
-      // pinch the flame back in right before it meets the logs, so the
-      // log caps below visibly splay out wider than the flame's base
-      const waist = bt > 0.88 ? lerp(1, 0.72, (bt - 0.88) / 0.12) : 1;
-      const notch = BODY_NOTCHES[Math.min(i, BODY_NOTCHES.length - 1)] || 0;
-      const flicker = Math.sin(time * 0.0022 + r * 0.9) * 0.5 + Math.sin(time * 0.0037 + r * 1.6) * 0.3;
-      const halfWidth = (lerp(3.2, center - 0.4, eased) + notch) * waist + flicker;
-
-      // tapered white-hot core: narrow at the top and bottom of its
-      // range, widest in the middle — reads as a small flame-within-the-
-      // flame instead of a flat disc
-      const coreShape = hump((bt - 0.28) / 0.56);
-      const corePulse = 1 + Math.sin(time * 0.005 + i) * 0.12;
-      const coreHalf = halfWidth * 0.34 * coreShape * corePulse;
-
-      for (let c = 0; c < cols; c++) {
-        const dist = Math.abs(c - center);
-        if (dist > halfWidth) continue;
-        const edgeFrac = dist / Math.max(halfWidth, 0.001);
-
-        let band;
-        if (edgeFrac > 0.82) band = 'band1';
-        else if (edgeFrac > 0.52) band = 'band2';
-        else if (edgeFrac > 0.28) band = 'band3';
-        else band = 'band4';
-
-        if (dist < coreHalf) band = 'band5';
-
-        grid[r][c] = band;
-      }
-    }
-
-    // outline: empty cells touching a flame cell
-    for (let r = 0; r < flameRows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (grid[r][c]) continue;
-        const up = grid[r - 1]?.[c];
-        const down = grid[r + 1]?.[c];
-        const left = grid[r][c - 1];
-        const right = grid[r][c + 1];
-        if (
-          (up && up !== 'outline') ||
-          (down && down !== 'outline') ||
-          (left && left !== 'outline') ||
-          (right && right !== 'outline')
-        ) {
-          grid[r][c] = 'outline';
-        }
-      }
-    }
-
-    // --- logs: five individual logs, caps splayed wide at the top of the
-    // log region, bodies angling inward as they descend, crossing near
-    // the bottom center — a teepee lay, not a flat log "bed" ---
-    const logStart = flameRows;
-    const logRows = rows - logStart;
-    const capFractions = [0.06, 0.28, 0.5, 0.72, 0.94];
-    const logs = capFractions.map((f) => {
-      const cap = f * (cols - 1);
-      // drift gently toward center, don't funnel all the way to a point —
-      // each log stays a distinct, mostly-vertical shape
-      return { cap, target: lerp(cap, center, 0.32) };
-    });
-    for (const log of logs) {
-      for (let j = 0; j < logRows; j++) {
-        const jt = j / Math.max(1, logRows - 1);
-        const colF = lerp(log.cap, log.target, jt);
-        const col = Math.round(colF);
-        for (let dc = -1; dc <= 1; dc++) {
-          const c = col + dc;
-          if (c < 0 || c >= cols) continue;
-          const r = logStart + j;
-          // highlight down each log's own center, shadow at its own edges —
-          // a per-log cylindrical read, independent of where it sits
-          grid[r][c] = dc === 0 ? 'logLight' : 'logDark';
-        }
-      }
-      // wood-grain cap at the top of the log, wider than the body
-      const r0 = logStart;
-      const c0 = Math.round(log.cap);
-      for (let dc = -1; dc <= 1; dc++) {
-        if (grid[r0]) grid[r0][c0 + dc] = 'logCap';
-        if (grid[r0 + 1]) grid[r0 + 1][c0 + dc] = 'logCap';
-      }
-      if (grid[r0]) grid[r0][c0] = 'logCapRing';
-    }
-    for (let r = logStart; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (grid[r][c]) continue;
-        const up = grid[r - 1]?.[c];
-        const left = grid[r][c - 1];
-        const right = grid[r][c + 1];
-        if ((up && up !== 'outline') || (left && left !== 'outline') || (right && right !== 'outline')) {
-          grid[r][c] = 'outline';
-        }
-      }
-    }
-
-    return grid;
-  }
-
   onMount(() => {
     const ctx = canvas.getContext('2d');
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = COLS;
+    canvas.height = ROWS;
 
     let frameId;
     let lastTime = 0;
     function loop(time) {
-      // ~12fps — a flame flickers, it doesn't need 60fps to read as alive
+      // ~12fps — a flame flickers, it doesn't need 60fps to read as alive.
+      // The silhouette/colors below are the exact extracted artwork; only
+      // per-cell brightness is modulated, so the shape never changes.
       if (time - lastTime > 80) {
         lastTime = time;
-        const grid = buildFireGrid(width, height, time);
-        ctx.clearRect(0, 0, width, height);
-        for (let r = 0; r < height; r++) {
-          for (let c = 0; c < width; c++) {
-            const key = grid[r][c];
-            if (!key) continue;
-            ctx.fillStyle = PALETTE[key];
+        ctx.clearRect(0, 0, COLS, ROWS);
+        for (let r = 0; r < ROWS; r++) {
+          const row = GRID[r];
+          for (let c = 0; c < COLS; c++) {
+            const v = row[c];
+            if (v < 0) continue;
+            const rgb = PALETTE_RGB[v];
+            const flicker = 1 + 0.1 * Math.sin(time * 0.004 + (r * 7 + c * 13) * 0.6) * (v === 0 ? 0.2 : 1);
+            const r8 = Math.min(255, Math.max(0, Math.round(rgb[0] * flicker)));
+            const g8 = Math.min(255, Math.max(0, Math.round(rgb[1] * flicker)));
+            const b8 = Math.min(255, Math.max(0, Math.round(rgb[2] * flicker)));
+            ctx.fillStyle = `rgb(${r8},${g8},${b8})`;
             ctx.fillRect(c, r, 1, 1);
           }
         }
@@ -211,7 +125,7 @@
   <canvas
     bind:this={canvas}
     class="pixel-fire"
-    style="aspect-ratio: {width} / {height};"
+    style="aspect-ratio: {COLS} / {ROWS};"
     aria-hidden="true"
   ></canvas>
 </div>
