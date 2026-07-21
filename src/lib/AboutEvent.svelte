@@ -27,7 +27,7 @@
     </div>
     
     <div class="fire-col">
-      <AsciiFire width={70} height={35} />
+      <AsciiFire />
     </div>
   </div>
 </div>
