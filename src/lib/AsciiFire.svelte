@@ -83,18 +83,48 @@
   ];
 
   let canvas;
+  let glow = 0.35;
+
+  // Number of color bands available above the outline (index 0), for
+  // shifting a flame cell's rendered band up/down without ever touching
+  // the fixed silhouette itself.
+  const MAX_BAND = PALETTE_RGB.length - 1;
 
   onMount(() => {
     const ctx = canvas.getContext('2d');
     canvas.width = COLS;
     canvas.height = ROWS;
 
+    // Precompute the topmost flame row per column, so embers can spawn
+    // right at each column's own tip instead of a fixed point.
+    const topRowForCol = new Array(COLS).fill(null);
+    for (let c = 0; c < COLS; c++) {
+      for (let r = 0; r < ROWS; r++) {
+        if (GRID[r][c] >= 0) {
+          topRowForCol[c] = r;
+          break;
+        }
+      }
+    }
+    const minTop = Math.min(...topRowForCol.filter((v) => v !== null));
+    // bias spawns toward the tallest columns (the twin tongues' tips)
+    const tipCols = [];
+    for (let c = 0; c < COLS; c++) {
+      if (topRowForCol[c] !== null && topRowForCol[c] <= minTop + 5) tipCols.push(c);
+    }
+
+    let embers = [];
+    let nextEmberAt = 0;
+
     let frameId;
     let lastTime = 0;
     function loop(time) {
       // ~12fps — a flame flickers, it doesn't need 60fps to read as alive.
-      // The silhouette/colors below are the exact extracted artwork; only
-      // per-cell brightness is modulated, so the shape never changes.
+      // The silhouette below is the exact extracted artwork and never
+      // moves; what animates is each cell's brightness and, for flame
+      // cells, an occasional shift to a neighboring color band (so hot
+      // spots seem to travel through the fixed shape) plus rising embers
+      // spawned above the tips.
       if (time - lastTime > 80) {
         lastTime = time;
         ctx.clearRect(0, 0, COLS, ROWS);
@@ -103,8 +133,23 @@
           for (let c = 0; c < COLS; c++) {
             const v = row[c];
             if (v < 0) continue;
-            const rgb = PALETTE_RGB[v];
-            const flicker = 1 + 0.1 * Math.sin(time * 0.004 + (r * 7 + c * 13) * 0.6) * (v === 0 ? 0.2 : 1);
+
+            let paletteIdx = v;
+            let flickerAmp = 0.22;
+            if (v > 0) {
+              // a wave that travels by row (rising heat), with a gentle
+              // column-based phase offset for horizontal texture — this
+              // reads as coordinated turbulence moving up through the
+              // flame rather than independent per-cell sparkle/static
+              const bandWave =
+                Math.sin(time * 0.006 - r * 0.55 + c * 0.12) * 0.85 +
+                Math.sin(time * 0.013 - r * 0.32) * 0.45;
+              const shift = Math.round(bandWave * 0.9);
+              paletteIdx = Math.min(MAX_BAND, Math.max(1, v + shift));
+              flickerAmp = 0.28;
+            }
+            const rgb = PALETTE_RGB[paletteIdx];
+            const flicker = 1 + flickerAmp * Math.sin(time * 0.007 - r * 0.4 + c * 0.08);
             const r8 = Math.min(255, Math.max(0, Math.round(rgb[0] * flicker)));
             const g8 = Math.min(255, Math.max(0, Math.round(rgb[1] * flicker)));
             const b8 = Math.min(255, Math.max(0, Math.round(rgb[2] * flicker)));
@@ -112,6 +157,34 @@
             ctx.fillRect(c, r, 1, 1);
           }
         }
+
+        // rising embers: small bright sparks that break free above the tips
+        if (time > nextEmberAt && tipCols.length) {
+          nextEmberAt = time + 260 + Math.random() * 420;
+          const c = tipCols[(Math.random() * tipCols.length) | 0];
+          embers.push({
+            x: c + (Math.random() - 0.5) * 1.5,
+            y: topRowForCol[c] - 0.5,
+            vy: -0.12 - Math.random() * 0.14,
+            vx: (Math.random() - 0.5) * 0.05,
+            life: 1,
+            decay: 0.018 + Math.random() * 0.02,
+            hot: Math.random() < 0.5,
+          });
+        }
+        embers = embers.filter((e) => e.life > 0 && e.y > -3);
+        for (const e of embers) {
+          e.x += e.vx;
+          e.y += e.vy;
+          e.life -= e.decay;
+          const rgb = e.hot ? PALETTE_RGB[MAX_BAND] : PALETTE_RGB[MAX_BAND - 2];
+          const a = Math.max(0, e.life);
+          ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+          ctx.fillRect(Math.round(e.x), Math.round(e.y), 1, 1);
+        }
+
+        // the light a fire casts flickers too
+        glow = 0.3 + Math.sin(time * 0.009) * 0.08 + Math.sin(time * 0.021) * 0.05;
       }
       frameId = requestAnimationFrame(loop);
     }
@@ -125,7 +198,7 @@
   <canvas
     bind:this={canvas}
     class="pixel-fire"
-    style="aspect-ratio: {COLS} / {ROWS};"
+    style="aspect-ratio: {COLS} / {ROWS}; filter: drop-shadow(0 0 {18 + glow * 24}px rgba(255, 120, 20, {glow}));"
     aria-hidden="true"
   ></canvas>
 </div>
@@ -141,6 +214,5 @@
     height: auto;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-    filter: drop-shadow(0 0 22px rgba(255, 120, 20, 0.35));
   }
 </style>
