@@ -4,24 +4,25 @@
   // Kept for API compatibility with existing callers, but now read as a
   // low-res pixel grid (columns x rows) instead of a monospace character
   // grid — chunky pixel-art blocks, not a Doom-fire text simulation.
-  export let width = 29;
-  export let height = 32;
+  export let width = 31;
+  export let height = 36;
 
   let canvas;
 
-  const PEAK_ROWS = 6; // twin flame-tongue tips at the top
-  const LOG_ROWS = 6; // wood-log bed at the bottom
+  const PEAK_ROWS = 7; // twin flame-tongue tips at the top
+  const LOG_ROWS = 8; // wood-log bed at the bottom
 
   const PALETTE = {
-    outline: '#1a0e07',
+    outline: '#160b05',
     band1: '#c33e18', // outer rim — deep red-orange
     band2: '#f07c1c', // orange
     band3: '#ffb63a', // amber
     band4: '#ffe98a', // bright yellow
-    band5: '#fffaf0', // white-hot core
-    logBed: '#4a2a15',
-    logCap: '#c99a63',
-    logCapRing: '#8a5c34',
+    band5: '#fff5da', // white-hot core
+    logLight: '#8a4a2a', // log body, lit side
+    logDark: '#5c2f18', // log body, shadow side
+    logCap: '#d9b483',
+    logCapRing: '#a97a4a',
   };
 
   function lerp(a, b, t) {
@@ -30,6 +31,15 @@
   function easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
   }
+  // 0 at t=0 and t=1, 1 at t=0.5 — for tapering a shape in from both ends
+  function hump(t) {
+    return Math.max(0, Math.sin(Math.max(0, Math.min(1, t)) * Math.PI));
+  }
+
+  // Gentle, sparse irregularity along the body's silhouette (indexed by
+  // body row) — a couple of soft undulations, not a sawtooth. Values are
+  // added to the smooth base half-width.
+  const BODY_NOTCHES = [0, 0, 0.6, 0, -0.5, 0, 0.5, 0, 0, -0.6, 0, 0.5, 0, 0, -0.4, 0, 0, 0, 0, 0, 0];
 
   // Builds one frame of the pixel grid. `time` (ms) drives a gentle,
   // continuous flicker in the tip height, silhouette edges, and the
@@ -41,22 +51,24 @@
     const bodyRows = flameRows - PEAK_ROWS;
     const grid = Array.from({ length: rows }, () => Array(cols).fill(null));
 
-    const tipFlicker = Math.sin(time * 0.004) * 0.6;
-
-    // --- twin peaks ---
+    // --- twin peaks, each with an inward "hook" partway down its inner
+    // edge (a concave notch), not a plain triangle ---
     for (let r = 0; r < PEAK_ROWS; r++) {
-      const t = Math.max(0, Math.min(1, r / (PEAK_ROWS - 1) + tipFlicker * 0.08));
-      const peakHalf = lerp(0.6, 2.3, t);
-      const gapHalf = lerp(3.4, 0.3, t);
-      const wobble = Math.sin(time * 0.003 + r) * 0.35;
-      const leftCenter = center - gapHalf - peakHalf + wobble;
-      const rightCenter = center + gapHalf + peakHalf - wobble;
+      const t = r / (PEAK_ROWS - 1);
+      const outerHalf = lerp(0.6, 2.1, t);
+      const hookPinch = hump((t - 0.35) / 0.5) * 0.35; // subtle notch mid-way down
+      const innerHalf = Math.max(0.4, outerHalf - hookPinch);
+      const gapHalf = lerp(2.5, 0.15, t);
+      const wobble = Math.sin(time * 0.0026 + r) * 0.3;
+
+      const leftOuter = center - gapHalf - outerHalf + wobble;
+      const leftInner = center - gapHalf + innerHalf + wobble;
+      const rightInner = center + gapHalf - innerHalf - wobble;
+      const rightOuter = center + gapHalf + outerHalf - wobble;
+      const band = t < 0.4 ? 'band1' : 'band2';
       for (let c = 0; c < cols; c++) {
-        const dL = Math.abs(c - leftCenter);
-        const dR = Math.abs(c - rightCenter);
-        const band = t < 0.45 ? 'band1' : 'band2';
-        if (dL <= peakHalf) grid[r][c] = band;
-        if (dR <= peakHalf) grid[r][c] = band;
+        if (c >= leftOuter && c <= leftInner) grid[r][c] = band;
+        if (c >= rightInner && c <= rightOuter) grid[r][c] = band;
       }
     }
 
@@ -65,9 +77,19 @@
       const r = PEAK_ROWS + i;
       const bt = i / (bodyRows - 1);
       const eased = easeOutCubic(bt);
-      const jitter =
-        Math.sin(time * 0.0022 + r * 0.9) * 1.1 + Math.sin(time * 0.0037 + r * 1.6) * 0.5;
-      const halfWidth = lerp(3.2, center - 0.4, eased) + jitter;
+      // pinch the flame back in right before it meets the logs, so the
+      // log caps below visibly splay out wider than the flame's base
+      const waist = bt > 0.88 ? lerp(1, 0.72, (bt - 0.88) / 0.12) : 1;
+      const notch = BODY_NOTCHES[Math.min(i, BODY_NOTCHES.length - 1)] || 0;
+      const flicker = Math.sin(time * 0.0022 + r * 0.9) * 0.5 + Math.sin(time * 0.0037 + r * 1.6) * 0.3;
+      const halfWidth = (lerp(3.2, center - 0.4, eased) + notch) * waist + flicker;
+
+      // tapered white-hot core: narrow at the top and bottom of its
+      // range, widest in the middle — reads as a small flame-within-the-
+      // flame instead of a flat disc
+      const coreShape = hump((bt - 0.28) / 0.56);
+      const corePulse = 1 + Math.sin(time * 0.005 + i) * 0.12;
+      const coreHalf = halfWidth * 0.34 * coreShape * corePulse;
 
       for (let c = 0; c < cols; c++) {
         const dist = Math.abs(c - center);
@@ -80,11 +102,7 @@
         else if (edgeFrac > 0.28) band = 'band3';
         else band = 'band4';
 
-        // white-hot core: a narrow zone in the middle-lower body only —
-        // a real flame's hottest point isn't at its very tip or its root
-        const corePulse = 0.1 + Math.sin(time * 0.005 + i) * 0.03;
-        if (bt > 0.3 && bt < 0.82 && edgeFrac < corePulse + 0.06) band = 'band5';
-        if (bt > 0.86 && (band === 'band4' || band === 'band5')) band = 'band3';
+        if (dist < coreHalf) band = 'band5';
 
         grid[r][c] = band;
       }
@@ -109,25 +127,40 @@
       }
     }
 
-    // --- log bed ---
+    // --- logs: five individual logs, caps splayed wide at the top of the
+    // log region, bodies angling inward as they descend, crossing near
+    // the bottom center — a teepee lay, not a flat log "bed" ---
     const logStart = flameRows;
-    const capCols = [2, 8, 14, 20, 26].map((c) =>
-      Math.round((c / 28) * (cols - 1))
-    );
-    for (let i = 0; i < LOG_ROWS; i++) {
-      if (i >= LOG_ROWS - 1) continue; // leave the very bottom row empty
-      const r = logStart + i;
-      for (let c = 0; c < cols; c++) grid[r][c] = 'logBed';
-    }
-    // wood-grain end caps: a 3-wide x 2-tall oval with a darker ring dot,
-    // like the cut ends visible where each log meets the fire
-    for (const cc of capCols) {
-      const r = logStart + 1;
-      for (let dc = -1; dc <= 1; dc++) {
-        if (grid[r]) grid[r][cc + dc] = 'logCap';
-        if (grid[r + 1]) grid[r + 1][cc + dc] = 'logCap';
+    const logRows = rows - logStart;
+    const capFractions = [0.06, 0.28, 0.5, 0.72, 0.94];
+    const logs = capFractions.map((f) => {
+      const cap = f * (cols - 1);
+      // drift gently toward center, don't funnel all the way to a point —
+      // each log stays a distinct, mostly-vertical shape
+      return { cap, target: lerp(cap, center, 0.32) };
+    });
+    for (const log of logs) {
+      for (let j = 0; j < logRows; j++) {
+        const jt = j / Math.max(1, logRows - 1);
+        const colF = lerp(log.cap, log.target, jt);
+        const col = Math.round(colF);
+        for (let dc = -1; dc <= 1; dc++) {
+          const c = col + dc;
+          if (c < 0 || c >= cols) continue;
+          const r = logStart + j;
+          // highlight down each log's own center, shadow at its own edges —
+          // a per-log cylindrical read, independent of where it sits
+          grid[r][c] = dc === 0 ? 'logLight' : 'logDark';
+        }
       }
-      if (grid[r]) grid[r][cc] = 'logCapRing';
+      // wood-grain cap at the top of the log, wider than the body
+      const r0 = logStart;
+      const c0 = Math.round(log.cap);
+      for (let dc = -1; dc <= 1; dc++) {
+        if (grid[r0]) grid[r0][c0 + dc] = 'logCap';
+        if (grid[r0 + 1]) grid[r0 + 1][c0 + dc] = 'logCap';
+      }
+      if (grid[r0]) grid[r0][c0] = 'logCapRing';
     }
     for (let r = logStart; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
