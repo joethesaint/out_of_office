@@ -13,7 +13,19 @@
   </div>
 
   <div class="embed-wrapper" class:visible>
-    <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5uJnnaFGzzaBcunJz6HA0h?utm_source=generator&theme=0&si=bcca622a34564cf1" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <iframe 
+      title="Out of Office Spotify Mixtape Playlist" 
+      data-testid="embed-iframe" 
+      style="border-radius:12px" 
+      src="https://open.spotify.com/embed/playlist/5uJnnaFGzzaBcunJz6HA0h?utm_source=generator&theme=0" 
+      width="100%" 
+      height="352" 
+      frameBorder="0" 
+      allowfullscreen="" 
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+      referrerpolicy="strict-origin-when-cross-origin"
+      loading="lazy"
+    ></iframe>
   </div>
 </section>
 

@@ -14,10 +14,10 @@
 
   <div class="collage" class:visible>
     <figure class="postcard gamified-float interactive-card">
-      <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
+      <img src={postcardImg} alt="Greetings from Out of Office" width="545" height="545" loading="lazy" />
     </figure>
     <figure class="stamp-photo gamified-float interactive-card">
-      <img src={stampImg} alt="Out of Office postage stamp, July 18 to August 18" loading="lazy" />
+      <img src={stampImg} alt="Out of Office postage stamp, July 18 to August 18" width="736" height="920" loading="lazy" />
     </figure>
   </div>
 </section>

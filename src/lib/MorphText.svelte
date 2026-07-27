@@ -38,6 +38,7 @@
     text-transform: none;
     letter-spacing: 0.02em;
     transform: rotate(-3deg);
+    font-family: var(--marker, 'Permanent Marker', cursive);
     color: var(--pink-deep);
   }
   .mt-sr-only {

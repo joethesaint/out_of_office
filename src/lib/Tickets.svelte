@@ -173,7 +173,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.6rem;
-    background: linear-gradient(135deg, var(--card-surface) 0%, #faf8f5 100%);
+    background: linear-gradient(135deg, var(--card-surface) 0%, var(--cream) 100%);
   }
 
   .pass-header {
@@ -358,7 +358,7 @@
   .pass-stub {
     width: clamp(230px, 28vw, 290px);
     padding: 1.8rem 1.6rem;
-    background: #fbf9f6;
+    background: var(--cream);
     display: flex;
     flex-direction: column;
     justify-content: space-between;

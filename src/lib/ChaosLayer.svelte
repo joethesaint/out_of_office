@@ -1,13 +1,78 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   export let progress = 0;
+  export let forceOnline = false;
 
-  // Fade out completely by progress 0.55
-  $: opacity = Math.max(0, 1 - progress * 1.85);
-  $: blurAmount = Math.min(12, progress * 24);
-  $: scale = Math.max(0.75, 1 - progress * 0.4);
-  $: translateY = progress * -80;
-  $: visible = progress < 0.58;
+  // Fade out completely by progress 0.55 unless forceOnline is true
+  $: opacity = forceOnline ? 1 : Math.max(0, 1 - progress * 1.85);
+  $: blurAmount = forceOnline ? 0 : Math.min(12, progress * 24);
+  $: scale = forceOnline ? 1 : Math.max(0.75, 1 - progress * 0.4);
+  $: translateY = forceOnline ? 0 : progress * -80;
+  $: visible = forceOnline || progress < 0.58;
+
+  $: if (forceOnline) {
+    dismissedIds = [];
+    try { sessionStorage.removeItem("oooChaosDismissed"); } catch {}
+  }
+
+  const STORAGE_KEY = "oooChaosDismissed";
+  let dismissedIds = [];
+  let burstingId = null;
+
+  function handleOnlineEvent() {
+    dismissedIds = [];
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+    // Restart battery bounce timer
+    if (!batteryTimer) {
+      batteryTimer = setInterval(() => {
+        batteryIndex = (batteryIndex + 1) % batterySpots.length;
+      }, 4200);
+    }
+  }
+
+  const ALL_POPUP_IDS = ['whatsapp','slack','email','calendar','twitter','instagram','zoom','trello','bank','battery'];
+
+  function handleAwayEvent() {
+    dismissedIds = [...ALL_POPUP_IDS];
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedIds));
+    } catch {}
+    // Stop the battery notification from bouncing
+    clearInterval(batteryTimer);
+    batteryTimer = null;
+  }
+
+  onMount(() => {
+    try {
+      dismissedIds = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "[]");
+    } catch {
+      dismissedIds = [];
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('oooStatusOnline', handleOnlineEvent);
+      window.addEventListener('oooStatusAway', handleAwayEvent);
+    }
+  });
+
+  onDestroy(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('oooStatusOnline', handleOnlineEvent);
+      window.removeEventListener('oooStatusAway', handleAwayEvent);
+    }
+  });
+
+  function burst(id) {
+    if (burstingId === id || dismissedIds.includes(id)) return;
+    burstingId = id;
+  }
+
+  function settleBurst(id) {
+    burstingId = null;
+    dismissedIds = [...dismissedIds, id];
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dismissedIds));
+    } catch {}
+  }
 
   // The System Notification card keeps "re-popping" at a new spot every
   // few seconds instead of sitting fixed over the card's footer.
@@ -36,108 +101,204 @@
   <div
     class="chaos-layer"
     style="opacity: {opacity}; filter: blur({blurAmount}px); transform: translateY({translateY}px) scale({scale});"
-    aria-hidden="true"
   >
     <!-- WhatsApp + Slack pile up on the left, overlapping each other —
          the point is a stack of competing alerts, not four tidy corners -->
-    <div class="popup-card whatsapp" style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); left: 1%; transform: rotate(-8deg); z-index: 3;">
-      <div class="popup-header">
-        <span class="icon">💬</span>
-        <span class="app-name">WhatsApp · Boss (Urgent!)</span>
-        <span class="time">now</span>
-      </div>
-      <p class="popup-body">Where is the updated Q2 budget deck??? We are waiting in the boardroom right now!</p>
-    </div>
+    {#if !dismissedIds.includes("whatsapp")}
+      <button
+        type="button"
+        class="popup-card whatsapp"
+        class:bursting={burstingId === "whatsapp"}
+        style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); left: 1%; transform: rotate(-8deg); z-index: 3;"
+        aria-label="Dismiss WhatsApp notification"
+        on:click={() => burst("whatsapp")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("whatsapp")}
+      >
+        <div class="popup-header">
+          <span class="icon">💬</span>
+          <span class="app-name">WhatsApp · Boss (Urgent!)</span>
+          <span class="time">now</span>
+        </div>
+        <p class="popup-body">Where is the updated Q2 budget deck??? We are waiting in the boardroom right now!</p>
+      </button>
+    {/if}
 
-    <div class="popup-card slack" style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); left: 9%; transform: rotate(7deg) scale(0.96); z-index: 4;">
-      <div class="popup-header">
-        <span class="icon">⚡</span>
-        <span class="app-name">Slack · #production-incident</span>
-        <span class="time">2m ago</span>
-      </div>
-      <p class="popup-body"><strong>@here</strong> Server CPU spiking to 99% across 4 instances in af-south-1. Can someone check logs immediately?</p>
-    </div>
+    {#if !dismissedIds.includes("slack")}
+      <button
+        type="button"
+        class="popup-card slack"
+        class:bursting={burstingId === "slack"}
+        style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); left: 9%; transform: rotate(7deg) scale(0.96); z-index: 4;"
+        aria-label="Dismiss Slack notification"
+        on:click={() => burst("slack")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("slack")}
+      >
+        <div class="popup-header">
+          <span class="icon">⚡</span>
+          <span class="app-name">Slack · #production-incident</span>
+          <span class="time">2m ago</span>
+        </div>
+        <p class="popup-body"><strong>@here</strong> Server CPU spiking to 99% across 4 instances in af-south-1. Can someone check logs immediately?</p>
+      </button>
+    {/if}
 
     <!-- Email + Calendar mirror the same overlapping pile on the right -->
-    <div class="popup-card email" style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); right: 1%; transform: rotate(9deg); z-index: 3;">
-      <div class="popup-header">
-        <span class="icon">✉️</span>
-        <span class="app-name">Mail · 14 Unread</span>
-        <span class="time">5m ago</span>
-      </div>
-      <p class="popup-body"><strong>ACTION REQUIRED:</strong> Mandatory compliance training overdue. Your access will be restricted by 5 PM.</p>
-    </div>
+    {#if !dismissedIds.includes("email")}
+      <button
+        type="button"
+        class="popup-card email"
+        class:bursting={burstingId === "email"}
+        style="top: calc(clamp(52px, 9vh, 72px) + 5.5rem); right: 1%; transform: rotate(9deg); z-index: 3;"
+        aria-label="Dismiss Mail notification"
+        on:click={() => burst("email")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("email")}
+      >
+        <div class="popup-header">
+          <span class="icon">✉️</span>
+          <span class="app-name">Mail · 14 Unread</span>
+          <span class="time">5m ago</span>
+        </div>
+        <p class="popup-body"><strong>ACTION REQUIRED:</strong> Mandatory compliance training overdue. Your access will be restricted by 5 PM.</p>
+      </button>
+    {/if}
 
-    <div class="popup-card calendar" style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); right: 8%; transform: rotate(-7deg) scale(0.96); z-index: 4;">
-      <div class="popup-header">
-        <span class="icon">📅</span>
-        <span class="app-name">Calendar Reminder</span>
-        <span class="time">in 3 min</span>
-      </div>
-      <p class="popup-body"><strong>Quick 15-min Sync</strong> w/ Legal & Finance (Google Meet link inside)</p>
-    </div>
+    {#if !dismissedIds.includes("calendar")}
+      <button
+        type="button"
+        class="popup-card calendar"
+        class:bursting={burstingId === "calendar"}
+        style="top: calc(clamp(52px, 9vh, 72px) + 11.5rem); right: 8%; transform: rotate(-7deg) scale(0.96); z-index: 4;"
+        aria-label="Dismiss Calendar notification"
+        on:click={() => burst("calendar")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("calendar")}
+      >
+        <div class="popup-header">
+          <span class="icon">📅</span>
+          <span class="app-name">Calendar Reminder</span>
+          <span class="time">in 3 min</span>
+        </div>
+        <p class="popup-body"><strong>Quick 15-min Sync</strong> w/ Legal & Finance (Google Meet link inside)</p>
+      </button>
+    {/if}
 
     <!-- Second wave, doubling the pile: same chaos, more channels -->
-    <div class="popup-card twitter" style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); left: 4%; transform: rotate(5deg) scale(0.95); z-index: 3;">
-      <div class="popup-header">
-        <span class="icon">🐦</span>
-        <span class="app-name">X · DM from Investor</span>
-        <span class="time">now</span>
-      </div>
-      <p class="popup-body">Saw the deck. Can we jump on a call before markets open tomorrow?</p>
-    </div>
+    {#if !dismissedIds.includes("twitter")}
+      <button
+        type="button"
+        class="popup-card twitter"
+        class:bursting={burstingId === "twitter"}
+        style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); left: 4%; transform: rotate(5deg) scale(0.95); z-index: 3;"
+        aria-label="Dismiss X notification"
+        on:click={() => burst("twitter")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("twitter")}
+      >
+        <div class="popup-header">
+          <span class="icon">🐦</span>
+          <span class="app-name">X · DM from Investor</span>
+          <span class="time">now</span>
+        </div>
+        <p class="popup-body">Saw the deck. Can we jump on a call before markets open tomorrow?</p>
+      </button>
+    {/if}
 
-    <div class="popup-card instagram" style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); right: 4%; transform: rotate(-6deg) scale(0.95); z-index: 3;">
-      <div class="popup-header">
-        <span class="icon">📸</span>
-        <span class="app-name">Instagram · Client tagged you</span>
-        <span class="time">8m ago</span>
-      </div>
-      <p class="popup-body">"@you why is our stand still not ready?? event is in 2 days 😭"</p>
-    </div>
+    {#if !dismissedIds.includes("instagram")}
+      <button
+        type="button"
+        class="popup-card instagram"
+        class:bursting={burstingId === "instagram"}
+        style="top: calc(clamp(52px, 9vh, 72px) + 17.5rem); right: 4%; transform: rotate(-6deg) scale(0.95); z-index: 3;"
+        aria-label="Dismiss Instagram notification"
+        on:click={() => burst("instagram")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("instagram")}
+      >
+        <div class="popup-header">
+          <span class="icon">📸</span>
+          <span class="app-name">Instagram · Client tagged you</span>
+          <span class="time">8m ago</span>
+        </div>
+        <p class="popup-body">"@you why is our stand still not ready?? event is in 2 days 😭"</p>
+      </button>
+    {/if}
 
-    <div class="popup-card zoom" style="bottom: 20%; left: 3%; transform: rotate(-4deg) scale(0.95); z-index: 4;">
-      <div class="popup-header">
-        <span class="icon">🎥</span>
-        <span class="app-name">Zoom · Meeting starting</span>
-        <span class="time">in 1 min</span>
-      </div>
-      <p class="popup-body"><strong>All-hands:</strong> Q2 targets review. Camera on, please.</p>
-    </div>
+    {#if !dismissedIds.includes("zoom")}
+      <button
+        type="button"
+        class="popup-card zoom"
+        class:bursting={burstingId === "zoom"}
+        style="bottom: 20%; left: 3%; transform: rotate(-4deg) scale(0.95); z-index: 4;"
+        aria-label="Dismiss Zoom notification"
+        on:click={() => burst("zoom")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("zoom")}
+      >
+        <div class="popup-header">
+          <span class="icon">🎥</span>
+          <span class="app-name">Zoom · Meeting starting</span>
+          <span class="time">in 1 min</span>
+        </div>
+        <p class="popup-body"><strong>All-hands:</strong> Q2 targets review. Camera on, please.</p>
+      </button>
+    {/if}
 
-    <div class="popup-card trello" style="bottom: 20%; right: 3%; transform: rotate(6deg) scale(0.95); z-index: 4;">
-      <div class="popup-header">
-        <span class="icon">📋</span>
-        <span class="app-name">Trello · Card overdue</span>
-        <span class="time">3h ago</span>
-      </div>
-      <p class="popup-body"><strong>"Fix production bug"</strong> is 3 days past due. 4 people are watching.</p>
-    </div>
+    {#if !dismissedIds.includes("trello")}
+      <button
+        type="button"
+        class="popup-card trello"
+        class:bursting={burstingId === "trello"}
+        style="bottom: 20%; right: 3%; transform: rotate(6deg) scale(0.95); z-index: 4;"
+        aria-label="Dismiss Trello notification"
+        on:click={() => burst("trello")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("trello")}
+      >
+        <div class="popup-header">
+          <span class="icon">📋</span>
+          <span class="app-name">Trello · Card overdue</span>
+          <span class="time">3h ago</span>
+        </div>
+        <p class="popup-body"><strong>"Fix production bug"</strong> is 3 days past due. 4 people are watching.</p>
+      </button>
+    {/if}
 
-    <div class="popup-card bank" style="top: 62%; left: 1%; transform: rotate(3deg) scale(0.94); z-index: 2;">
-      <div class="popup-header">
-        <span class="icon">🏦</span>
-        <span class="app-name">GTBank · Debit Alert</span>
-        <span class="time">1m ago</span>
-      </div>
-      <p class="popup-body">Debit of ₦45,000 on card **1234. Generator fuel, again.</p>
-    </div>
+    {#if !dismissedIds.includes("bank")}
+      <button
+        type="button"
+        class="popup-card bank"
+        class:bursting={burstingId === "bank"}
+        style="top: 62%; left: 1%; transform: rotate(3deg) scale(0.94); z-index: 2;"
+        aria-label="Dismiss GTBank notification"
+        on:click={() => burst("bank")}
+        on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("bank")}
+      >
+        <div class="popup-header">
+          <span class="icon">🏦</span>
+          <span class="app-name">GTBank · Debit Alert</span>
+          <span class="time">1m ago</span>
+        </div>
+        <p class="popup-body">Debit of ₦45,000 on card **1234. Generator fuel, again.</p>
+      </button>
+    {/if}
 
     <!-- System Notification — the one that keeps re-popping in a new spot
          instead of parking itself over the card footer, and reads as
          frosted glass so the card underneath stays partly visible. -->
-    {#key batteryIndex}
-      <div
-        class="popup-card battery glass"
-        style="{batterySpot.style} --rot: {batterySpot.rot}deg; z-index: 5;"
-      >
-        <div class="popup-header">
-          <span class="icon">🔋</span>
-          <span class="app-name">System Notification</span>
-        </div>
-        <p class="popup-body"><strong>Battery Low (9%)</strong> — Connect your Mac to a power adapter soon or it will sleep.</p>
-      </div>
-    {/key}
+    {#if !dismissedIds.includes("battery")}
+      {#key batteryIndex}
+        <button
+          type="button"
+          class="popup-card battery glass"
+          class:bursting={burstingId === "battery"}
+          style="{batterySpot.style} --rot: {batterySpot.rot}deg; z-index: 5;"
+          aria-label="Dismiss system notification"
+          on:click={() => burst("battery")}
+          on:animationend={(e) => e.animationName.endsWith("cardBurst") && settleBurst("battery")}
+        >
+          <div class="popup-header">
+            <span class="icon">🔋</span>
+            <span class="app-name">System Notification</span>
+          </div>
+          <p class="popup-body"><strong>Battery Low (9%)</strong> — Connect your Mac to a power adapter soon or it will sleep.</p>
+        </button>
+      {/key}
+    {/if}
   </div>
 {/if}
 
@@ -162,6 +323,41 @@
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.8);
     animation: floatChaos 4s ease-in-out infinite alternate;
+    /* .chaos-layer is pointer-events: none so it never blocks the page
+       underneath — each card opts back in so it can be tapped away. */
+    pointer-events: auto;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    appearance: none;
+  }
+
+  .popup-card:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  .popup-card.bursting {
+    animation: cardBurst 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    pointer-events: none;
+  }
+
+  @keyframes cardBurst {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+      filter: blur(0);
+    }
+    35% {
+      transform: scale(1.16);
+      opacity: 1;
+      filter: blur(0);
+    }
+    100% {
+      transform: scale(1.7);
+      opacity: 0;
+      filter: blur(8px);
+    }
   }
 
   /* Give different cards slightly staggered float animations */

@@ -20,7 +20,29 @@
   import StressMeter from "./lib/StressMeter.svelte";
   import AmbientSound from "./lib/AmbientSound.svelte";
   import AboutEvent from "./lib/AboutEvent.svelte";
+  import ToastSystem from "./lib/ToastSystem.svelte";
+  import RsvpDrawer from "./lib/RsvpDrawer.svelte";
+  import CommandPalette from "./lib/CommandPalette.svelte";
+  import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
+  import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
+  import EventTrail from "./lib/EventTrail.svelte";
+  import { clearAllToasts } from "./lib/toastStore.js";
+  import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
+  import dropletPink from "../docs/brand-reference/paint-droplet-pink.png";
   import { pageProgress } from "./lib/scrollProgress.js";
+
+  let isDrawerOpen = false;
+  let isCmdKOpen = false;
+  let isOooGenOpen = false;
+
+  function openDrawer() { isDrawerOpen = true; }
+  function closeDrawer() { isDrawerOpen = false; }
+
+  function openCmdK() { isCmdKOpen = true; }
+  function closeCmdK() { isCmdKOpen = false; }
+
+  function openOooGen() { isOooGenOpen = true; }
+  function closeOooGen() { isOooGenOpen = false; }
 
   let currentRoute = typeof window !== 'undefined' ? window.location.hash || '#/' : '#/';
   function onHashChange() {
@@ -169,27 +191,51 @@
     }
   }
 
+  let isOnline = false;
+
+  function handleStatusChange(onlineState) {
+    isOnline = onlineState;
+    if (isOnline) {
+      try {
+        sessionStorage.removeItem("oooChaosDismissed");
+      } catch {}
+      // Restore all chaos popups + toasts
+      window.dispatchEvent(new CustomEvent('oooStatusOnline'));
+    } else {
+      // Going AWAY — kill every popup and toast immediately
+      clearAllToasts();
+      window.dispatchEvent(new CustomEvent('oooStatusAway'));
+    }
+  }
+
+  function handleArrowClick() {
+    const el = document.getElementById('open-canvas-event');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   $: activated = progress >= 0.995;
 
-  $: notificationCount =
-    smoothedProgress < 0.05
+  $: notificationCount = isOnline
+    ? "999+ (ONLINE ⚡)"
+    : smoothedProgress < 0.05
       ? "999+"
       : smoothedProgress >= 0.95
         ? 0
         : Math.floor(999 * Math.pow(1 - (smoothedProgress - 0.05) / 0.9, 3));
 
-  // Chaos -> calm color arc for the notification pill (concept.txt: "the
-  // colors become calmer" as you scroll) — traffic red while the inbox is
-  // still slammed, danfo yellow through the mid-range taper, brand blue once
-  // muted. Mirrors the mainland (red/yellow) -> island (blue) journey.
-  $: notifStage = notificationCount === 0 ? "zero" : smoothedProgress < 0.25 ? "high" : "mid";
+  // Chaos -> calm color arc for the notification pill
+  $: notifStage = notificationCount === 0 ? "zero" : (smoothedProgress < 0.25 || isOnline) ? "high" : "mid";
 </script>
 
-<svelte:window on:hashchange={onHashChange} />
+<svelte:window on:hashchange={onHashChange} on:keydown={onKeyDown} />
 
 {#if currentRoute === '#/about'}
   <AboutEvent />
-{/if}
+{:else if currentRoute === '#/trail'}
+  <EventTrail />
+{:else}
 
 <BootSequence />
 
@@ -198,15 +244,20 @@
     <div class="stage-wrap">
       <div class="grain"></div>
       <!-- Chaos Layer chat bubbles outside of the main postcard card to frame the digital noise around our escape -->
-      <ChaosLayer progress={smoothedProgress} />
+      <ChaosLayer progress={smoothedProgress} forceOnline={isOnline} />
       <main class="frame">
-        <HeaderBar />
+        <HeaderBar
+          onOpenCmdK={openCmdK}
+          onOpenDrawer={openDrawer}
+          onOpenOooGen={openOooGen}
+          onStatusChange={handleStatusChange}
+        />
         <ZineDecorations />
 
         <div class="hero">
           <DanfoBus progress={smoothedProgress} />
 
-          <button class="icon-btn icon-share" aria-label="Share this page" on:click={handleShare}>
+          <button class="icon-btn icon-share" aria-label="Scroll to Open Canvas event" on:click={handleArrowClick} title="Scroll to Open Canvas event (May 30)">
             <svg viewBox="0 0 24 24"
               ><path
                 fill="none"
@@ -230,33 +281,18 @@
                 <span class="notif-count">{notificationCount === 0 ? "0 (Muted ✓)" : notificationCount}</span>
               </div>
               <span class="eyebrow">
-                <svg class="paint-splat" viewBox="0 0 60 50" aria-hidden="true">
-                  <path
-                    fill="url(#splatGrad)"
-                    d="M18 6c9 0 15 5 19 5s9-4 12 0-2 8 1 12 8 5 5 10-9 3-12 7-6 8-13 5-3-9-9-9-11 3-14-3 3-8 0-12-7-5-3-10 9-2 11-5 1-1 3-0z"
-                  />
-                  <path
-                    fill="url(#splatGrad)"
-                    d="M14 24q4 11-1 17q-5 6-9 0q-3-6 2-15q3-5 8-2z"
-                  />
-                  <circle cx="46" cy="10" r="3.5" fill="var(--pink-deep)" />
-                  <defs>
-                    <linearGradient id="splatGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stop-color="var(--pink)" />
-                      <stop offset="1" stop-color="var(--pink-deep)" />
-                    </linearGradient>
-                  </defs>
-                </svg>
+                <img class="paint-splat paint-splat-blue" src={dropletBlue} alt="" aria-hidden="true" width="489" height="404" />
+                <img class="paint-splat paint-splat-pink" src={dropletPink} alt="" aria-hidden="true" width="394" height="407" />
                 Auto-reply for real life</span
               >
-              <div class="stack">
+              <h1 class="stack">
                 <span class="word">OUT</span>
                 <span class="of">of</span>
                 <span class="word">OFFICE</span>
-              </div>
+              </h1>
               <div class="subhead">
-                <span class="stamp">OOO 002</span>
-                <span class="venue">Tarkwa Bay · Apr 11</span>
+                <span class="stamp">OOO 0x03</span>
+                <span class="venue">Tarkwa Bay · Aug 15</span>
               </div>
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>
@@ -307,6 +343,13 @@
 <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Tickets {visible} /></ScrollReveal>
 
+<ScheduleFAQ />
+
+<RsvpDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
+<CommandPalette isOpen={isCmdKOpen} onClose={closeCmdK} onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
+<OooGeneratorModal isOpen={isOooGenOpen} onClose={closeOooGen} />
+<ToastSystem />
+
 <div class="stats-toast" class:visible={showStats} role="status">
   <p class="stats-title">Lagos Survival Stats</p>
   <ul>
@@ -315,6 +358,8 @@
     <li>Stress reduced: <strong>68%</strong></li>
   </ul>
 </div>
+
+{/if}
 
 <style>
   .scroll-track {
@@ -461,12 +506,23 @@
 
   .paint-splat {
     position: absolute;
-    top: -0.9em;
-    left: -1.8em;
-    width: clamp(16px, 4vw, 22px);
-    height: auto;
     z-index: -1;
-    opacity: 0.9;
+    pointer-events: none;
+    height: auto;
+  }
+
+  .paint-splat-blue {
+    top: -5.2em;
+    left: -14.4em;
+    width: clamp(88px, 20vw, 120px);
+    opacity: 0.95;
+  }
+
+  .paint-splat-pink {
+    top: 1.4em;
+    left: -4.8em;
+    width: clamp(60px, 13.6vw, 80px);
+    opacity: 0.92;
   }
 
   .stack {
@@ -480,10 +536,7 @@
     font-size: clamp(3.2rem, 14vw, 5.4rem);
     color: var(--blue);
     letter-spacing: 0.02em;
-    /* Hallmark typography.md: all-caps display heads need line-height >= 1.0
-       (recommended 1.02-1.08) — below that, cap-tops on the wrapped second
-       line collide with the line above since there are no descenders to
-       cushion the gap. */
+    /* All-caps display heads need line-height >= 1.0 */
     line-height: 1.04;
   }
   /* "of" breaks from the wordmark's Back Wild/blue pairing into Permanent
@@ -770,7 +823,7 @@
     top: 2rem;
     left: 50%;
     transform: translate(-50%, -20px);
-    background: rgba(246, 244, 241, 0.95);
+    background: var(--card-surface);
     backdrop-filter: blur(8px);
     border: 2px solid var(--blue);
     padding: 1.25rem 1.75rem;

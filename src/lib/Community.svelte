@@ -33,7 +33,7 @@
   <div class="wall">
     {#each POLAROIDS as p, i}
       <figure class="polaroid" class:visible style="--rotate: {p.rotate}deg; --i: {i};">
-        <img src={p.src} alt={p.caption} loading="lazy" />
+        <img src={p.src} alt={p.caption} width="600" height="400" loading="lazy" />
         <figcaption>{p.caption}</figcaption>
       </figure>
     {/each}
@@ -84,14 +84,43 @@
 
   .wall {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: clamp(1rem, 3vw, 2rem);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: clamp(1rem, 3vw, 1.75rem);
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 1.5rem;
+    /* Snap scrolling for a tactile feel on touch */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar aesthetically */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft-deep) transparent;
+  }
+  .wall::-webkit-scrollbar {
+    height: 4px;
+  }
+  .wall::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .wall::-webkit-scrollbar-thumb {
+    background: var(--border-soft-deep);
+    border-radius: 999px;
+  }
+
+  @media (min-width: 900px) {
+    .wall {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      justify-content: flex-end;
+      padding-bottom: 0;
+    }
   }
 
   .polaroid {
     margin: 0;
-    width: clamp(150px, 20vw, 220px);
+    flex: 0 0 clamp(200px, 28vw, 280px);
+    scroll-snap-align: start;
     background: var(--card-surface);
     padding: 0.6rem 0.6rem 1.1rem;
     border-radius: 4px;
@@ -113,8 +142,9 @@
   .polaroid img {
     display: block;
     width: 100%;
-    aspect-ratio: 9 / 16;
-    object-fit: cover;
+    height: auto;
+    /* No forced aspect-ratio or cover — show the full flyer */
+    object-fit: contain;
     border-radius: 2px;
   }
   .polaroid figcaption {

@@ -1,9 +1,16 @@
 <script>
   import { onMount, onDestroy } from "svelte";
+  import { DialStore } from "dialkit/store";
 
   let node;
   let visible = false;
   let observer;
+
+  // Register Dialkit animation config for scroll transitions
+  DialStore.registerPanel('scroll-reveal', 'Scroll Reveal Transitions', {
+    revealDistance: [40, 10, 100],
+    revealDuration: [0.8, 0.2, 2.0],
+  });
 
   onMount(() => {
     observer = new IntersectionObserver(

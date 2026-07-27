@@ -151,7 +151,7 @@
   const CHAOS_RED = '#e5383b';
   // Dynamic seam/plastic body color based on dark/light mode (`$isDark`).
   // White edges around cube colors for light mode, obsidian black for dark mode!
-  $: seamColor = $isDark ? '#0c0c0f' : '#ffffff';
+  $: seamColor = $isDark ? '#0a0b0c' : '#ffffff';
 
   let activeRepaintAll = null;
   $: if (activeRepaintAll && seamColor) {
