@@ -84,14 +84,16 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: oklch(18% 0.02 260);
-  --ink: oklch(95% 0.01 260);
-  --cream: oklch(22% 0.03 260);
-  --muted: oklch(70% 0.01 260);
-  --card-surface: oklch(24% 0.03 260);
-  --border-soft: oklch(30% 0.04 260);
-  --border-soft-deep: oklch(35% 0.04 260);
-  --border-dashed: oklch(40% 0.03 260);
+  /* Matches the "What We Are" about page's obsidian/limestone palette,
+     instead of the cooler blue-tinted dark scale this used to compute. */
+  --bg: #0a0b0c;
+  --ink: #e6e6dc;
+  --cream: #141513;
+  --muted: #c6c7bd;
+  --card-surface: #1a1b18;
+  --border-soft: #2a2b27;
+  --border-soft-deep: #34352f;
+  --border-dashed: #3e3f38;
   --blue: oklch(70% 0.15 245);
 }
 

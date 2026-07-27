@@ -1,5 +1,6 @@
 <script>
   import postcardImg from '../../docs/brand-reference/postcard-greetings-from-out-of-office.jpg';
+  import stampImg from '../../docs/brand-reference/postcard-out-of-office-stamp.jpg';
   import MorphText from './MorphText.svelte';
 
   export let visible = false;
@@ -11,16 +12,14 @@
     <p class="caption" class:visible>A postcard for whenever you're out of office — not just Tarkwa Bay.</p>
   </div>
 
-  <figure class="postcard gamified-float interactive-card" class:visible>
-    <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
-    <span class="stamp">
-      <svg viewBox="0 0 40 40" aria-hidden="true">
-        <circle cx="20" cy="20" r="18" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 2" />
-        <text x="20" y="17" text-anchor="middle" font-size="7" fill="#fff" font-family="var(--bungee)">OOO</text>
-        <text x="20" y="27" text-anchor="middle" font-size="6" fill="#fff" font-family="var(--sans)">LAGOS</text>
-      </svg>
-    </span>
-  </figure>
+  <div class="collage" class:visible>
+    <figure class="postcard gamified-float interactive-card">
+      <img src={postcardImg} alt="Greetings from Out of Office" loading="lazy" />
+    </figure>
+    <figure class="stamp-photo gamified-float interactive-card">
+      <img src={stampImg} alt="Out of Office postage stamp, July 18 to August 18" loading="lazy" />
+    </figure>
+  </div>
 </section>
 
 <style>
@@ -33,7 +32,7 @@
     align-items: center;
     gap: 3rem;
   }
-  
+
   @media (min-width: 768px) {
     .postcard-section {
       flex-direction: row;
@@ -43,24 +42,23 @@
     .text-content {
       flex: 1 1 40%;
     }
-    .postcard {
+    .collage {
       flex: 1 1 60%;
       margin: 0;
     }
   }
 
   .eyebrow,
-  .postcard,
+  .collage,
   .caption {
     opacity: 0;
     transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
   }
   .eyebrow.visible,
-  .postcard.visible,
+  .collage.visible,
   .caption.visible {
     opacity: 1;
   }
-  .postcard.visible { transition-delay: 100ms; }
   .caption.visible { transition-delay: 220ms; }
 
   .eyebrow {
@@ -73,18 +71,27 @@
     transform: translateY(0);
   }
 
+  /* Two photos scattered together like a scrapbook page — the postcard
+     sits underneath, the stamp photo overlaps its corner on top */
+  .collage {
+    position: relative;
+    max-width: 100%;
+    display: inline-block;
+    transform: translateY(24px);
+  }
+  .collage.visible {
+    transform: translateY(0);
+  }
+
   .postcard {
     position: relative;
     margin: 0;
-    display: inline-block;
+    display: block;
     max-width: 100%;
     border-radius: 6px;
     overflow: hidden;
     box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
-    transform: translateY(24px) rotate(-1.5deg);
-  }
-  .postcard.visible {
-    transform: translateY(0) rotate(-1.5deg);
+    transform: rotate(-1.5deg);
   }
   .postcard img {
     display: block;
@@ -93,17 +100,37 @@
     height: auto;
   }
 
-  .stamp {
+  .stamp-photo {
     position: absolute;
-    top: 0.9rem;
-    right: 0.9rem;
-    width: clamp(44px, 8vw, 56px);
-    height: clamp(44px, 8vw, 56px);
-    opacity: 0.85;
+    right: -6%;
+    bottom: -12%;
+    z-index: 1;
+    margin: 0;
+    width: clamp(120px, 34%, 190px);
+    padding: 0.4rem 0.4rem 1.1rem;
+    background: var(--card-surface, #fff);
+    border-radius: 4px;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+    transform: rotate(6deg);
+    transition: opacity 0.6s var(--ease-out-expo) 180ms, transform 0.6s var(--ease-out-expo) 180ms;
+    opacity: 0;
   }
-  .stamp svg {
+  .collage.visible .stamp-photo {
+    opacity: 1;
+  }
+  .stamp-photo img {
+    display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 480px) {
+    .stamp-photo {
+      right: -4%;
+      bottom: -10%;
+      width: clamp(96px, 38%, 150px);
+    }
   }
 
   .caption {
