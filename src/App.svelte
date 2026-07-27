@@ -512,16 +512,16 @@
   }
 
   .paint-splat-blue {
-    top: -5.2em;
-    left: -14.4em;
-    width: clamp(88px, 20vw, 120px);
+    top: -3.9em;
+    left: -10.8em;
+    width: clamp(66px, 15vw, 90px);
     opacity: 0.95;
   }
 
   .paint-splat-pink {
-    top: 1.4em;
-    left: -4.8em;
-    width: clamp(60px, 13.6vw, 80px);
+    top: 1.05em;
+    left: -3.6em;
+    width: clamp(45px, 10.2vw, 60px);
     opacity: 0.92;
   }
 

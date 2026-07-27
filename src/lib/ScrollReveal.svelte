@@ -1,13 +1,13 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  import { DialStore } from "dialkit/store";
+  import { createDialKit } from "dialkit/svelte";
 
   let node;
   let visible = false;
   let observer;
 
   // Register Dialkit animation config for scroll transitions
-  DialStore.registerPanel('scroll-reveal', 'Scroll Reveal Transitions', {
+  const scrollReveal = createDialKit('scroll-reveal', {
     revealDistance: [40, 10, 100],
     revealDuration: [0.8, 0.2, 2.0],
   });

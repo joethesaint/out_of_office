@@ -1,11 +1,11 @@
 <script>
   import MorphText from './MorphText.svelte';
-  import { DialStore } from 'dialkit/store';
+  import { createDialKit } from 'dialkit/svelte';
 
   export let visible = false;
 
   // Register Dialkit animation configuration for timeline transitions
-  DialStore.registerPanel('timeline-anim', 'Memory Timeline Physics', {
+  const timelineAnim = createDialKit('timeline-anim', {
     springStiffness: [120, 10, 300],
     springDamping: [14, 1, 40],
     staggerDelay: [130, 50, 400]

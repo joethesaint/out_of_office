@@ -4,9 +4,9 @@
    * states: default · path-drawn · node-done · node-active · node-pending
    */
   import { onMount, onDestroy } from 'svelte';
-  import { DialStore } from 'dialkit/store';
+  import { createDialKit } from 'dialkit/svelte';
 
-  DialStore.registerPanel('trail-roadmap', 'OOO Roadmap Trail Physics', {
+  const trailRoadmap = createDialKit('trail-roadmap', {
     springStiffness: [240, 60, 700],
     springDamping:   [22,  4,  70],
     staggerDelay:    [200, 80, 600],

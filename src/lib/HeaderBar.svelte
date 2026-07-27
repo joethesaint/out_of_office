@@ -1,7 +1,7 @@
 <script>
   import { isDark, toggleTheme } from './theme.js';
   import AudioControlDeck from './AudioControlDeck.svelte';
-  import { DialStore } from 'dialkit/store';
+  import { createDialKit } from 'dialkit/svelte';
 
   export let onOpenCmdK = () => {};
   export let onOpenDrawer = () => {};
@@ -9,7 +9,7 @@
   export let onStatusChange = (onlineState) => {};
 
   // Register Dialkit topbar animation & glass parameters
-  DialStore.registerPanel('topbar-physics', 'Topbar Glass & Animation Physics', {
+  const physics = createDialKit('topbar-physics', {
     topPadding: [8, 0, 24],
     glassBlur: [16, 4, 32],
     hoverExpandSpeed: [0.35, 0.1, 1.0],
@@ -30,7 +30,7 @@
   }
 </script>
 
-<header class="bar-container">
+<header class="bar-container" style="--pt: {physics.topPadding}px; --blur: {physics.glassBlur}px; --speed: {physics.hoverExpandSpeed}s;">
   <div class="bar">
     <!-- Clickable Away/Online Status Toggle -->
     <button 
@@ -127,10 +127,11 @@
     position: sticky;
     top: 0.5rem;
     z-index: 1000;
-    width: calc(100% - 1.5rem);
-    max-width: 1280px;
-    margin: 0.4rem auto 0 auto;
+    width: calc(100% - 2rem);
+    max-width: 1400px;
+    margin: var(--pt, 8px) auto 0 auto;
     font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', 'Courier New', monospace);
+    transition: margin-top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* Glassmorphic Container Design System */
@@ -141,12 +142,12 @@
     min-height: 56px;
     color: var(--ink);
     background: rgba(18, 20, 24, 0.78);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(var(--blur, 16px)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur, 16px)) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
   }
 
   :global([data-theme="light"]) .bar {
@@ -276,7 +277,7 @@
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all var(--speed, 0.35s) cubic-bezier(0.16, 1, 0.3, 1);
     font-family: inherit;
   }
   :global([data-theme="light"]) .action-pill {
@@ -294,9 +295,9 @@
     opacity: 0;
     margin-left: 0;
     white-space: nowrap;
-    transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    transition: max-width var(--speed, 0.35s) cubic-bezier(0.16, 1, 0.3, 1),
                 opacity 0.25s ease,
-                margin-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+                margin-left var(--speed, 0.35s) cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .action-pill:hover {
@@ -365,6 +366,7 @@
     align-items: center;
     gap: 0.6rem;
     padding: 0 1rem;
+    margin-left: auto; /* Push to the far right edge */
     text-decoration: none;
     transition: transform 0.3s var(--ease-out-expo), opacity 0.3s ease;
   }
@@ -374,11 +376,11 @@
   }
 
   .status-dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--pink-deep, #ff2e63), var(--blue, #00bfff));
-    box-shadow: 0 0 10px var(--pink-deep, #ff2e63);
+    background: var(--ink);
+    opacity: 0.8;
     animation: dotPulse 2.5s infinite ease-in-out;
   }
 
@@ -392,10 +394,7 @@
     font-size: 1.45rem;
     font-weight: 900;
     letter-spacing: -0.05em;
-    background: linear-gradient(135deg, var(--blue, #00bfff) 0%, var(--pink-deep, #ff2e63) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 8px rgba(0, 191, 255, 0.25));
+    color: var(--ink);
   }
 
   .meta {
@@ -425,8 +424,27 @@
     animation: fadeIn 0.25s ease-out;
   }
   .status-toast.online {
-    border-color: #00ff88;
-    color: #00ff88;
+    background: #00ff88;
+    color: #042f1a;
+  }
+
+  /* Responsive Adjustments to fix horizontal squishing on mobile */
+  @media (max-width: 900px) {
+    .block-trend {
+      display: none;
+    }
+    .wordmark-col .meta {
+      display: none;
+    }
+    .status-val {
+      font-size: 0.8rem;
+    }
+    .status-btn {
+      padding: 0 0.5rem;
+    }
+    .block-logo {
+      padding: 0 0.5rem;
+    }
   }
 
   @keyframes fadeIn {
