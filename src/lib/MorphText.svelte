@@ -8,11 +8,18 @@
   export let boost = 1;
 
   $: p = Math.max(0, Math.min(1, $pageProgress * boost));
+
+  // Crossfade window: fully corporate below 40%, fully handwritten above
+  // 60%, dissolving between. Narrow on purpose — the two faces have very
+  // different metrics (uppercase/tracked vs rotated cursive), so a long
+  // blend reads as a double-exposure. A quick dissolve reads as a swap.
+  $: handOpacity = Math.max(0, Math.min(1, (p - 0.4) / 0.2));
+  $: corpOpacity = 1 - handOpacity;
 </script>
 
 <span class="morph-text">
-  <span class="mt-corporate" aria-hidden="true" style="clip-path: polygon({p * 100}% 0, 100% 0, 100% 100%, {p * 100}% 100%);">{text}</span>
-  <span class="mt-hand" aria-hidden="true" style="clip-path: polygon(0 0, {p * 100}% 0, {p * 100}% 100%, 0 100%);">{text}</span>
+  <span class="mt-corporate" aria-hidden="true" style="opacity: {corpOpacity};">{text}</span>
+  <span class="mt-hand" aria-hidden="true" style="opacity: {handOpacity};">{text}</span>
   <span class="mt-sr-only">{text}</span>
 </span>
 
@@ -20,7 +27,11 @@
   /* Corporate (grotesk, tracked-out caps) crossfades into handwritten
      (marker script) as p climbs from 0 to 1 — a continuous scroll-tied
      morph rather than a fixed per-element font assignment. Both states
-     occupy the same grid cell so there's no layout jump mid-fade. */
+     occupy the same grid cell so there's no layout jump mid-fade.
+     Opacity crossfade rather than a clip-path wipe: the two faces don't
+     share glyph metrics (different case, tracking, rotation), so slicing
+     them at a shared boundary never lines up — a dissolve doesn't need
+     alignment, it just needs both centered on the same anchor. */
   .morph-text {
     position: relative;
     display: inline-grid;
@@ -28,8 +39,9 @@
   .mt-corporate,
   .mt-hand {
     grid-area: 1 / 1;
-    will-change: clip-path;
+    will-change: opacity;
     white-space: nowrap;
+    transition: opacity 0.15s ease;
   }
   .mt-corporate {
     text-transform: uppercase;
