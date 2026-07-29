@@ -1,27 +1,22 @@
 <script>
-  import tarkwaBay from '../../docs/brand-reference/flyer-post-nysc-hangout-tarkwa-bay.png';
-  import openCanvas from '../../docs/brand-reference/flyer-open-canvas-jaekel-house.png';
-  import saveTheDate from '../../docs/brand-reference/flyer-save-the-date-painting.png';
   import MorphText from './MorphText.svelte';
 
   export let visible = false;
 
   const POLAROIDS = [
-    { src: tarkwaBay, caption: 'Tarkwa Bay 🌊', rotate: -4 },
-    { src: openCanvas, caption: 'Open Canvas 🎨', rotate: 3 },
-    { src: saveTheDate, caption: 'Save the date', rotate: -2 },
+    { src: 'https://images.pexels.com/photos/7149181/pexels-photo-7149181.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'no hierarchy, just vibes', rotate: -4 },
+    { src: 'https://images.pexels.com/photos/3483763/pexels-photo-3483763.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'make a mess. make friends.', rotate: 3 },
+    { src: 'https://images.pexels.com/photos/35435219/pexels-photo-35435219.jpeg?auto=compress&cs=tinysrgb&w=800', caption: 'play is the plan', rotate: -2 },
   ];
 </script>
 
 <section class="community">
   <div class="text-content">
-    <p class="eyebrow"><MorphText text="Community" /></p>
-    <h2 class="heading">Leaving yellow Lagos, entering blue Lagos.</h2>
+    <p class="eyebrow"><MorphText text="Community > calendar invites" /></p>
+    <h2 class="heading">The best memories are slightly blurry.</h2>
 
     <div class="manifesto" class:visible>
-      <p>For the young and the working, the ones done with NYSC and starting life. It is also for those who want to take a break from the Lagos palava and wahala.</p>
-      <p>For the ones who came to Lagos from other states, seeing Lagos for the beauty that it is: the arts and the paintings on the beach, the artists, the creators, the DJs, the engineers. The free people, the Lagos spirits.</p>
-      <p>We gather for the silent reading and quiet musings, the serenity, the blue and the ocean. The yogi, the bonfire, the peaceful.</p>
+      <p>Out of Office is not status-heavy nightlife. It is a small rebellion: music, art, board games, shared snacks and the kind of conversation you remember on Monday.</p>
     </div>
 
     <div class="cta-row" class:visible>
@@ -52,17 +47,8 @@
   
   @media (min-width: 900px) {
     .community {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6rem;
-    }
-    .text-content {
-      flex: 1 1 50%;
-    }
-    .wall {
-      flex: 1 1 50%;
-      justify-content: flex-end;
+      flex-direction: column;
+      gap: 3rem;
     }
   }
 
@@ -83,44 +69,23 @@
   }
 
   .wall {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: clamp(1rem, 3vw, 1.75rem);
-    overflow-x: auto;
-    overflow-y: visible;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
     padding-bottom: 1.5rem;
-    /* Snap scrolling for a tactile feel on touch */
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    /* Hide scrollbar aesthetically */
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-soft-deep) transparent;
-  }
-  .wall::-webkit-scrollbar {
-    height: 4px;
-  }
-  .wall::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .wall::-webkit-scrollbar-thumb {
-    background: var(--border-soft-deep);
-    border-radius: 999px;
+    width: 100%;
   }
 
-  @media (min-width: 900px) {
+  @media (min-width: 768px) {
     .wall {
-      flex-wrap: wrap;
-      overflow-x: visible;
-      justify-content: flex-end;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
       padding-bottom: 0;
     }
   }
 
   .polaroid {
     margin: 0;
-    flex: 0 0 clamp(200px, 28vw, 280px);
-    scroll-snap-align: start;
     background: var(--card-surface);
     padding: 0.6rem 0.6rem 1.1rem;
     border-radius: 4px;
@@ -129,28 +94,38 @@
     transform: translateY(28px) rotate(var(--rotate));
     transition: transform 0.6s var(--ease-out-expo), opacity 0.6s var(--ease-out-expo);
     transition-delay: calc(var(--i, 0) * 110ms);
+    position: relative;
+    z-index: 1;
   }
+  
+  /* Stagger polaroids vertically like the Canva grid */
+  @media (min-width: 768px) {
+    .polaroid:nth-child(2) {
+      margin-top: 2.5rem;
+    }
+  }
+  
   .polaroid.visible {
     opacity: 1;
     transform: translateY(0) rotate(var(--rotate));
   }
   .polaroid.visible:hover {
     transition-delay: 0s;
-    transform: rotate(0deg) scale(1.03);
+    transform: rotate(0deg) scale(1.05);
     z-index: 10;
   }
   .polaroid img {
     display: block;
     width: 100%;
-    height: auto;
-    /* No forced aspect-ratio or cover — show the full flyer */
-    object-fit: contain;
+    height: 18rem;
+    object-fit: cover;
     border-radius: 2px;
   }
   .polaroid figcaption {
-    margin-top: 0.6rem;
-    font-size: 1rem;
-    color: var(--ink);
+    margin-top: 0.8rem;
+    font-size: 1.1rem;
+    font-family: "Permanent Marker", var(--sans);
+    color: var(--pink-deep);
     text-align: center;
   }
 

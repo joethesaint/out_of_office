@@ -1,14 +1,50 @@
 <script>
+  import { onDestroy } from 'svelte';
   import MorphText from './MorphText.svelte';
 
   export let visible = false;
 
+  // Target values count up when the section reveals, rather than sitting
+  // static — matches the live-counter treatment already used for the hero
+  // notification badge, cube, and StressMeter elsewhere in this app.
   const STATS = [
-    { value: '87', label: 'Emails ignored', color: 'var(--blue)' },
-    { value: '62%', label: 'Stress reduced', color: 'var(--sunset-orange)' },
-    { value: '∞', label: 'New friendships', color: 'var(--muted-green)' },
-    { value: '100%', label: 'Battery recharged', color: 'var(--pink-deep)' },
+    { target: 87, suffix: '', label: 'Emails ignored', color: 'var(--blue)' },
+    { target: 62, suffix: '%', label: 'Stress reduced', color: 'var(--sunset-orange)' },
+    { display: '∞', label: 'New friendships', color: 'var(--muted-green)' },
+    { target: 100, suffix: '%', label: 'Battery recharged', color: 'var(--pink-deep)' },
   ];
+
+  let displayValues = STATS.map((s) => (s.display ?? '0' + s.suffix));
+  let animated = false;
+  let cancelled = false;
+
+  function animateStats() {
+    const reduced = typeof window !== 'undefined'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      displayValues = STATS.map((s) => s.display ?? s.target + s.suffix);
+      return;
+    }
+    const duration = 1100;
+    const start = performance.now();
+    function tick(now) {
+      if (cancelled) return;
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      displayValues = STATS.map((s) =>
+        s.display ?? Math.round(s.target * eased) + s.suffix
+      );
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  $: if (visible && !animated) {
+    animated = true;
+    animateStats();
+  }
+
+  onDestroy(() => { cancelled = true; });
 </script>
 
 <section class="metrics">
@@ -24,7 +60,7 @@
   <div class="grid">
     {#each STATS as stat, i}
       <div class="tile" class:visible style="--i: {i};">
-        <span class="value" style="color: {stat.color}">{stat.value}</span>
+        <span class="value" style="color: {stat.color}">{displayValues[i]}</span>
         <span class="label">{stat.label}</span>
       </div>
     {/each}

@@ -5,6 +5,9 @@
    */
   import { onMount, onDestroy } from 'svelte';
   import { createDialKit } from 'dialkit/svelte';
+  import tarkwaBay from '../../docs/brand-reference/flyer-post-nysc-hangout-tarkwa-bay.png';
+  import openCanvas from '../../docs/brand-reference/flyer-open-canvas-jaekel-house.png';
+  import saveTheDate from '../../docs/brand-reference/flyer-save-the-date-painting.png';
 
   const trailRoadmap = createDialKit('trail-roadmap', {
     springStiffness: [240, 60, 700],
@@ -24,6 +27,7 @@
       textColor: '#fff',
       done: true,
       tagline: 'Where we first exhaled.',
+      image: tarkwaBay,
     },
     {
       stamp: 'OOO 0x02',
@@ -34,16 +38,30 @@
       time:  'TBA',
       color: 'var(--blue)',
       textColor: '#fff',
-      active: true,
+      done: true,
       tagline: 'You don\'t need to know how to paint.',
+      image: openCanvas,
     },
     {
       stamp: 'OOO 0x03',
       hex: '0x03',
+      title: 'Release and Unwind',
+      venue: 'TBA',
+      date:  'TBA',
+      time:  'TBA',
+      color: 'var(--pink-deep)',
+      textColor: '#fff',
+      active: true,
+      tagline: 'Take a break from the Lagos palava.',
+      image: saveTheDate,
+    },
+    {
+      stamp: 'OOO 0x04',
+      hex: '0x04',
       title: '???',
       venue: 'Coming soon',
-      date:  'Aug 15, 2025',
-      time:  'Tarkwa Bay',
+      date:  'TBA',
+      time:  'TBA',
       color: 'var(--muted-green)',
       textColor: 'var(--ink)',
       pending: true,
@@ -157,6 +175,13 @@
           <!-- Event title -->
           <h2 class="card-title">{ev.title}</h2>
           <p class="card-tagline">{ev.tagline}</p>
+
+          <!-- Flyer Thumbnail -->
+          {#if ev.image}
+            <div class="card-image-wrap" class:pending={ev.pending}>
+              <img src={ev.image} alt={ev.title} class="card-image" loading="lazy" />
+            </div>
+          {/if}
 
           <!-- Meta row -->
           <div class="card-meta">
@@ -520,6 +545,26 @@
     font-style: italic;
   }
   .pending .card-tagline { font-style: normal; }
+
+  /* ─── Flyer Thumbnail ────────────────────────────────── */
+  .card-image-wrap {
+    margin: 1.25rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+    background: color-mix(in oklch, var(--bg) 50%, transparent);
+  }
+  .card-image-wrap.pending {
+    filter: grayscale(100%) blur(4px) opacity(0.5);
+  }
+  .card-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 280px;
+    object-fit: contain;
+    border-radius: 12px;
+  }
 
   /* ─── Meta row ───────────────────────────────────────── */
   .card-meta {

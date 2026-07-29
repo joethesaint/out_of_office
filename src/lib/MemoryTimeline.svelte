@@ -29,6 +29,14 @@
     },
     {
       stamp: 'OOO 0x03',
+      title: 'Release and Unwind',
+      meta: 'TBA',
+      note: 'Take a break from the Lagos palava.',
+      color: 'var(--pink-deep)',
+      href: '#release-and-unwind-event',
+    },
+    {
+      stamp: 'OOO 0x04',
       title: '???',
       meta: 'Coming soon',
       note: 'Stay tuned.',

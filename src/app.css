@@ -68,13 +68,13 @@
   --border-dashed: oklch(76% 0.035 85);
   --island-divider: rgba(255, 255, 255, 0.15);
 
-  /* Unified Gamified Font */
-  --display: "Fredoka", system-ui, sans-serif;
-  --sans: "Fredoka", system-ui, sans-serif;
-  --bungee: "Fredoka", system-ui, sans-serif;
-  --marker: "Fredoka", system-ui, sans-serif;
-  --serif: "Fredoka", system-ui, sans-serif;
-  --wild: "Fredoka", system-ui, sans-serif;
+  /* Unified Canva Font System */
+  --display: "Fraunces", Georgia, serif;
+  --sans: "DM Sans", "Space Grotesk", system-ui, sans-serif;
+  --bungee: "Bungee", system-ui, sans-serif;
+  --marker: "Permanent Marker", cursive, sans-serif;
+  --serif: "Fraunces", Georgia, serif;
+  --wild: "Back Wild", cursive, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);

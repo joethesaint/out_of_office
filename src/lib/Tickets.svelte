@@ -146,10 +146,11 @@
     background: var(--card-surface);
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 2px solid #181818;
+    border: 2px solid var(--ink);
     display: flex;
     overflow: hidden;
     position: relative;
+    font-family: var(--font-mono, 'JetBrains Mono', 'Fira Code', 'Courier New', monospace);
     opacity: 0;
     transform: translateY(32px);
     transition: transform 0.6s var(--ease-out-expo), opacity 0.6s var(--ease-out-expo),
@@ -173,22 +174,22 @@
     display: flex;
     flex-direction: column;
     gap: 1.6rem;
-    background: linear-gradient(135deg, var(--card-surface) 0%, var(--cream) 100%);
+    background: var(--card-surface);
   }
 
   .pass-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #181818;
+    border-bottom: 2px solid var(--ink);
     padding-bottom: 0.8rem;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: #555;
+    color: var(--muted);
   }
   .brand-tag {
-    color: #181818;
+    color: var(--ink);
   }
   .flight-num strong {
     color: var(--blue, #00bfff);
@@ -219,7 +220,7 @@
   .route-point .city {
     font-size: 0.78rem;
     font-weight: 600;
-    color: #666;
+    color: var(--muted);
     text-transform: uppercase;
   }
 
@@ -267,7 +268,7 @@
   .route-arrow .line {
     width: 100%;
     height: 2px;
-    background: #181818;
+    background: var(--ink);
     position: relative;
   }
   .route-arrow .line::after {
@@ -277,8 +278,8 @@
     top: -3px;
     width: 8px;
     height: 8px;
-    border-top: 2px solid #181818;
-    border-right: 2px solid #181818;
+    border-top: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
     transform: rotate(45deg);
   }
   .route-arrow .duration {
@@ -293,10 +294,10 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.1rem 1.5rem;
-    background: var(--card-surface);
+    background: rgba(128, 128, 128, 0.05);
     padding: 1.2rem 1.4rem;
     border-radius: 12px;
-    border: 1px solid rgba(24, 24, 24, 0.12);
+    border: 1px solid rgba(128, 128, 128, 0.15);
   }
   .detail-item {
     display: flex;
@@ -305,7 +306,7 @@
   }
   .detail-item.col-span {
     grid-column: span 2;
-    border-top: 1px dashed rgba(24, 24, 24, 0.2);
+    border-top: 1px dashed rgba(128, 128, 128, 0.25);
     padding-top: 0.8rem;
   }
   .detail-item .label {
@@ -317,7 +318,7 @@
   .detail-item .value {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #181818;
+    color: var(--ink);
   }
   .detail-item .value.highlight {
     color: var(--accent, #e0568f);
@@ -340,8 +341,8 @@
     position: absolute;
     width: 24px;
     height: 24px;
-    background: var(--bg, #f6f4f1);
-    border: 2px solid #181818;
+    background: transparent;
+    border: 2px solid var(--ink);
     border-radius: 50%;
     z-index: 2;
   }
@@ -358,7 +359,7 @@
   .pass-stub {
     width: clamp(230px, 28vw, 290px);
     padding: 1.8rem 1.6rem;
-    background: var(--cream);
+    background: rgba(128, 128, 128, 0.05);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -384,8 +385,8 @@
     color: var(--muted);
   }
   .seat-badge {
-    background: #181818;
-    color: #fff;
+    background: var(--ink);
+    color: var(--bg);
     font-size: 0.72rem;
     font-weight: 700;
     padding: 0.35rem 0.6rem;
@@ -405,27 +406,27 @@
     height: 48px;
     background: repeating-linear-gradient(
       90deg,
-      #181818 0px,
-      #181818 3px,
+      var(--ink) 0px,
+      var(--ink) 3px,
       transparent 3px,
       transparent 5px,
-      #181818 5px,
-      #181818 9px,
+      var(--ink) 5px,
+      var(--ink) 9px,
       transparent 9px,
       transparent 11px,
-      #181818 11px,
-      #181818 13px,
+      var(--ink) 11px,
+      var(--ink) 13px,
       transparent 13px,
       transparent 18px,
-      #181818 18px,
-      #181818 20px
+      var(--ink) 18px,
+      var(--ink) 20px
     );
   }
   .barcode-num {
     font-family: monospace;
     font-size: 0.72rem;
     letter-spacing: 0.12em;
-    color: #444;
+    color: var(--muted);
   }
 
   .cta-btn {
