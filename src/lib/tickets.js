@@ -5,7 +5,6 @@ export const SHARED_INCLUSIONS = [
   '🎨 Open Canvas Painting Experience',
   '🏐 Beach Games & Group Activities',
   '🔥 Bonfire Experience',
-  '🎟️ Beach Access & Gate Fee',
   '🥤 Light Refreshments',
 ];
 
@@ -26,7 +25,7 @@ export const TICKET_TIERS = [
     amountKobo: 2000000,
     label: '₦20,000',
     sleeping: '⛺ Private tent accommodation',
-    extras: ['🧺 Beach Picnic'],
+    extras: [],
   },
 ];
 

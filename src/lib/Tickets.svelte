@@ -109,9 +109,14 @@
         {/each}
       </ul>
 
-      <p class="shared-inclusions">
-        <strong>Both passes include:</strong> {SHARED_INCLUSIONS.join(' · ')}
-      </p>
+      <div class="shared-inclusions">
+        <strong>Both passes include:</strong>
+        <ul>
+          {#each SHARED_INCLUSIONS as item}
+            <li>{item}</li>
+          {/each}
+        </ul>
+      </div>
 
       <button type="button" class="cta-btn" on:click={onOpenDrawer}>
         Claim Your Pass →
@@ -495,14 +500,22 @@
 
   .shared-inclusions {
     margin: 0;
-    font-size: 0.68rem;
-    line-height: 1.5;
+    font-size: 0.7rem;
     color: var(--muted);
     text-align: left;
   }
 
   .shared-inclusions strong {
     color: var(--ink);
+  }
+
+  .shared-inclusions ul {
+    list-style: none;
+    margin: 0.3rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
   }
 
   .cta-btn {

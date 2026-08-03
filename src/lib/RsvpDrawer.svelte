@@ -133,9 +133,14 @@
                 </div>
               {/each}
             </div>
-            <p class="shared-inclusions">
-              <strong>Both passes include:</strong> {SHARED_INCLUSIONS.join(' · ')}
-            </p>
+            <div class="shared-inclusions">
+              <strong>Both passes include:</strong>
+              <ul>
+                {#each SHARED_INCLUSIONS as item}
+                  <li>{item}</li>
+                {/each}
+              </ul>
+            </div>
             <button class="primary-btn" on:click={() => (step = 2)}>Continue to Details &rarr;</button>
           </div>
         {:else if step === 2}
@@ -314,10 +319,19 @@
   }
 
   .shared-inclusions {
-    font-size: 0.78rem;
-    line-height: 1.5;
-    opacity: 0.75;
+    font-size: 0.82rem;
+    opacity: 0.85;
     margin: -0.4rem 0 0;
+  }
+
+  .shared-inclusions ul {
+    list-style: none;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    opacity: 0.85;
   }
 
   .form-group {
