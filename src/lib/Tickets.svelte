@@ -4,6 +4,42 @@
 
   export let visible = false;
   const TICKET_URL = 'https://tix.africa/discover/outofofficeng';
+  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+
+  const TIERS = [
+    { id: 'explorer', name: 'Explorer Pass', amountKobo: 1575000, label: '₦15,750' },
+    { id: 'retreat', name: 'Retreat Pass', amountKobo: 2100000, label: '₦21,000' },
+  ];
+
+  let selectedTier = TIERS[0];
+  let paying = false;
+
+  function payForTicket() {
+    if (!PAYSTACK_PUBLIC_KEY) {
+      window.open(TICKET_URL, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    const attendeeEmail = prompt('Enter your email to receive your pass:');
+    if (!attendeeEmail) return;
+
+    paying = true;
+    const popup = new PaystackPop();
+    popup.newTransaction({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: attendeeEmail,
+      amount: selectedTier.amountKobo,
+      currency: 'NGN',
+      ref: 'OOO_' + selectedTier.id + '_' + Math.floor(Math.random() * 1000000000 + 1),
+      onSuccess: (transaction) => {
+        paying = false;
+        alert(`Success! Your ${selectedTier.name} is confirmed. Reference: ${transaction.reference}`);
+      },
+      onCancel: () => {
+        paying = false;
+      },
+    });
+  }
 </script>
 
 <section class="tickets-section">
@@ -90,10 +126,26 @@
         <span class="barcode-num">4 829104 772019 OOO-BNG</span>
       </div>
 
-      <a class="cta-btn" href={TICKET_URL} target="_blank" rel="noopener noreferrer">
-        Claim Boarding Pass →
-      </a>
-      <span class="fine-print">Powered by tix.africa</span>
+      <div class="tier-select" role="radiogroup" aria-label="Ticket tier">
+        {#each TIERS as tier (tier.id)}
+          <button
+            type="button"
+            class="tier-option"
+            class:active={selectedTier.id === tier.id}
+            role="radio"
+            aria-checked={selectedTier.id === tier.id}
+            on:click={() => (selectedTier = tier)}
+          >
+            <span class="tier-name">{tier.name}</span>
+            <span class="tier-price">{tier.label}</span>
+          </button>
+        {/each}
+      </div>
+
+      <button type="button" class="cta-btn" on:click={payForTicket} disabled={paying}>
+        {paying ? 'Processing…' : `Claim ${selectedTier.name} →`}
+      </button>
+      <span class="fine-print">Secured by Paystack</span>
     </div>
   </div>
 </section>
@@ -429,6 +481,41 @@
     color: var(--muted);
   }
 
+  .tier-select {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tier-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    border: 1.5px solid rgba(128, 128, 128, 0.25);
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .tier-option.active {
+    border-color: var(--blue, #00bfff);
+    background: rgba(0, 191, 255, 0.08);
+  }
+  .tier-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .tier-price {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--blue, #00bfff);
+  }
+
   .cta-btn {
     display: inline-block;
     width: 100%;
@@ -437,10 +524,13 @@
     color: #fff;
     background: var(--blue, #00bfff);
     padding: 0.9rem 1rem;
+    border: none;
     border-radius: 999px;
     text-decoration: none;
     box-shadow: 0 10px 24px rgba(0, 191, 255, 0.28);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    font-family: inherit;
   }
   .cta-btn:hover {
     transform: translateY(-2px);
@@ -449,6 +539,11 @@
   .cta-btn:focus-visible {
     outline: 2px solid var(--blue, #00bfff);
     outline-offset: 3px;
+  }
+  .cta-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+    transform: none;
   }
   .fine-print {
     font-size: 0.68rem;
