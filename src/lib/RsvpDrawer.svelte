@@ -122,6 +122,12 @@
                   class="tier-card"
                   class:active={selectedTier === t.id}
                   on:click={() => (selectedTier = t.id)}
+                  on:keydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      selectedTier = t.id;
+                    }
+                  }}
                   role="button"
                   tabindex="0"
                 >
@@ -205,7 +211,8 @@
   .overlay {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    /* matches CommandPalette / ToastSystem / OooGeneratorModal's top-tier overlay stack */
+    z-index: 10000;
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(4px);
     display: flex;
@@ -285,7 +292,7 @@
     border-radius: 12px;
     padding: 1rem;
     cursor: pointer;
-    transition: border-color 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.2s var(--ease-out-expo), transform 0.2s var(--ease-out-expo);
   }
 
   .tier-card.active,
