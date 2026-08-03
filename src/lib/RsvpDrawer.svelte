@@ -3,7 +3,7 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
-  import { TICKET_TIERS, payForTicket as startPaystackCheckout } from './tickets.js';
+  import { TICKET_TIERS, SHARED_INCLUSIONS, payForTicket as startPaystackCheckout } from './tickets.js';
 
   export let isOpen = false;
   export let onClose = () => {};
@@ -129,10 +129,13 @@
                     <span class="tier-name">{t.name}</span>
                     <span class="tier-price">{t.label}</span>
                   </div>
-                  <p class="tier-desc">{t.description}</p>
+                  <p class="tier-desc">{t.sleeping}{#if t.extras.length} · {t.extras.join(' · ')}{/if}</p>
                 </div>
               {/each}
             </div>
+            <p class="shared-inclusions">
+              <strong>Both passes include:</strong> {SHARED_INCLUSIONS.join(' · ')}
+            </p>
             <button class="primary-btn" on:click={() => (step = 2)}>Continue to Details &rarr;</button>
           </div>
         {:else if step === 2}
@@ -305,8 +308,16 @@
 
   .tier-desc {
     font-size: 0.85rem;
+    font-weight: 700;
     margin: 0 0 0.6rem;
-    opacity: 0.8;
+    opacity: 0.85;
+  }
+
+  .shared-inclusions {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    opacity: 0.75;
+    margin: -0.4rem 0 0;
   }
 
   .form-group {

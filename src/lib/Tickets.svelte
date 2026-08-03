@@ -1,7 +1,7 @@
 <script>
   import MorphText from './MorphText.svelte';
   import { muted, toggleMute } from './ambientSound.js';
-  import { TICKET_TIERS, payForTicket as startPaystackCheckout } from './tickets.js';
+  import { TICKET_TIERS, SHARED_INCLUSIONS, payForTicket as startPaystackCheckout } from './tickets.js';
 
   export let visible = false;
 
@@ -134,10 +134,14 @@
         {/each}
       </div>
 
-      <p class="tier-description">{selectedTier.description}</p>
+      <p class="tier-diff">{selectedTier.sleeping}{#if selectedTier.extras.length} · {selectedTier.extras.join(' · ')}{/if}</p>
+
+      <p class="shared-inclusions">
+        <strong>Both passes include:</strong> {SHARED_INCLUSIONS.join(' · ')}
+      </p>
 
       <button type="button" class="cta-btn" on:click={payForTicket} disabled={paying}>
-        {paying ? 'Processing…' : `Claim ${selectedTier.name} →`}
+        {paying ? 'Processing…' : `Claim ${selectedTier.shortName} →`}
       </button>
       <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
     </div>
@@ -510,12 +514,25 @@
     color: var(--blue, #00bfff);
   }
 
-  .tier-description {
+  .tier-diff {
     margin: 0;
-    font-size: 0.7rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink);
+    text-align: left;
+  }
+
+  .shared-inclusions {
+    margin: 0;
+    font-size: 0.68rem;
     line-height: 1.5;
     color: var(--muted);
     text-align: left;
+  }
+
+  .shared-inclusions strong {
+    color: var(--ink);
   }
 
   .cta-btn {

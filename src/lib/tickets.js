@@ -1,21 +1,32 @@
 export const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
+export const SHARED_INCLUSIONS = [
+  '🌅 Sunrise Yoga Session',
+  '🎨 Open Canvas Painting Experience',
+  '🏐 Beach Games & Group Activities',
+  '🔥 Bonfire Experience',
+  '🎟️ Beach Access & Gate Fee',
+  '🥤 Light Refreshments',
+];
+
 export const TICKET_TIERS = [
   {
     id: 'explorer',
-    name: 'Explorer Pass',
+    name: 'Explorer Pass (Shared Tent)',
+    shortName: 'Explorer Pass',
     amountKobo: 1500000,
     label: '₦15,000',
-    description:
-      "Perfect for those who don't mind sharing the camping experience. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Shared Tent Accommodation · 🥤 Light Refreshments",
+    sleeping: '⛺ Shared tent accommodation',
+    extras: [],
   },
   {
     id: 'retreat',
-    name: 'Retreat Pass',
+    name: 'Retreat Pass (Private Tent)',
+    shortName: 'Retreat Pass',
     amountKobo: 2000000,
     label: '₦20,000',
-    description:
-      'Enjoy the full experience with the added comfort and privacy of your own tent. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🧺 Beach Picnic · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Private Tent Accommodation · 🥤 Light Refreshments',
+    sleeping: '⛺ Private tent accommodation',
+    extras: ['🧺 Beach Picnic'],
   },
 ];
 
