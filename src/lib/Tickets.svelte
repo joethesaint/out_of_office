@@ -36,6 +36,11 @@
     const attendeeEmail = prompt('Enter your email to receive your pass:');
     if (!attendeeEmail) return;
 
+    if (typeof PaystackPop === 'undefined') {
+      alert('Payment could not start — please check your connection and try again.');
+      return;
+    }
+
     paying = true;
     const popup = new PaystackPop();
     popup.newTransaction({
