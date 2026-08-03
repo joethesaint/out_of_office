@@ -3,7 +3,7 @@
   import { muted, toggleMute } from './ambientSound.js';
 
   export let visible = false;
-  const TICKET_URL = 'https://tix.africa/discover/outofofficeng';
+  const TICKET_URL = 'https://tickets.smooth.africa/release-and-unwind';
   const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
   const TIERS = [
@@ -90,7 +90,7 @@
         </div>
         <div class="detail-item">
           <span class="label">DATE</span>
-          <span class="value">ANYTIME</span>
+          <span class="value">SUN, AUG 16, 2026</span>
         </div>
         <div class="detail-item">
           <span class="label">GATE</span>
@@ -145,7 +145,7 @@
       <button type="button" class="cta-btn" on:click={payForTicket} disabled={paying}>
         {paying ? 'Processing…' : `Claim ${selectedTier.name} →`}
       </button>
-      <span class="fine-print">Secured by Paystack</span>
+      <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
     </div>
   </div>
 </section>
