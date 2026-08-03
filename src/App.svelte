@@ -166,9 +166,10 @@
   }
 
   function onActivateClick() {
-    if (!scrollTrack) return;
-    const rect = scrollTrack.getBoundingClientRect();
-    easedScrollTo(window.scrollY + rect.top + window.innerHeight * 1.5);
+    const ticketsEl = document.getElementById('tickets-anchor');
+    if (!ticketsEl) return;
+    const rect = ticketsEl.getBoundingClientRect();
+    easedScrollTo(window.scrollY + rect.top);
   }
 
   let shareConfirmed = false;
@@ -341,7 +342,9 @@
 <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
 <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
-<ScrollReveal let:visible><Tickets {visible} onOpenDrawer={openDrawer} /></ScrollReveal>
+<div id="tickets-anchor">
+  <ScrollReveal let:visible><Tickets {visible} onOpenDrawer={openDrawer} /></ScrollReveal>
+</div>
 
 <ScheduleFAQ />
 
