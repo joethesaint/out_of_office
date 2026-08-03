@@ -3,48 +3,19 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { dialogDuration } from './motion.js';
+  import { TICKET_TIERS, payForTicket as startPaystackCheckout } from './tickets.js';
 
   export let isOpen = false;
   export let onClose = () => {};
 
   let step = 1;
-  let selectedTier = 'vip';
+  let selectedTier = TICKET_TIERS[0].id;
   let attendeeName = '';
   let attendeeEmail = '';
-  let selectedBadge = 'Offline Legend';
   let confirmedPass = null;
+  let paying = false;
 
-  const TIERS = [
-    {
-      id: 'free',
-      name: 'Grass Toucher Pass',
-      price: 'FREE',
-      desc: 'Access to the beach area & digital bonfire zone.',
-      perks: ['Digital Bonfire Access', 'Stress Meter Gauge', 'Standard Badge']
-    },
-    {
-      id: 'vip',
-      name: 'VIP Email Ignorer',
-      price: '₦5,000',
-      desc: 'Priority seating & exclusive physical zine sticker pack.',
-      perks: ['Priority Danfo Seating', 'Zine Pack & Stickers', 'Custom Auto-Responder']
-    },
-    {
-      id: 'boss',
-      name: 'Danfo Back-Bench Boss',
-      price: '₦15,000',
-      desc: 'All-inclusive pass with offline badge & complimentary cold drinks.',
-      perks: ['All VIP Perks', 'Back-Bench Reserved Seat', 'Cold Drink & Snack Kit', 'Lagos OOO Pin']
-    }
-  ];
-
-  const BADGES = [
-    'Offline Legend',
-    'Slack Ghost',
-    'Unsent Email Survivor',
-    'No-Reply Enthusiast',
-    'Danfo Navigator'
-  ];
+  const TIERS = TICKET_TIERS;
 
   function handleConfirm() {
     if (!attendeeName.trim()) {
@@ -55,31 +26,50 @@
       });
       return;
     }
+    if (!attendeeEmail.trim()) {
+      addToast({
+        title: 'Email Required',
+        description: 'Please enter your email so Paystack can send your receipt.',
+        type: 'warning'
+      });
+      return;
+    }
 
     const tierObj = TIERS.find((t) => t.id === selectedTier);
-    const passCode = 'OOO-LOS-' + Math.floor(100000 + Math.random() * 900000);
+    paying = true;
 
-    confirmedPass = {
-      code: passCode,
-      name: attendeeName,
-      email: attendeeEmail || 'offline@out-of-office.ng',
-      tier: tierObj.name,
-      price: tierObj.price,
-      badge: selectedBadge,
-      issuedAt: new Date().toLocaleDateString()
-    };
+    startPaystackCheckout(tierObj, attendeeEmail, {
+      onError: (message) => {
+        paying = false;
+        addToast({ title: 'Payment Error', description: message, type: 'warning' });
+      },
+      onCancel: () => {
+        paying = false;
+      },
+      onSuccess: (transaction) => {
+        paying = false;
+        confirmedPass = {
+          code: transaction.reference,
+          name: attendeeName,
+          email: attendeeEmail,
+          tier: tierObj.name,
+          price: tierObj.label,
+          issuedAt: new Date().toLocaleDateString()
+        };
 
-    step = 3;
-    addToast({
-      title: 'Pass Issued! 🎉',
-      description: `Your pass ${passCode} has been issued to ${attendeeName}.`,
-      type: 'success'
+        step = 3;
+        addToast({
+          title: 'Pass Issued! 🎉',
+          description: `Your pass ${transaction.reference} has been issued to ${attendeeName}.`,
+          type: 'success'
+        });
+      }
     });
   }
 
   function copyPassInfo() {
     if (!confirmedPass) return;
-    const text = `Out of Office Pass #${confirmedPass.code}\nHolder: ${confirmedPass.name}\nTier: ${confirmedPass.tier}\nBadge: ${confirmedPass.badge}`;
+    const text = `Out of Office Pass #${confirmedPass.code}\nHolder: ${confirmedPass.name}\nTier: ${confirmedPass.tier}\nPrice: ${confirmedPass.price}`;
     navigator.clipboard.writeText(text);
     addToast({
       title: 'Pass Copied',
@@ -137,14 +127,9 @@
                 >
                   <div class="tier-top">
                     <span class="tier-name">{t.name}</span>
-                    <span class="tier-price">{t.price}</span>
+                    <span class="tier-price">{t.label}</span>
                   </div>
-                  <p class="tier-desc">{t.desc}</p>
-                  <ul class="perk-list">
-                    {#each t.perks as perk}
-                      <li>✓ {perk}</li>
-                    {/each}
-                  </ul>
+                  <p class="tier-desc">{t.description}</p>
                 </div>
               {/each}
             </div>
@@ -152,7 +137,7 @@
           </div>
         {:else if step === 2}
           <div class="step-pane">
-            <h3 class="pane-subtitle">2. Customize Attendee Details</h3>
+            <h3 class="pane-subtitle">2. Attendee Details</h3>
             <div class="form-group">
               <label for="attendee-name">Name / Alias *</label>
               <input
@@ -165,7 +150,7 @@
             </div>
 
             <div class="form-group">
-              <label for="attendee-email">Email (Optional)</label>
+              <label for="attendee-email">Email *</label>
               <input
                 id="attendee-email"
                 type="email"
@@ -175,18 +160,11 @@
               />
             </div>
 
-            <div class="form-group">
-              <label for="badge-select">Select Custom Badge</label>
-              <select id="badge-select" class="select" bind:value={selectedBadge}>
-                {#each BADGES as b}
-                  <option value={b}>{b}</option>
-                {/each}
-              </select>
-            </div>
-
             <div class="btn-row">
               <button class="sec-btn" on:click={() => (step = 1)}>&larr; Back</button>
-              <button class="primary-btn" on:click={handleConfirm}>Confirm & Issue Pass</button>
+              <button class="primary-btn" on:click={handleConfirm} disabled={paying}>
+                {paying ? 'Processing…' : 'Pay & Claim Pass'}
+              </button>
             </div>
           </div>
         {:else if step === 3 && confirmedPass}
@@ -199,7 +177,7 @@
               <div class="ticket-name">{confirmedPass.name}</div>
               <div class="ticket-meta">
                 <div><span>TIER:</span> {confirmedPass.tier}</div>
-                <div><span>BADGE:</span> {confirmedPass.badge}</div>
+                <div><span>PRICE:</span> {confirmedPass.price}</div>
                 <div><span>ISSUED:</span> {confirmedPass.issuedAt}</div>
               </div>
             </div>
@@ -331,17 +309,6 @@
     opacity: 0.8;
   }
 
-  .perk-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.78rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    opacity: 0.9;
-  }
-
   .form-group {
     display: flex;
     flex-direction: column;
@@ -379,6 +346,11 @@
     border-radius: 999px;
     font-weight: 700;
     cursor: pointer;
+  }
+
+  .primary-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
   }
 
   .sec-btn {

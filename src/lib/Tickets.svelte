@@ -1,54 +1,24 @@
 <script>
   import MorphText from './MorphText.svelte';
   import { muted, toggleMute } from './ambientSound.js';
+  import { TICKET_TIERS, payForTicket as startPaystackCheckout } from './tickets.js';
 
   export let visible = false;
-  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
-  const TIERS = [
-    {
-      id: 'explorer',
-      name: 'Explorer Pass',
-      amountKobo: 1500000,
-      label: '₦15,000',
-      description:
-        "Perfect for those who don't mind sharing the camping experience. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Shared Tent Accommodation · 🥤 Light Refreshments",
-    },
-    {
-      id: 'retreat',
-      name: 'Retreat Pass',
-      amountKobo: 2000000,
-      label: '₦20,000',
-      description:
-        'Enjoy the full experience with the added comfort and privacy of your own tent. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🧺 Beach Picnic · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Private Tent Accommodation · 🥤 Light Refreshments',
-    },
-  ];
-
+  const TIERS = TICKET_TIERS;
   let selectedTier = TIERS[0];
   let paying = false;
 
   function payForTicket() {
-    if (!PAYSTACK_PUBLIC_KEY) {
-      alert('Ticketing is not configured yet — check back shortly.');
-      return;
-    }
-
     const attendeeEmail = prompt('Enter your email to receive your pass:');
     if (!attendeeEmail) return;
 
-    if (typeof PaystackPop === 'undefined') {
-      alert('Payment could not start — please check your connection and try again.');
-      return;
-    }
-
     paying = true;
-    const popup = new PaystackPop();
-    popup.newTransaction({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: attendeeEmail,
-      amount: selectedTier.amountKobo,
-      currency: 'NGN',
-      ref: 'OOO_' + selectedTier.id + '_' + Math.floor(Math.random() * 1000000000 + 1),
+    startPaystackCheckout(selectedTier, attendeeEmail, {
+      onError: (message) => {
+        paying = false;
+        alert(message);
+      },
       onSuccess: (transaction) => {
         paying = false;
         alert(`Success! Your ${selectedTier.name} is confirmed. Reference: ${transaction.reference}`);
