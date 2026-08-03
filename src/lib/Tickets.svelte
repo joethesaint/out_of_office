@@ -3,7 +3,6 @@
   import { muted, toggleMute } from './ambientSound.js';
 
   export let visible = false;
-  const TICKET_URL = 'https://tickets.smooth.africa/release-and-unwind';
   const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
   const TIERS = [
@@ -16,7 +15,7 @@
 
   function payForTicket() {
     if (!PAYSTACK_PUBLIC_KEY) {
-      window.open(TICKET_URL, '_blank', 'noopener,noreferrer');
+      alert('Ticketing is not configured yet — check back shortly.');
       return;
     }
 
