@@ -341,7 +341,7 @@
 <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
 <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
-<ScrollReveal let:visible><Tickets {visible} /></ScrollReveal>
+<ScrollReveal let:visible><Tickets {visible} onOpenDrawer={openDrawer} /></ScrollReveal>
 
 <ScheduleFAQ />
 

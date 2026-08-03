@@ -1,33 +1,12 @@
 <script>
   import MorphText from './MorphText.svelte';
   import { muted, toggleMute } from './ambientSound.js';
-  import { TICKET_TIERS, SHARED_INCLUSIONS, payForTicket as startPaystackCheckout } from './tickets.js';
+  import { TICKET_TIERS, SHARED_INCLUSIONS } from './tickets.js';
 
   export let visible = false;
+  export let onOpenDrawer = () => {};
 
   const TIERS = TICKET_TIERS;
-  let selectedTier = TIERS[0];
-  let paying = false;
-
-  function payForTicket() {
-    const attendeeEmail = prompt('Enter your email to receive your pass:');
-    if (!attendeeEmail) return;
-
-    paying = true;
-    startPaystackCheckout(selectedTier, attendeeEmail, {
-      onError: (message) => {
-        paying = false;
-        alert(message);
-      },
-      onSuccess: (transaction) => {
-        paying = false;
-        alert(`Success! Your ${selectedTier.name} is confirmed. Reference: ${transaction.reference}`);
-      },
-      onCancel: () => {
-        paying = false;
-      },
-    });
-  }
 </script>
 
 <section class="tickets-section">
@@ -118,30 +97,24 @@
         <span class="barcode-num">4 829104 772019 OOO-BNG</span>
       </div>
 
-      <div class="tier-select" role="radiogroup" aria-label="Ticket tier">
+      <ul class="tier-list">
         {#each TIERS as tier (tier.id)}
-          <button
-            type="button"
-            class="tier-option"
-            class:active={selectedTier.id === tier.id}
-            role="radio"
-            aria-checked={selectedTier.id === tier.id}
-            on:click={() => (selectedTier = tier)}
-          >
-            <span class="tier-name">{tier.name}</span>
-            <span class="tier-price">{tier.label}</span>
-          </button>
+          <li class="tier-row">
+            <div class="tier-row-main">
+              <span class="tier-name">{tier.name}</span>
+              <span class="tier-price">{tier.label}</span>
+            </div>
+            <p class="tier-diff">{tier.sleeping}{#if tier.extras.length} · {tier.extras.join(' · ')}{/if}</p>
+          </li>
         {/each}
-      </div>
-
-      <p class="tier-diff">{selectedTier.sleeping}{#if selectedTier.extras.length} · {selectedTier.extras.join(' · ')}{/if}</p>
+      </ul>
 
       <p class="shared-inclusions">
         <strong>Both passes include:</strong> {SHARED_INCLUSIONS.join(' · ')}
       </p>
 
-      <button type="button" class="cta-btn" on:click={payForTicket} disabled={paying}>
-        {paying ? 'Processing…' : `Claim ${selectedTier.shortName} →`}
+      <button type="button" class="cta-btn" on:click={onOpenDrawer}>
+        Claim Your Pass →
       </button>
       <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
     </div>
@@ -479,29 +452,26 @@
     color: var(--muted);
   }
 
-  .tier-select {
+  .tier-list {
     width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
-  .tier-option {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .tier-row {
     width: 100%;
     padding: 0.6rem 0.9rem;
     border-radius: 12px;
     border: 1.5px solid rgba(128, 128, 128, 0.25);
-    background: transparent;
-    cursor: pointer;
-    font-family: inherit;
     text-align: left;
-    transition: border-color 0.2s ease, background 0.2s ease;
   }
-  .tier-option.active {
-    border-color: var(--blue, #00bfff);
-    background: rgba(0, 191, 255, 0.08);
+  .tier-row-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .tier-name {
     font-size: 0.78rem;
@@ -515,11 +485,11 @@
   }
 
   .tier-diff {
-    margin: 0;
-    font-size: 0.76rem;
-    font-weight: 700;
+    margin: 0.2rem 0 0;
+    font-size: 0.7rem;
+    font-weight: 600;
     line-height: 1.4;
-    color: var(--ink);
+    color: var(--muted);
     text-align: left;
   }
 
