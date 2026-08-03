@@ -6,8 +6,22 @@
   const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
   const TIERS = [
-    { id: 'explorer', name: 'Explorer Pass', amountKobo: 1575000, label: '₦15,750' },
-    { id: 'retreat', name: 'Retreat Pass', amountKobo: 2100000, label: '₦21,000' },
+    {
+      id: 'explorer',
+      name: 'Explorer Pass',
+      amountKobo: 1500000,
+      label: '₦15,000',
+      description:
+        "Perfect for those who don't mind sharing the camping experience. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Shared Tent Accommodation · 🥤 Light Refreshments",
+    },
+    {
+      id: 'retreat',
+      name: 'Retreat Pass',
+      amountKobo: 2000000,
+      label: '₦20,000',
+      description:
+        'Enjoy the full experience with the added comfort and privacy of your own tent. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🧺 Beach Picnic · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Private Tent Accommodation · 🥤 Light Refreshments',
+    },
   ];
 
   let selectedTier = TIERS[0];
@@ -45,7 +59,11 @@
   <div class="header-text" class:visible>
     <p class="eyebrow"><MorphText text="Boarding pass" boost={1.3} /></p>
     <h2 class="heading">Your ticket out of yellow Lagos.</h2>
-    <p class="subheading">Destination: Out of Office. Permission to disconnect, granted.</p>
+    <p class="subheading">
+      Escape Lagos noise with Release and Unwind Beach Retreat—reconnect with yourself, nature,
+      and community through yoga, painting, beach games, picnics, bonfires, and meaningful
+      conversations by the ocean. Come for the experience. Leave with the memories.
+    </p>
   </div>
 
   <div class="boarding-pass gamified-float interactive-card" class:visible>
@@ -140,6 +158,8 @@
           </button>
         {/each}
       </div>
+
+      <p class="tier-description">{selectedTier.description}</p>
 
       <button type="button" class="cta-btn" on:click={payForTicket} disabled={paying}>
         {paying ? 'Processing…' : `Claim ${selectedTier.name} →`}
@@ -513,6 +533,14 @@
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--blue, #00bfff);
+  }
+
+  .tier-description {
+    margin: 0;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--muted);
+    text-align: left;
   }
 
   .cta-btn {
