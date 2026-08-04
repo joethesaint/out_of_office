@@ -206,7 +206,7 @@
     }
   }
 
-  let isOnline = false;
+  let isOnline = true;
 
   function handleStatusChange(onlineState) {
     isOnline = onlineState;
@@ -233,7 +233,7 @@
   $: activated = progress >= 0.995;
 
   $: notificationCount = isOnline
-    ? "999+ (ONLINE ⚡)"
+    ? "999+"
     : smoothedProgress < 0.05
       ? "999+"
       : smoothedProgress >= 0.95

@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import { isDark, toggleTheme } from './theme.js';
   import { muted, toggleMute } from './ambientSound.js';
 
@@ -7,19 +8,25 @@
   export let onStatusChange = (onlineState) => {};
   export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
 
-  let isOnline = false;
+  let isOnline = true;
   let statusToast = false;
   let statusMessage = '';
 
   function toggleStatus() {
     isOnline = !isOnline;
     onStatusChange(isOnline);
-    statusMessage = isOnline 
-      ? 'ONLINE ⚡ — Connected and receiving workspace alerts.' 
+    statusMessage = isOnline
+      ? 'ONLINE ⚡ — Connected and receiving workspace alerts.'
       : 'AWAY 🌴 — Muting notifications. Making room for life.';
     statusToast = true;
     setTimeout(() => { statusToast = false; }, 3200);
   }
+
+  // Sync the parent's isOnline (drives notification count + ChaosLayer)
+  // with our default of ONLINE on load — without popping the toggle toast.
+  onMount(() => {
+    onStatusChange(isOnline);
+  });
 </script>
 
 <header class="bar-container {scrollState}">
