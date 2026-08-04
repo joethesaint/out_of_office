@@ -1,63 +1,30 @@
 <script>
   import MorphText from './MorphText.svelte';
   import { muted, toggleMute } from './ambientSound.js';
+  import { fade } from 'svelte/transition';
 
   export let visible = false;
-  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+  export let showSticky = false;
+  export let onOpenDrawer = () => {};
 
   const TIERS = [
     {
       id: 'explorer',
       name: 'Explorer Pass',
-      amountKobo: 1500000,
-      label: '₦15,000',
+      price: '₦15,000',
       description:
         "Perfect for those who don't mind sharing the camping experience. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Shared Tent Accommodation · 🥤 Light Refreshments",
     },
     {
       id: 'retreat',
       name: 'Retreat Pass',
-      amountKobo: 2000000,
-      label: '₦20,000',
+      price: '₦20,000',
       description:
         'Enjoy the full experience with the added comfort and privacy of your own tent. Includes: 🌅 Sunrise Yoga Session · 🎨 Open Canvas Painting Experience · 🧺 Beach Picnic · 🏐 Games & Group Activities · 🔥 Bonfire Experience · ⛺ Private Tent Accommodation · 🥤 Light Refreshments',
     },
   ];
 
   let selectedTier = TIERS[0];
-  let paying = false;
-
-  function payForTicket() {
-    if (!PAYSTACK_PUBLIC_KEY) {
-      alert('Ticketing is not configured yet — check back shortly.');
-      return;
-    }
-
-    const attendeeEmail = prompt('Enter your email to receive your pass:');
-    if (!attendeeEmail) return;
-
-    if (typeof PaystackPop === 'undefined') {
-      alert('Payment could not start — please check your connection and try again.');
-      return;
-    }
-
-    paying = true;
-    const popup = new PaystackPop();
-    popup.newTransaction({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: attendeeEmail,
-      amount: selectedTier.amountKobo,
-      currency: 'NGN',
-      ref: 'OOO_' + selectedTier.id + '_' + Math.floor(Math.random() * 1000000000 + 1),
-      onSuccess: (transaction) => {
-        paying = false;
-        alert(`Success! Your ${selectedTier.name} is confirmed. Reference: ${transaction.reference}`);
-      },
-      onCancel: () => {
-        paying = false;
-      },
-    });
-  }
 </script>
 
 <section class="tickets-section">
@@ -159,19 +126,27 @@
             on:click={() => (selectedTier = tier)}
           >
             <span class="tier-name">{tier.name}</span>
-            <span class="tier-price">{tier.label}</span>
+            <span class="tier-price">{tier.price}</span>
           </button>
         {/each}
       </div>
 
       <p class="tier-description">{selectedTier.description}</p>
 
-      <button type="button" class="cta-btn" on:click={payForTicket} disabled={paying}>
-        {paying ? 'Processing…' : `Claim ${selectedTier.name} →`}
+      <button type="button" class="cta-btn" on:click={onOpenDrawer}>
+        Claim {selectedTier.name} →
       </button>
       <span class="fine-print">Secured by Paystack · Release & Unwind, Tarkwa Bay</span>
     </div>
   </div>
+
+  {#if showSticky}
+    <div class="sticky-cta-bar" transition:fade={{ duration: 200 }}>
+      <button class="sticky-action-btn" on:click={onOpenDrawer} type="button">
+        Claim Event Pass →
+      </button>
+    </div>
+  {/if}
 </section>
 
 <style>
@@ -179,9 +154,6 @@
     max-width: 920px;
     margin: 0 auto;
     padding: clamp(3rem, 10vh, 7rem) 1.5rem clamp(4rem, 12vh, 8rem);
-    /* warm-sand wash — the ticket is the last stop of the journey (Tarkwa Bay
-       arrival), so a beach-sand tint under the boarding pass reads truer to
-       concept.txt's escape palette than plain cream. */
     background: radial-gradient(ellipse at 50% 100%, rgba(232, 201, 160, 0.4), transparent 70%);
     border-radius: 32px;
   }
@@ -215,14 +187,15 @@
     margin: 0;
     color: #666;
     font-size: 1rem;
+    line-height: 1.5;
   }
 
   /* Boarding Pass Layout */
   .boarding-pass {
     background: var(--card-surface);
     border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 2px solid var(--ink);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--ink);
     display: flex;
     overflow: hidden;
     position: relative;
@@ -314,18 +287,11 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
   }
   .sound-toggle:hover {
     background: rgba(0, 191, 255, 0.14);
     transform: translateY(-1px);
-  }
-  .sound-toggle:active {
-    transform: translateY(0);
-  }
-  .sound-toggle:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
-    outline-offset: 2px;
   }
 
   .route-arrow {
@@ -433,7 +399,7 @@
 
   /* Stub Section */
   .pass-stub {
-    width: clamp(230px, 28vw, 290px);
+    width: clamp(230px, 28vw, 310px);
     padding: 1.8rem 1.6rem;
     background: rgba(128, 128, 128, 0.05);
     display: flex;
@@ -441,7 +407,7 @@
     justify-content: space-between;
     align-items: center;
     text-align: center;
-    gap: 1.4rem;
+    gap: 1rem;
     transition: transform 0.5s var(--ease-out-expo);
     transform-origin: left center;
   }
@@ -479,7 +445,7 @@
   }
   .barcode .bars {
     width: 100%;
-    height: 48px;
+    height: 44px;
     background: repeating-linear-gradient(
       90deg,
       var(--ink) 0px,
@@ -506,45 +472,46 @@
   }
 
   .tier-select {
+    display: flex;
+    gap: 0.5rem;
     width: 100%;
+  }
+
+  .tier-option {
+    flex: 1;
+    padding: 0.5rem;
+    background: var(--card-surface);
+    border: 1.5px solid var(--border-soft-deep);
+    border-radius: 8px;
+    cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-  }
-  .tier-option {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 0.6rem 0.9rem;
-    border-radius: 12px;
-    border: 1.5px solid rgba(128, 128, 128, 0.25);
-    background: transparent;
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
+    gap: 0.2rem;
     transition: border-color 0.2s ease, background 0.2s ease;
   }
+
   .tier-option.active {
     border-color: var(--blue, #00bfff);
     background: rgba(0, 191, 255, 0.08);
   }
-  .tier-name {
-    font-size: 0.78rem;
+
+  .tier-option .tier-name {
+    font-size: 0.72rem;
     font-weight: 700;
-    color: var(--ink);
   }
-  .tier-price {
+
+  .tier-option .tier-price {
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--blue, #00bfff);
   }
 
   .tier-description {
-    margin: 0;
-    font-size: 0.7rem;
-    line-height: 1.5;
+    font-size: 0.72rem;
+    line-height: 1.4;
     color: var(--muted);
+    margin: 0;
     text-align: left;
   }
 
@@ -555,27 +522,16 @@
     font-size: 0.95rem;
     color: #fff;
     background: var(--blue, #00bfff);
-    padding: 0.9rem 1rem;
+    padding: 0.85rem 1rem;
     border: none;
     border-radius: 999px;
-    text-decoration: none;
+    cursor: pointer;
     box-shadow: 0 10px 24px rgba(0, 191, 255, 0.28);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    font-family: inherit;
   }
   .cta-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 14px 30px rgba(0, 191, 255, 0.4);
-  }
-  .cta-btn:focus-visible {
-    outline: 2px solid var(--blue, #00bfff);
-    outline-offset: 3px;
-  }
-  .cta-btn:disabled {
-    opacity: 0.7;
-    cursor: default;
-    transform: none;
   }
   .fine-print {
     font-size: 0.68rem;
@@ -615,15 +571,56 @@
     .pass-stub {
       width: 100%;
     }
-    .boarding-pass.visible:hover .pass-stub {
-      transform: translateY(4px) rotate(1deg);
-      transform-origin: top center;
-    }
     .details-grid {
       grid-template-columns: 1fr;
     }
     .detail-item.col-span {
       grid-column: span 1;
+    }
+  }
+
+  /* Sticky Mobile CTA button */
+  .sticky-cta-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 80%, transparent);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .sticky-action-btn {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 500px;
+    padding: 1.1rem;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--bg);
+    background: var(--ink);
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    text-align: center;
+    transition: transform var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard);
+  }
+
+  .sticky-action-btn:hover,
+  .sticky-action-btn:focus-visible {
+    background: var(--blue);
+    transform: translateY(-2px);
+  }
+
+  @media (min-width: 768px) {
+    .sticky-cta-bar {
+      display: none;
     }
   }
 </style>

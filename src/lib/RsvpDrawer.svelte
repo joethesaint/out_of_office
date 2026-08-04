@@ -7,34 +7,47 @@
   export let isOpen = false;
   export let onClose = () => {};
 
+  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+
   let step = 1;
-  let selectedTier = 'vip';
+  let selectedTierId = 'explorer';
   let attendeeName = '';
   let attendeeEmail = '';
   let selectedBadge = 'Offline Legend';
   let confirmedPass = null;
+  let paying = false;
 
   const TIERS = [
     {
-      id: 'free',
-      name: 'Grass Toucher Pass',
-      price: 'FREE',
-      desc: 'Access to the beach area & digital bonfire zone.',
-      perks: ['Digital Bonfire Access', 'Stress Meter Gauge', 'Standard Badge']
-    },
-    {
-      id: 'vip',
-      name: 'VIP Email Ignorer',
-      price: '₦5,000',
-      desc: 'Priority seating & exclusive physical zine sticker pack.',
-      perks: ['Priority Danfo Seating', 'Zine Pack & Stickers', 'Custom Auto-Responder']
-    },
-    {
-      id: 'boss',
-      name: 'Danfo Back-Bench Boss',
+      id: 'explorer',
+      name: 'Explorer Pass',
       price: '₦15,000',
-      desc: 'All-inclusive pass with offline badge & complimentary cold drinks.',
-      perks: ['All VIP Perks', 'Back-Bench Reserved Seat', 'Cold Drink & Snack Kit', 'Lagos OOO Pin']
+      amountKobo: 1500000,
+      desc: 'Perfect for those who want the full disconnect experience with shared tenting.',
+      perks: [
+        '🌅 Sunrise Yoga Session',
+        '🎨 Open Canvas Painting',
+        '🏐 Games & Group Activities',
+        '🔥 Bonfire Experience',
+        '⛺ Shared Tent Accommodation',
+        '🥤 Light Refreshments'
+      ]
+    },
+    {
+      id: 'retreat',
+      name: 'Retreat Pass',
+      price: '₦20,000',
+      amountKobo: 2000000,
+      desc: 'Full experience with the added comfort and privacy of your own tent & beach picnic.',
+      perks: [
+        '🌅 Sunrise Yoga Session',
+        '🎨 Open Canvas Painting',
+        '🧺 Beach Picnic',
+        '🏐 Games & Group Activities',
+        '🔥 Bonfire Experience',
+        '⛺ Private Tent Accommodation',
+        '🥤 Light Refreshments'
+      ]
     }
   ];
 
@@ -56,13 +69,53 @@
       return;
     }
 
-    const tierObj = TIERS.find((t) => t.id === selectedTier);
-    const passCode = 'OOO-LOS-' + Math.floor(100000 + Math.random() * 900000);
+    if (!attendeeEmail.trim()) {
+      addToast({
+        title: 'Email Required',
+        description: 'Please enter your email address for your ticket confirmation.',
+        type: 'warning'
+      });
+      return;
+    }
 
+    const tierObj = TIERS.find((t) => t.id === selectedTierId) || TIERS[0];
+
+    if (typeof PaystackPop !== 'undefined' && PAYSTACK_PUBLIC_KEY) {
+      paying = true;
+      const popup = new PaystackPop();
+      popup.newTransaction({
+        key: PAYSTACK_PUBLIC_KEY,
+        email: attendeeEmail,
+        amount: tierObj.amountKobo,
+        currency: 'NGN',
+        ref: 'OOO_' + tierObj.id + '_' + Math.floor(Math.random() * 1000000000 + 1),
+        onSuccess: (transaction) => {
+          paying = false;
+          issuePass(tierObj, transaction.reference);
+        },
+        onCancel: () => {
+          paying = false;
+          addToast({
+            title: 'Payment Cancelled',
+            description: 'You can try again anytime when ready.',
+            type: 'info'
+          });
+        }
+      });
+    } else {
+      // Fallback offline simulation if Paystack SDK not loaded
+      const mockRef = 'OFFLINE_' + Math.floor(100000 + Math.random() * 900000);
+      issuePass(tierObj, mockRef);
+    }
+  }
+
+  function issuePass(tierObj, refCode) {
+    const passCode = 'OOO-LOS-' + Math.floor(100000 + Math.random() * 900000);
     confirmedPass = {
       code: passCode,
+      ref: refCode,
       name: attendeeName,
-      email: attendeeEmail || 'offline@out-of-office.ng',
+      email: attendeeEmail,
       tier: tierObj.name,
       price: tierObj.price,
       badge: selectedBadge,
@@ -72,14 +125,14 @@
     step = 3;
     addToast({
       title: 'Pass Issued! 🎉',
-      description: `Your pass ${passCode} has been issued to ${attendeeName}.`,
+      description: `Your ${tierObj.name} pass has been confirmed for ${attendeeName}.`,
       type: 'success'
     });
   }
 
   function copyPassInfo() {
     if (!confirmedPass) return;
-    const text = `Out of Office Pass #${confirmedPass.code}\nHolder: ${confirmedPass.name}\nTier: ${confirmedPass.tier}\nBadge: ${confirmedPass.badge}`;
+    const text = `Out of Office Pass #${confirmedPass.code}\nRef: ${confirmedPass.ref}\nHolder: ${confirmedPass.name}\nTier: ${confirmedPass.tier}\nPrice: ${confirmedPass.price}\nBadge: ${confirmedPass.badge}`;
     navigator.clipboard.writeText(text);
     addToast({
       title: 'Pass Copied',
@@ -91,6 +144,7 @@
   function resetAndClose() {
     step = 1;
     confirmedPass = null;
+    paying = false;
     onClose();
   }
 </script>
@@ -116,8 +170,8 @@
     >
       <div class="sheet-header">
         <div>
-          <span class="badge">EVENT PASS</span>
-          <h2 id="sheet-title" class="sheet-title">Claim OOO Pass</h2>
+          <span class="badge">RELEASE & UNWIND RETREAT</span>
+          <h2 id="sheet-title" class="sheet-title">Claim Event Pass</h2>
         </div>
         <button class="close-btn" on:click={resetAndClose} aria-label="Close sheet">&times;</button>
       </div>
@@ -125,13 +179,14 @@
       <div class="sheet-body">
         {#if step === 1}
           <div class="step-pane">
-            <h3 class="pane-subtitle">1. Select Pass Tier</h3>
+            <h3 class="pane-subtitle">1. Select Pass Tier & Inclusions Breakdown</h3>
             <div class="tier-grid">
               {#each TIERS as t}
                 <div
                   class="tier-card"
-                  class:active={selectedTier === t.id}
-                  on:click={() => (selectedTier = t.id)}
+                  class:active={selectedTierId === t.id}
+                  on:click={() => (selectedTierId = t.id)}
+                  on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && (selectedTierId = t.id)}
                   role="button"
                   tabindex="0"
                 >
@@ -140,19 +195,24 @@
                     <span class="tier-price">{t.price}</span>
                   </div>
                   <p class="tier-desc">{t.desc}</p>
+                  <div class="inclusions-header">What's Included:</div>
                   <ul class="perk-list">
                     {#each t.perks as perk}
-                      <li>✓ {perk}</li>
+                      <li>{perk}</li>
                     {/each}
                   </ul>
                 </div>
               {/each}
             </div>
-            <button class="primary-btn" on:click={() => (step = 2)}>Continue to Details &rarr;</button>
+            <button class="primary-btn" on:click={() => (step = 2)}>Continue to Attendee Details &rarr;</button>
           </div>
         {:else if step === 2}
           <div class="step-pane">
-            <h3 class="pane-subtitle">2. Customize Attendee Details</h3>
+            <h3 class="pane-subtitle">2. Attendee Details & Checkout</h3>
+            <div class="selected-tier-banner">
+              SELECTED: <strong>{TIERS.find(t => t.id === selectedTierId)?.name}</strong> ({TIERS.find(t => t.id === selectedTierId)?.price})
+            </div>
+
             <div class="form-group">
               <label for="attendee-name">Name / Alias *</label>
               <input
@@ -165,12 +225,12 @@
             </div>
 
             <div class="form-group">
-              <label for="attendee-email">Email (Optional)</label>
+              <label for="attendee-email">Email Address (for Paystack Pass Receipt) *</label>
               <input
                 id="attendee-email"
                 type="email"
                 class="input"
-                placeholder="you@company.com"
+                placeholder="you@example.com"
                 bind:value={attendeeEmail}
               />
             </div>
@@ -186,7 +246,9 @@
 
             <div class="btn-row">
               <button class="sec-btn" on:click={() => (step = 1)}>&larr; Back</button>
-              <button class="primary-btn" on:click={handleConfirm}>Confirm & Issue Pass</button>
+              <button class="primary-btn" on:click={handleConfirm} disabled={paying}>
+                {paying ? 'Opening Paystack…' : `Pay ${TIERS.find(t => t.id === selectedTierId)?.price} via Paystack 💳`}
+              </button>
             </div>
           </div>
         {:else if step === 3 && confirmedPass}
@@ -198,7 +260,8 @@
               </div>
               <div class="ticket-name">{confirmedPass.name}</div>
               <div class="ticket-meta">
-                <div><span>TIER:</span> {confirmedPass.tier}</div>
+                <div><span>TIER:</span> {confirmedPass.tier} ({confirmedPass.price})</div>
+                <div><span>REF:</span> {confirmedPass.ref}</div>
                 <div><span>BADGE:</span> {confirmedPass.badge}</div>
                 <div><span>ISSUED:</span> {confirmedPass.issuedAt}</div>
               </div>
@@ -219,22 +282,23 @@
   .overlay {
     position: fixed;
     inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     display: flex;
     justify-content: flex-end;
   }
 
   .sheet {
-    width: min(100vw, 480px);
+    width: min(100vw, 560px);
     height: 100%;
     background: var(--bg);
     color: var(--ink);
-    border-left: 2px solid var(--border-soft-deep);
-    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
+    border-left: 1px solid var(--border-soft-deep);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   .sheet-header {
@@ -257,7 +321,7 @@
 
   .sheet-title {
     margin: 0.4rem 0 0;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
   }
 
@@ -270,8 +334,8 @@
   }
 
   .sheet-body {
-    flex: 1;
     padding: 1.5rem;
+    flex: 1;
     overflow-y: auto;
   }
 
@@ -282,64 +346,86 @@
   }
 
   .pane-subtitle {
-    font-size: 1.1rem;
     margin: 0;
-    opacity: 0.9;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .selected-tier-banner {
+    background: rgba(0, 191, 255, 0.1);
+    border: 1px solid var(--blue, #00bfff);
+    color: var(--blue, #00bfff);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
   }
 
   .tier-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 1rem;
   }
 
   .tier-card {
     background: var(--card-surface);
     border: 2px solid var(--border-soft-deep);
     border-radius: 12px;
-    padding: 1rem;
+    padding: 1.2rem;
     cursor: pointer;
     transition: border-color 0.2s ease, transform 0.2s ease;
   }
 
-  .tier-card.active,
   .tier-card:hover {
-    border-color: var(--blue, #00bfff);
     transform: translateY(-2px);
+  }
+
+  .tier-card.active {
+    border-color: var(--blue, #00bfff);
+    box-shadow: 0 4px 14px rgba(0, 191, 255, 0.2);
   }
 
   .tier-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
   }
 
   .tier-name {
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .tier-price {
     font-weight: 700;
-    color: var(--pink-deep, #fc9ce0);
+    font-size: 1.1rem;
+    color: var(--blue, #00bfff);
   }
 
   .tier-desc {
+    margin: 0 0 0.8rem;
     font-size: 0.85rem;
-    margin: 0 0 0.6rem;
-    opacity: 0.8;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .inclusions-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
   }
 
   .perk-list {
-    list-style: none;
-    padding: 0;
     margin: 0;
-    font-size: 0.78rem;
+    padding: 0;
+    list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    opacity: 0.9;
+    gap: 0.35rem;
+    font-size: 0.82rem;
   }
 
   .form-group {
@@ -348,13 +434,7 @@
     gap: 0.4rem;
   }
 
-  .form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .input,
-  .select {
+  .input, .select {
     width: 100%;
     padding: 0.75rem 1rem;
     background: var(--card-surface);
@@ -362,40 +442,54 @@
     border: 1.5px solid var(--border-soft-deep);
     border-radius: 8px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .btn-row {
     display: flex;
-    gap: 0.8rem;
+    gap: 1rem;
+    margin-top: 1rem;
   }
 
   .primary-btn {
     flex: 1;
+    padding: 0.85rem 1.2rem;
     background: var(--blue, #00bfff);
     color: #fff;
     border: none;
-    padding: 0.85rem;
     border-radius: 999px;
     font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 191, 255, 0.3);
+    transition: transform 0.15s ease;
+  }
+
+  .primary-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .primary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .sec-btn {
+    padding: 0.85rem 1.2rem;
     background: transparent;
     color: var(--ink);
     border: 1.5px solid var(--border-soft-deep);
-    padding: 0.85rem 1.2rem;
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
   }
 
   .pass-ticket {
-    background: var(--card-surface);
-    border: 2px dashed var(--blue, #00bfff);
-    border-radius: 14px;
+    background: linear-gradient(135deg, #00bfff 0%, #fc9ce0 100%);
+    color: #fff;
     padding: 1.5rem;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -405,29 +499,24 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .t-badge {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--blue, #00bfff);
-  }
-
-  .t-code {
-    font-family: monospace;
+    font-size: 0.75rem;
     font-weight: 700;
   }
 
   .ticket-name {
-    font-size: 1.6rem;
-    font-weight: 700;
+    font-family: "Permanent Marker", cursive;
+    font-size: 1.5rem;
   }
 
   .ticket-meta {
-    font-size: 0.85rem;
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
+    font-size: 0.8rem;
   }
 
+  .ticket-meta span {
+    font-weight: 700;
+    opacity: 0.8;
+  }
 </style>

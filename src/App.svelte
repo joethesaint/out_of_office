@@ -26,6 +26,8 @@
   import OooGeneratorModal from "./lib/OooGeneratorModal.svelte";
   import ScheduleFAQ from "./lib/ScheduleFAQ.svelte";
   import EventTrail from "./lib/EventTrail.svelte";
+  import CountdownTimer from "./lib/CountdownTimer.svelte";
+  import ScrollToTop from "./lib/ScrollToTop.svelte";
   import { clearAllToasts } from "./lib/toastStore.js";
   import dropletBlue from "../docs/brand-reference/paint-droplet-blue.png";
   import dropletPink from "../docs/brand-reference/paint-droplet-pink.png";
@@ -91,7 +93,16 @@
     smoothRafId = requestAnimationFrame(smoothTick);
   }
 
+  let isScrolledPast80 = false;
+  let isScrolledPast500 = false;
+  let showStickyCta = false;
+  let ticketsEl;
+
   function readProgress() {
+    isScrolledPast80 = typeof window !== 'undefined' && window.scrollY > 80;
+    isScrolledPast500 = typeof window !== 'undefined' && window.scrollY > 500;
+    showStickyCta = typeof window !== 'undefined' && window.scrollY > window.innerHeight * 0.8;
+
     if (!scrollTrack) return;
     const rect = scrollTrack.getBoundingClientRect();
     const total = rect.height - window.innerHeight;
@@ -166,9 +177,13 @@
   }
 
   function onActivateClick() {
-    if (!scrollTrack) return;
-    const rect = scrollTrack.getBoundingClientRect();
-    easedScrollTo(window.scrollY + rect.top + window.innerHeight * 1.5);
+    const ticketsSection = document.querySelector('.tickets-section');
+    if (ticketsSection) {
+      ticketsSection.scrollIntoView({ behavior: 'smooth' });
+    } else if (scrollTrack) {
+      const rect = scrollTrack.getBoundingClientRect();
+      easedScrollTo(window.scrollY + rect.top + window.innerHeight * 1.5);
+    }
   }
 
   let shareConfirmed = false;
@@ -239,6 +254,13 @@
 
 <BootSequence />
 
+<HeaderBar
+  scrollState={isScrolledPast80 ? 'frosted' : 'transparent'}
+  onOpenDrawer={openDrawer}
+  onOpenOooGen={openOooGen}
+  onStatusChange={handleStatusChange}
+/>
+
 <div class="scroll-track" bind:this={scrollTrack}>
   <div class="pinned">
     <div class="stage-wrap">
@@ -246,12 +268,6 @@
       <!-- Chaos Layer chat bubbles outside of the main postcard card to frame the digital noise around our escape -->
       <ChaosLayer progress={smoothedProgress} forceOnline={isOnline} />
       <main class="frame">
-        <HeaderBar
-          onOpenCmdK={openCmdK}
-          onOpenDrawer={openDrawer}
-          onOpenOooGen={openOooGen}
-          onStatusChange={handleStatusChange}
-        />
         <ZineDecorations />
 
         <div class="hero">
@@ -294,6 +310,7 @@
                 <span class="stamp">OOO 0x03</span>
                 <span class="venue">Tarkwa Bay · Aug 15</span>
               </div>
+              <CountdownTimer targetDateStr="August 15, 2026 12:00:00" />
               <div class="tagline">
                 <span>Release. Unwind. Reconnect.</span>
                 <span class="sub">Auto replies enabled. Stress disabled.</span>
@@ -341,13 +358,14 @@
 <ScrollReveal let:visible><Community {visible} /></ScrollReveal>
 <ScrollReveal let:visible><MemoryTimeline {visible} /></ScrollReveal>
 <ScrollReveal let:visible><Playlist {visible} /></ScrollReveal>
-<ScrollReveal let:visible><Tickets {visible} /></ScrollReveal>
+<ScrollReveal let:visible><Tickets {visible} showSticky={showStickyCta} onOpenDrawer={openDrawer} /></ScrollReveal>
 
 <ScheduleFAQ />
 
 <RsvpDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
 <CommandPalette isOpen={isCmdKOpen} onClose={closeCmdK} onOpenDrawer={openDrawer} onOpenOooGen={openOooGen} />
 <OooGeneratorModal isOpen={isOooGenOpen} onClose={closeOooGen} />
+<ScrollToTop />
 <ToastSystem />
 
 <div class="stats-toast" class:visible={showStats} role="status">

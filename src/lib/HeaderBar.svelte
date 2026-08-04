@@ -1,11 +1,11 @@
 <script>
   import { isDark, toggleTheme } from './theme.js';
-  import AudioControlDeck from './AudioControlDeck.svelte';
+  import { muted, toggleMute } from './ambientSound.js';
 
-  export let onOpenCmdK = () => {};
   export let onOpenDrawer = () => {};
   export let onOpenOooGen = () => {};
   export let onStatusChange = (onlineState) => {};
+  export let scrollState = 'transparent'; // 'transparent' | 'frosted' | 'cream'
 
   let isOnline = false;
   let statusToast = false;
@@ -15,18 +15,18 @@
     isOnline = !isOnline;
     onStatusChange(isOnline);
     statusMessage = isOnline 
-      ? 'STATUS: ONLINE ⚡ — Live popups & notifications active!' 
-      : 'STATUS: AWAY 🌴 — Disconnected & popups muted.';
+      ? 'ONLINE ⚡ — Connected and receiving workspace alerts.' 
+      : 'AWAY 🌴 — Muting notifications. Making room for life.';
     statusToast = true;
     setTimeout(() => { statusToast = false; }, 3200);
   }
 </script>
 
-<header class="bar-container">
+<header class="bar-container {scrollState}">
   <div class="bar">
     <!-- Left: Brand -->
     <a href="#/about" class="brand-link" title="What We Are">
-      OOO LAGOS
+      OUT OF OFFICE
     </a>
 
     <!-- Left-Middle: Minimal Status Dot -->
@@ -35,6 +35,7 @@
       class="status-pill" 
       class:online={isOnline}
       on:click={toggleStatus} 
+      aria-pressed={isOnline}
       title="Toggle status"
     >
       <span class="live-dot" aria-hidden="true"></span>
@@ -46,16 +47,21 @@
     <!-- Right: Actions -->
     <nav class="actions-wrap">
       <button type="button" class="action-pill" on:click={onOpenDrawer}>
-        EVENT PASS
+        OOO PASS
       </button>
 
       <button type="button" class="action-pill" on:click={onOpenOooGen}>
         AUTO-REPLY
       </button>
 
-      <div class="audio-deck-wrap">
-        <AudioControlDeck />
-      </div>
+      <button
+        type="button"
+        class="action-pill"
+        on:click={toggleMute}
+        title="Toggle Sound"
+      >
+        {#if $muted} UNMUTE {:else} MUTE {/if}
+      </button>
 
       <button
         type="button"
@@ -79,7 +85,7 @@
   /* Hallmark N5 Floating Pill Navigation */
   .bar-container {
     position: sticky;
-    top: 1rem;
+    top: calc(1rem + env(safe-area-inset-top));
     z-index: 1000;
     width: calc(100% - 2rem);
     max-width: 1000px;
@@ -89,15 +95,46 @@
   .bar {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background: color-mix(in srgb, var(--card-surface) 80%, transparent);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid var(--border-soft);
     border-radius: 999px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: background 0.3s ease, 
+                border-color 0.3s ease, 
+                box-shadow 0.3s ease;
+  }
+
+  /* Keyboard Focus Rings */
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 4px;
+  }
+
+  /* State 1: Transparent (0-80px) */
+  .bar-container.transparent .bar {
+    background: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* State 2: Frosted / Blur (80px - 500px) */
+  .bar-container.frosted .bar {
+    background: color-mix(in srgb, var(--card-surface) 60%, transparent);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+
+  /* State 3: Solid Cream (Past 500px) */
+  .bar-container.cream .bar {
+    background: var(--bg);
+    border: 1px solid var(--border-soft-deep);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .brand-link {
@@ -109,6 +146,7 @@
     text-decoration: none;
     padding-left: 0.5rem;
     white-space: nowrap;
+    border-radius: 999px;
   }
 
   .spacer {
@@ -119,8 +157,8 @@
   .status-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.6rem;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 999px;
     background: transparent;
     border: 1px solid transparent;
@@ -136,7 +174,7 @@
     height: 6px;
     border-radius: 50%;
     background: var(--muted);
-    transition: background 0.3s ease;
+    transition: background 0.2s ease;
   }
   .status-pill.online .live-dot {
     background: var(--chaos-yellow);
@@ -165,7 +203,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 0.75rem;
     font-family: var(--sans);
     font-size: 0.65rem;
     font-weight: 700;
@@ -181,17 +219,11 @@
   .action-pill:hover {
     background: var(--border-soft);
   }
-  
-  .audio-deck-wrap {
-    display: flex;
-    align-items: center;
-    margin: 0 0.25rem;
-  }
 
   /* Status Toast */
   .status-toast {
     position: absolute;
-    top: calc(100% + 12px);
+    top: calc(100% + 0.75rem);
     left: 50%;
     transform: translateX(-50%);
     background: var(--ink);
@@ -203,7 +235,7 @@
     font-weight: 600;
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     white-space: nowrap;
-    animation: fadeIn 0.25s ease-out;
+    animation: fadeIn 0.2s ease-out;
   }
   .status-toast.online {
     background: var(--chaos-yellow);
@@ -217,7 +249,7 @@
 
   @media (max-width: 768px) {
     .action-pill {
-      padding: 0.4rem 0.5rem;
+      padding: 0.5rem 0.5rem;
       font-size: 0.55rem;
     }
   }
