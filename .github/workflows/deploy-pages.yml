@@ -34,7 +34,7 @@ jobs:
       - name: Build static bundle with base path 🏗️
         env:
           VITE_PAYSTACK_PUBLIC_KEY: ${{ secrets.VITE_PAYSTACK_PUBLIC_KEY }}
-        run: npx vite build --base=/out_of_office/
+        run: npx vite build --base=/
 
       - name: Setup Pages 📐
         uses: actions/configure-pages@v5
