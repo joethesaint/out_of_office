@@ -22,6 +22,8 @@ jobs:
         run: npm ci || npm install
 
       - name: Build static bundle with base path 🏗️
+        env:
+          VITE_PAYSTACK_PUBLIC_KEY: ${{ secrets.VITE_PAYSTACK_PUBLIC_KEY }}
         run: npx vite build --base=/out-of-office/
 
       - name: Checkout Portfolio Repository 🚀
